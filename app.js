@@ -9,8 +9,7 @@
 // cuando lo despliegues. Ejemplo: "https://astro-transits-api.onrender.com"
 // Si lo dejas con YOUR-BACKEND-NAME, el frontend no podrá conectarse
 // cuando esté en producción.
-const PRODUCTION_BACKEND_URL = "https://YOUR-BACKEND-NAME.onrender.com";
-
+const PRODUCTION_BACKEND_URL = "https://astro-transits-api-planets.onrender.com";
 function getDefaultBackendUrl() {
   const host = window.location.hostname;
   // Si estamos en localhost o IP local, usar backend local
