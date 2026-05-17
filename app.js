@@ -41,7 +41,7 @@ const i18n = {
     planetNow: "Planeta en este momento",
     planetHouse: "Casa natal que está transitando",
     aspectCount: "Aspectos exactos a tus planetas natales",
-    tabInterpret: "Interpretación", tabAspects: "Aspectos actuales", tabCalendar: "Calendario 12 meses",
+    tabInterpret: "Interpretación", tabLecturaRP: "Lectura Ricardo Puerta", tabAspects: "Aspectos actuales", tabCalendar: "Calendario 12 meses",
     tabChart: "Carta detallada", tabSummary: "Sumario",
     aspectsTitle: "Aspectos exactos por tránsito",
     chartTitle: "Tu carta natal completa",
@@ -78,7 +78,7 @@ const i18n = {
     planetNow: "Planet right now",
     planetHouse: "Natal house being transited",
     aspectCount: "Exact aspects to your natal planets",
-    tabInterpret: "Interpretation", tabAspects: "Current aspects", tabCalendar: "12-month calendar",
+    tabInterpret: "Interpretation", tabLecturaRP: "Ricardo Puerta Reading", tabAspects: "Current aspects", tabCalendar: "12-month calendar",
     tabChart: "Detailed chart", tabSummary: "Summary",
     aspectsTitle: "Exact aspects by transit",
     chartTitle: "Your full natal chart",
@@ -1846,6 +1846,179 @@ function renderSummary(data) {
 }
 
 // ============================================================
+// LECTURA RICARDO PUERTA — Integración con biblioteca de 367 textos
+// ============================================================
+
+// Etiquetas de cada tipo de interpretación
+const RP_TIPO_LABELS = {
+  es: {
+    planeta_en_signo: 'Planetas en signos',
+    planeta_en_casa: 'Planetas en casas',
+    nodo_norte: 'Nodo Norte',
+    nodo_sur: 'Nodo Sur',
+    fortuna_signo: 'Parte de la Fortuna en signo',
+    fortuna_casa: 'Parte de la Fortuna en casa',
+    aspecto: 'Aspectos planetarios'
+  },
+  en: {
+    planeta_en_signo: 'Planets in signs',
+    planeta_en_casa: 'Planets in houses',
+    nodo_norte: 'North Node',
+    nodo_sur: 'South Node',
+    fortuna_signo: 'Part of Fortune in sign',
+    fortuna_casa: 'Part of Fortune in house',
+    aspecto: 'Planetary aspects'
+  }
+};
+
+const RP_ORDEN_CATEGORIAS = ['planeta_en_signo', 'planeta_en_casa', 'nodo_norte', 'nodo_sur', 'fortuna_signo', 'fortuna_casa', 'aspecto'];
+
+// Convierte texto plano con \n\n y **bold** a HTML con párrafos y negritas
+function rpFormatTexto(texto) {
+  if (!texto) return '';
+  // Escapar HTML peligroso
+  let html = texto
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  // Convertir **texto** a <strong>texto</strong>
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // Convertir \n\n a párrafos separados
+  const parrafos = html.split(/\n\n+/).map(p => p.trim()).filter(p => p.length > 0);
+  return parrafos.map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+}
+
+// Genera el título de cada interpretación según su tipo
+function rpTituloInterpretacion(clave, item, lang) {
+  const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
+  const PLANETA_LABEL = {
+    es: { sol:'Sol', luna:'Luna', mercurio:'Mercurio', venus:'Venus', marte:'Marte', jupiter:'Júpiter', saturno:'Saturno', urano:'Urano', neptuno:'Neptuno', pluton:'Plutón', quiron:'Quirón' },
+    en: { sol:'Sun', luna:'Moon', mercurio:'Mercury', venus:'Venus', marte:'Mars', jupiter:'Jupiter', saturno:'Saturn', urano:'Uranus', neptuno:'Neptune', pluton:'Pluto', quiron:'Chiron' }
+  };
+  const SIGNO_LABEL = {
+    es: { aries:'Aries', tauro:'Tauro', geminis:'Géminis', cancer:'Cáncer', leo:'Leo', virgo:'Virgo', libra:'Libra', escorpio:'Escorpio', sagitario:'Sagitario', capricornio:'Capricornio', acuario:'Acuario', piscis:'Piscis' },
+    en: { aries:'Aries', tauro:'Taurus', geminis:'Gemini', cancer:'Cancer', leo:'Leo', virgo:'Virgo', libra:'Libra', escorpio:'Scorpio', sagitario:'Sagittarius', capricornio:'Capricorn', acuario:'Aquarius', piscis:'Pisces' }
+  };
+  const en = lang === 'en';
+  const casaWord = en ? 'House' : 'Casa';
+  const inWord = en ? 'in' : 'en';
+
+  if (item.tipo === 'planeta_en_signo') {
+    return `${PLANETA_LABEL[lang][item.planeta]} ${inWord} ${SIGNO_LABEL[lang][item.signo]}`;
+  }
+  if (item.tipo === 'planeta_en_casa') {
+    return `${PLANETA_LABEL[lang][item.planeta]} ${inWord} ${casaWord} ${item.casa}`;
+  }
+  if (item.tipo === 'nodo_norte') {
+    return `${en ? 'North Node' : 'Nodo Norte'} ${inWord} ${SIGNO_LABEL[lang][item.signo]}`;
+  }
+  if (item.tipo === 'nodo_sur') {
+    return `${en ? 'South Node' : 'Nodo Sur'} ${inWord} ${SIGNO_LABEL[lang][item.signo]}`;
+  }
+  if (item.tipo === 'fortuna_signo') {
+    return `${en ? 'Part of Fortune' : 'Parte de la Fortuna'} ${inWord} ${SIGNO_LABEL[lang][item.signo]}`;
+  }
+  if (item.tipo === 'fortuna_casa') {
+    return `${en ? 'Part of Fortune' : 'Parte de la Fortuna'} ${inWord} ${casaWord} ${item.casa}`;
+  }
+  if (item.tipo === 'aspecto') {
+    const aspectoLabel = item.aspecto || '';
+    return `${PLANETA_LABEL[lang][item.planeta1]} — ${PLANETA_LABEL[lang][item.planeta2]} (${aspectoLabel})`;
+  }
+  return clave;
+}
+
+// Cache para evitar re-fetch innecesario
+let rpCachedKey = null;
+let rpCachedHtml = null;
+
+async function cargarLecturaRP() {
+  if (!currentResult) return;
+
+  const container = document.getElementById('lectura-rp-content');
+  if (!container) return;
+
+  const lang = currentLang;
+  const bd = currentResult.birth_data;
+  // Crear clave única para cache (datos + idioma)
+  const cacheKey = `${bd.datetime}|${bd.latitude}|${bd.longitude}|${lang}`;
+
+  // Si ya cargamos lo mismo, no volver a llamar al backend
+  if (rpCachedKey === cacheKey && rpCachedHtml) {
+    container.innerHTML = rpCachedHtml;
+    return;
+  }
+
+  container.innerHTML = `<p style="text-align:center; color: var(--ink-faint); padding: 2rem;">${lang === 'es' ? 'Cargando lectura profunda...' : 'Loading deep reading...'}</p>`;
+
+  const backendUrl = backendUrlInput.value.trim().replace(/\/$/, '');
+
+  try {
+    const res = await fetch(backendUrl + '/interpret-chart', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: bd.name,
+        year: parseInt(bd.datetime.slice(0, 4)),
+        month: parseInt(bd.datetime.slice(5, 7)),
+        day: parseInt(bd.datetime.slice(8, 10)),
+        hour: parseInt(bd.datetime.slice(11, 13)),
+        minute: parseInt(bd.datetime.slice(14, 16)),
+        latitude: bd.latitude,
+        longitude: bd.longitude,
+        city_name: bd.city,
+        use_lmt: bd.use_lmt,
+        transit_planet: currentFocusPlanet
+      })
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    const interpretaciones = data.interpretaciones && data.interpretaciones.textos ? data.interpretaciones.textos : {};
+    const total = data.interpretaciones && data.interpretaciones.total ? data.interpretaciones.total : 0;
+
+    // Agrupar por categoría
+    const porCategoria = {};
+    Object.entries(interpretaciones).forEach(([clave, item]) => {
+      const tipo = item.tipo || 'aspecto';
+      if (!porCategoria[tipo]) porCategoria[tipo] = [];
+      porCategoria[tipo].push({ clave, item });
+    });
+
+    // Construir HTML
+    let html = `<p class="lead">${lang === 'es' ? `Lectura profunda de tu carta natal — <strong>${total} interpretaciones</strong> en la voz de Ricardo Puerta.` : `Deep reading of your natal chart — <strong>${total} interpretations</strong> in Ricardo Puerta's voice.`}</p>`;
+
+    RP_ORDEN_CATEGORIAS.forEach(cat => {
+      if (!porCategoria[cat] || porCategoria[cat].length === 0) return;
+
+      const catLabel = RP_TIPO_LABELS[lang][cat] || cat;
+      html += `<h3 style="border-top: 1px solid var(--line); padding-top: 2rem; margin-top: 3rem;">${catLabel}</h3>`;
+
+      porCategoria[cat].forEach(({ clave, item }) => {
+        const titulo = rpTituloInterpretacion(clave, item, lang);
+        const textoHtml = rpFormatTexto(item.texto || '');
+        html += `<div style="margin-bottom: 2.5rem;">`;
+        html += `<h4 style="font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; font-weight: 500; color: var(--uranus); margin: 1.5rem 0 1rem 0;">${titulo}</h4>`;
+        html += textoHtml;
+        html += `</div>`;
+      });
+    });
+
+    // Guardar en cache
+    rpCachedKey = cacheKey;
+    rpCachedHtml = html;
+
+    container.innerHTML = html;
+  } catch (err) {
+    console.error('Error cargando Lectura RP:', err);
+    container.innerHTML = `<p style="text-align:center; color: var(--error); padding: 2rem;">${lang === 'es' ? 'Error al cargar la lectura. Verifica la conexión con el backend.' : 'Error loading reading. Check backend connection.'}<br><small style="opacity:0.7;">${err.message}</small></p>`;
+  }
+}
+
+// ============================================================
 // REFETCH WITH NEW FOCUS PLANET
 // ============================================================
 async function refreshFocusPlanet() {
@@ -1891,6 +2064,7 @@ document.querySelectorAll('.tab').forEach(tab => {
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     tab.classList.add('active');
     document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    if (tab.dataset.tab === 'lectura-rp') cargarLecturaRP();
   });
 });
 
