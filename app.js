@@ -1874,8 +1874,15 @@ const RP_TIPO_LABELS = {
 const RP_ORDEN_CATEGORIAS = ['planeta_en_signo', 'planeta_en_casa', 'nodo_norte', 'nodo_sur', 'fortuna_signo', 'fortuna_casa', 'aspecto'];
 
 // Convierte texto plano con \n\n y **bold** a HTML con párrafos y negritas
-function rpFormatTexto(texto) {
+// Si se pasa aspectoFiltrar, filtra el texto para mostrar solo ese aspecto específico
+function rpFormatTexto(texto, aspectoFiltrar) {
   if (!texto) return '';
+
+  // Si hay un aspecto a filtrar, hacer el filtrado antes de procesar el HTML
+  if (aspectoFiltrar) {
+    texto = rpFiltrarPorAspecto(texto, aspectoFiltrar);
+  }
+
   // Escapar HTML peligroso
   let html = texto
     .replace(/&/g, '&amp;')
@@ -1886,6 +1893,70 @@ function rpFormatTexto(texto) {
   // Convertir \n\n a párrafos separados
   const parrafos = html.split(/\n\n+/).map(p => p.trim()).filter(p => p.length > 0);
   return parrafos.map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+}
+
+// Filtra el texto de aspectos para mostrar solo el aspecto específico
+// que tiene la persona, manteniendo introducción y cierre genéricos
+function rpFiltrarPorAspecto(texto, nombreAspecto) {
+  if (!texto || !nombreAspecto) return texto;
+
+  // Los 5 tipos de aspectos en el orden en que aparecen en los textos
+  const aspectos = ['Conjunción', 'Sextil', 'Cuadratura', 'Trígono', 'Oposición'];
+
+  // Verificar que el aspecto a filtrar es uno de los conocidos
+  if (!aspectos.includes(nombreAspecto)) return texto;
+
+  // Dividir en párrafos
+  const parrafos = texto.split(/\n\n+/);
+
+  const intro = [];           // Párrafos antes del primer aspecto
+  const aspectoElegido = [];  // Párrafos del aspecto que aplica
+  const cierre = [];          // Párrafos finales (Spoiler ácido, trabajo evolutivo)
+
+  let estadoActual = 'intro'; // 'intro' | 'aspecto_actual' | 'otro_aspecto' | 'cierre'
+
+  for (const p of parrafos) {
+    // Detectar si el párrafo empieza con un encabezado de aspecto (**Conjunción...**, **Sextil...**, etc.)
+    let esEncabezadoAspecto = false;
+    let aspectoDelParrafo = null;
+    for (const asp of aspectos) {
+      // Regex: empieza con **Aspecto (signo glyph)** o **Aspecto X-Y**
+      const regex = new RegExp(`^\\*\\*${asp}\\b`, 'i');
+      if (regex.test(p.trim())) {
+        esEncabezadoAspecto = true;
+        aspectoDelParrafo = asp;
+        break;
+      }
+    }
+
+    // Detectar si el párrafo empieza con "Spoiler ácido" o cierre típico
+    const esCierre = /^(Spoiler ácido|Otro pecado|Y un tercer|Otro riesgo|Tu camino evolutivo|Tu trabajo evolutivo|Cuando alineas)/i.test(p.trim());
+
+    if (esEncabezadoAspecto) {
+      if (aspectoDelParrafo === nombreAspecto) {
+        estadoActual = 'aspecto_actual';
+        aspectoElegido.push(p);
+      } else {
+        estadoActual = 'otro_aspecto';
+      }
+    } else if (esCierre) {
+      estadoActual = 'cierre';
+      cierre.push(p);
+    } else {
+      // Continuar en el estado actual
+      if (estadoActual === 'intro') {
+        intro.push(p);
+      } else if (estadoActual === 'aspecto_actual') {
+        aspectoElegido.push(p);
+      } else if (estadoActual === 'cierre') {
+        cierre.push(p);
+      }
+      // Si es 'otro_aspecto', se ignora (no se agrega a nada)
+    }
+  }
+
+  // Reconstruir: intro + aspecto elegido + cierre
+  return [...intro, ...aspectoElegido, ...cierre].join('\n\n');
 }
 
 // Genera el título de cada interpretación según su tipo
@@ -1999,7 +2070,9 @@ async function cargarLecturaRP() {
 
       porCategoria[cat].forEach(({ clave, item }) => {
         const titulo = rpTituloInterpretacion(clave, item, lang);
-        const textoHtml = rpFormatTexto(item.texto || '');
+        // Si es aspecto, pasar el nombre del aspecto para filtrar el texto
+        const aspectoFiltrar = item.tipo === 'aspecto' ? item.aspecto : null;
+        const textoHtml = rpFormatTexto(item.texto || '', aspectoFiltrar);
         html += `<div style="margin-bottom: 2.5rem;">`;
         html += `<h4 style="font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; font-weight: 500; color: var(--uranus); margin: 1.5rem 0 1rem 0;">${titulo}</h4>`;
         html += textoHtml;
