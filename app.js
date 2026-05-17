@@ -2073,8 +2073,51 @@ async function cargarLecturaRP() {
         // Si es aspecto, pasar el nombre del aspecto para filtrar el texto
         const aspectoFiltrar = item.tipo === 'aspecto' ? item.aspecto : null;
         const textoHtml = rpFormatTexto(item.texto || '', aspectoFiltrar);
+
+        // Detectar si es un aspecto entre planetas transgeneracionales / kármicos
+        // (estos textos no tienen secciones específicas por aspecto)
+        const planetasTransgeneracionales = ['saturno', 'urano', 'neptuno', 'pluton', 'quiron'];
+        const esTransgeneracional = item.tipo === 'aspecto' &&
+          planetasTransgeneracionales.includes(item.planeta1) &&
+          planetasTransgeneracionales.includes(item.planeta2);
+
+        // Generar nota explicativa según el tipo de aspecto
+        let notaTransgeneracional = '';
+        if (esTransgeneracional && item.aspecto) {
+          const aspectoLower = item.aspecto.toLowerCase();
+          let matizDescripcion = '';
+          if (lang === 'es') {
+            if (aspectoLower === 'trígono' || aspectoLower === 'sextil') {
+              matizDescripcion = `el matiz específico del <strong>${item.aspecto}</strong> se vive como una versión más fluida y armónica de esta dinámica`;
+            } else if (aspectoLower === 'cuadratura' || aspectoLower === 'oposición') {
+              matizDescripcion = `el matiz específico del <strong>${item.aspecto}</strong> se vive como una versión más tensa y exigente de esta dinámica`;
+            } else if (aspectoLower === 'conjunción') {
+              matizDescripcion = `el matiz específico de la <strong>Conjunción</strong> se vive como una fusión intensa de esta dinámica`;
+            } else {
+              matizDescripcion = `el matiz específico del <strong>${item.aspecto}</strong> modula esta dinámica`;
+            }
+            notaTransgeneracional = `<div style="background: var(--accent-soft); border-left: 3px solid var(--accent); padding: 0.85rem 1.15rem; border-radius: 4px; margin-bottom: 1.25rem; font-size: 0.88rem; line-height: 1.6;">
+              <strong style="color: var(--accent);">ℹ️ Aspecto transgeneracional</strong> — El texto que sigue describe la dinámica general entre estos dos planetas, que afecta a generaciones enteras. Para tu carta personal, ${matizDescripcion}.
+            </div>`;
+          } else {
+            if (aspectoLower === 'trine' || aspectoLower === 'sextile') {
+              matizDescripcion = `the specific nuance of the <strong>${item.aspecto}</strong> is experienced as a more fluid, harmonic version of this dynamic`;
+            } else if (aspectoLower === 'square' || aspectoLower === 'opposition') {
+              matizDescripcion = `the specific nuance of the <strong>${item.aspecto}</strong> is experienced as a tenser, more demanding version of this dynamic`;
+            } else if (aspectoLower === 'conjunction') {
+              matizDescripcion = `the specific nuance of the <strong>Conjunction</strong> is experienced as an intense fusion of this dynamic`;
+            } else {
+              matizDescripcion = `the specific nuance of the <strong>${item.aspecto}</strong> modulates this dynamic`;
+            }
+            notaTransgeneracional = `<div style="background: var(--accent-soft); border-left: 3px solid var(--accent); padding: 0.85rem 1.15rem; border-radius: 4px; margin-bottom: 1.25rem; font-size: 0.88rem; line-height: 1.6;">
+              <strong style="color: var(--accent);">ℹ️ Transgenerational aspect</strong> — The text that follows describes the general dynamic between these two planets, which affects entire generations. For your personal chart, ${matizDescripcion}.
+            </div>`;
+          }
+        }
+
         html += `<div style="margin-bottom: 2.5rem;">`;
         html += `<h4 style="font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; font-weight: 500; color: var(--uranus); margin: 1.5rem 0 1rem 0;">${titulo}</h4>`;
+        html += notaTransgeneracional;
         html += textoHtml;
         html += `</div>`;
       });
