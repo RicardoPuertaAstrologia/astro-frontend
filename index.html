@@ -425,16 +425,23 @@
 
     <!-- TABS -->
     <div class="tabs">
-      <button class="tab active" data-tab="interpretation" data-i18n="tabInterpret">Interpretación</button>
-      <button class="tab" data-tab="aspects" data-i18n="tabAspects">Aspectos actuales</button>
-      <button class="tab" data-tab="calendar" data-i18n="tabCalendar">Calendario 12 meses</button>
-      <button class="tab" data-tab="chart-detail" data-i18n="tabChart">Carta detallada</button>
-      <button class="tab" data-tab="summary" data-i18n="tabSummary">Sumario</button>
+  <button class="tab active" data-tab="interpretation" data-i18n="tabInterpret">Interpretación</button>
+  <button class="tab" data-tab="lectura-rp" data-i18n="tabLecturaRP">Lectura Ricardo Puerta</button>
+  <button class="tab" data-tab="aspects" data-i18n="tabAspects">Aspectos actuales</button>
+  <button class="tab" data-tab="calendar" data-i18n="tabCalendar">Calendario 12 meses</button>
+  <button class="tab" data-tab="chart-detail" data-i18n="tabChart">Carta detallada</button>
+  <button class="tab" data-tab="summary" data-i18n="tabSummary">Sumario</button>
     </div>
 
     <!-- TAB CONTENTS -->
     <div class="tab-content active" id="tab-interpretation">
-      <article class="interpretation" id="interpretation-content"></article>
+  <article class="interpretation" id="interpretation-content"></article>
+    </div>
+    
+    <div class="tab-content" id="tab-lectura-rp">
+  <article class="interpretation" id="lectura-rp-content">
+    <p style="text-align:center; color: var(--ink-faint); padding: 2rem;">Cargando lectura profunda...</p>
+  </article>
     </div>
 
     <div class="tab-content" id="tab-aspects">
