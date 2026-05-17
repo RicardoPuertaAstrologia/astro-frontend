@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Astro · Tránsitos & Carta Natal</title>
+<title>Ricardo Puerta Isaza · Astrología</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <style>
   /* ============================================================
      CSS Variables — Modo claro (default) y oscuro (auto)
@@ -78,12 +79,17 @@
     background: var(--surface); position: sticky; top: 0; z-index: 100;
     backdrop-filter: blur(8px); background: color-mix(in srgb, var(--surface) 85%, transparent);
   }
-  .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 500; display: flex; align-items: center; gap: 0.6rem; }
-  .logo .uranus-glyph { color: var(--uranus); width: 1.4em; height: 1.4em; }
-  .top-actions { display: flex; gap: 0.75rem; align-items: center; }
-  .lang-switch { display: flex; gap: 0.5rem; background: var(--bg); padding: 0.25rem; border-radius: 999px; border: 1px solid var(--line); }
-  .lang-btn { background: none; border: none; padding: 0.4rem 0.9rem; border-radius: 999px; font-family: inherit; font-size: 0.8rem; font-weight: 500; color: var(--ink-soft); cursor: pointer; transition: all 0.2s; }
-  .lang-btn.active { background: var(--ink); color: var(--bg); }
+  .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 500; display: flex; align-items: center; gap: 0.7rem; }
+.logo .uranus-glyph { color: var(--uranus); width: 1.4em; height: 1.4em; }
+.brand-logo { width: 38px; height: 38px; color: var(--ink); display: block; }
+.brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+.brand-name { font-size: 1.05rem; font-weight: 500; letter-spacing: 0.01em; color: var(--ink); }
+.brand-tagline { font-family: 'Inter', sans-serif; font-size: 0.7rem; font-weight: 400; color: var(--ink-faint); letter-spacing: 0.05em; font-style: italic; margin-top: 0.1rem; }
+@media (max-width: 600px) {
+  .brand-tagline { display: none; }
+  .brand-name { font-size: 0.95rem; }
+  .brand-logo { width: 32px; height: 32px; }
+  }
 
   .container { max-width: 1180px; margin: 0 auto; padding: 3rem 2rem 5rem; }
 
@@ -297,8 +303,11 @@
 
 <header class="top-bar">
   <div class="logo">
-    <svg class="uranus-glyph"><use href="#glyph-uranus"/></svg>
-    <span class="display-font">Astro</span>
+    <img src="assets/logo-simbolo.svg" alt="Ricardo Puerta Isaza" class="brand-logo">
+    <div class="brand-text">
+      <span class="brand-name display-font">Ricardo Puerta Isaza</span>
+      <span class="brand-tagline">arquitecto y astrólogo</span>
+    </div>
   </div>
   <div class="top-actions">
     <div class="lang-switch">
