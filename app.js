@@ -2265,11 +2265,12 @@ document.getElementById('download-png-btn').addEventListener('click', async () =
   const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(blob);
 
-  // Tamaños: canvas total 1200x1400 (carta 1200x1200 + logo abajo 1200x200)
-  const CANVAS_WIDTH = 1200;
+  // Tamaños: carta con padding + zona del logo
+  const CANVAS_WIDTH = 1300;
+  const CHART_PADDING = 50;  // Margen para que no se corten MC/IC
   const CHART_SIZE = 1200;
-  const LOGO_AREA_HEIGHT = 200;
-  const CANVAS_HEIGHT = CHART_SIZE + LOGO_AREA_HEIGHT;
+  const LOGO_AREA_HEIGHT = 280;
+  const CANVAS_HEIGHT = CHART_SIZE + (CHART_PADDING * 2) + LOGO_AREA_HEIGHT;
 
   const img = new Image();
   img.onload = async () => {
@@ -2278,20 +2279,29 @@ document.getElementById('download-png-btn').addEventListener('click', async () =
     canvas.height = CANVAS_HEIGHT;
     const ctx = canvas.getContext('2d');
     const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Colores según modo
+    const bgColor = dark ? '#1a1816' : '#fafaf7';
+    const inkColor = dark ? '#efece5' : '#1a1a1a';
+    const lineColor = dark ? '#3d3a35' : '#d4d2c8';
+    const inkFaintColor = dark ? '#807a6e' : '#8a897f';
     // Fondo
-    ctx.fillStyle = dark ? '#1a1816' : '#fafaf7';
+    ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    // Dibujar la carta natal
-    ctx.drawImage(img, 0, 0, CHART_SIZE, CHART_SIZE);
+    // Dibujar la carta natal con padding (centrada horizontalmente)
+    const chartX = (CANVAS_WIDTH - CHART_SIZE) / 2;
+    const chartY = CHART_PADDING;
+    ctx.drawImage(img, chartX, chartY, CHART_SIZE, CHART_SIZE);
+
     // Línea divisoria sutil
-    ctx.strokeStyle = dark ? '#3d3a35' : '#d4d2c8';
+    const dividerY = CHART_SIZE + (CHART_PADDING * 2) - 20;
+    ctx.strokeStyle = lineColor;
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(CANVAS_WIDTH * 0.15, CHART_SIZE + 30);
-    ctx.lineTo(CANVAS_WIDTH * 0.85, CHART_SIZE + 30);
+    ctx.moveTo(CANVAS_WIDTH * 0.2, dividerY);
+    ctx.lineTo(CANVAS_WIDTH * 0.8, dividerY);
     ctx.stroke();
 
-    // Función auxiliar: descarga el PNG (con o sin logo)
+    // Función auxiliar: descarga el PNG
     const descargarPNG = () => {
       canvas.toBlob(b => {
         const a = document.createElement('a');
@@ -2304,35 +2314,59 @@ document.getElementById('download-png-btn').addEventListener('click', async () =
       URL.revokeObjectURL(url);
     };
 
-    // Cargar el logo completo y dibujarlo debajo de la carta
+    // Función auxiliar: dibujar texto del logo con canvas (más confiable que SVG text)
+    const dibujarTextoLogo = (centerY) => {
+      // Nombre principal
+      ctx.fillStyle = inkColor;
+      ctx.font = '600 38px "Inter", "Source Sans Pro", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('RICARDO PUERTA ISAZA', CANVAS_WIDTH / 2, centerY);
+      // Subtítulo
+      ctx.fillStyle = inkFaintColor;
+      ctx.font = '400 italic 22px "Inter", "Source Sans Pro", sans-serif';
+      ctx.fillText('arquitecto y astrólogo', CANVAS_WIDTH / 2, centerY + 38);
+    };
+
+    // Cargar el SÍMBOLO del logo (sin texto, más confiable)
     try {
-      const logoResponse = await fetch('assets/logo-completo.svg');
+      const logoResponse = await fetch('assets/logo-simbolo.svg');
       let logoSvgText = await logoResponse.text();
       // Reemplazar currentColor por el color final según modo
-      const logoColor = dark ? '#efece5' : '#1a1a1a';
-      logoSvgText = logoSvgText.replace(/currentColor/g, logoColor);
+      logoSvgText = logoSvgText.replace(/currentColor/g, inkColor);
       const logoBlob = new Blob([logoSvgText], { type: 'image/svg+xml;charset=utf-8' });
       const logoUrl = URL.createObjectURL(logoBlob);
 
       const logoImg = new Image();
       logoImg.onload = () => {
-        // Logo centrado horizontalmente, debajo de la carta
-        const logoSize = 400;
-        const logoX = (CANVAS_WIDTH - logoSize) / 2;
-        const logoY = CHART_SIZE + 60;
-        ctx.globalAlpha = 0.85;
-        ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize * 0.55);
+        // Símbolo del logo: 120x120, centrado, debajo de la línea divisoria
+        const symbolSize = 120;
+        const symbolX = (CANVAS_WIDTH - symbolSize) / 2;
+        const symbolY = dividerY + 30;
+        ctx.globalAlpha = 0.9;
+        ctx.drawImage(logoImg, symbolX, symbolY, symbolSize, symbolSize);
         ctx.globalAlpha = 1.0;
         URL.revokeObjectURL(logoUrl);
+
+        // Dibujar el texto del logo debajo del símbolo
+        const textCenterY = symbolY + symbolSize + 30;
+        dibujarTextoLogo(textCenterY);
+
         descargarPNG();
       };
       logoImg.onerror = () => {
-        console.warn('No se pudo cargar el logo para la marca de agua');
+        console.warn('No se pudo cargar el símbolo del logo');
+        // Aún así dibujar el texto (al menos la firma queda)
+        const textCenterY = dividerY + 60;
+        dibujarTextoLogo(textCenterY);
         descargarPNG();
       };
       logoImg.src = logoUrl;
     } catch (err) {
       console.warn('Error cargando logo:', err);
+      // Dibujar solo el texto si falla el fetch
+      const textCenterY = dividerY + 60;
+      dibujarTextoLogo(textCenterY);
       descargarPNG();
     }
   };
