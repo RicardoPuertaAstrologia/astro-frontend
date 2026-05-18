@@ -2259,31 +2259,82 @@ document.getElementById('download-pdf-btn').addEventListener('click', () => {
 });
 
 document.getElementById('download-png-btn').addEventListener('click', async () => {
-  // Convert SVG to PNG via canvas
+  // Convert SVG to PNG via canvas with logo watermark
   const svg = document.getElementById('natal-chart');
   const svgData = new XMLSerializer().serializeToString(svg);
   const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(blob);
 
+  // Tamaños: canvas total 1200x1400 (carta 1200x1200 + logo abajo 1200x200)
+  const CANVAS_WIDTH = 1200;
+  const CHART_SIZE = 1200;
+  const LOGO_AREA_HEIGHT = 200;
+  const CANVAS_HEIGHT = CHART_SIZE + LOGO_AREA_HEIGHT;
+
   const img = new Image();
-  img.onload = () => {
+  img.onload = async () => {
     const canvas = document.createElement('canvas');
-    canvas.width = 1200;
-    canvas.height = 1200;
+    canvas.width = CANVAS_WIDTH;
+    canvas.height = CANVAS_HEIGHT;
     const ctx = canvas.getContext('2d');
     const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Fondo
     ctx.fillStyle = dark ? '#1a1816' : '#fafaf7';
-    ctx.fillRect(0, 0, 1200, 1200);
-    ctx.drawImage(img, 0, 0, 1200, 1200);
-    canvas.toBlob(b => {
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(b);
-      const name = (currentResult?.birth_data?.name || 'carta_natal').replace(/[^a-z0-9]/gi, '_');
-      a.download = `${name}_carta_natal.png`;
-      a.click();
-      URL.revokeObjectURL(a.href);
-    }, 'image/png');
-    URL.revokeObjectURL(url);
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    // Dibujar la carta natal
+    ctx.drawImage(img, 0, 0, CHART_SIZE, CHART_SIZE);
+    // Línea divisoria sutil
+    ctx.strokeStyle = dark ? '#3d3a35' : '#d4d2c8';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(CANVAS_WIDTH * 0.15, CHART_SIZE + 30);
+    ctx.lineTo(CANVAS_WIDTH * 0.85, CHART_SIZE + 30);
+    ctx.stroke();
+
+    // Función auxiliar: descarga el PNG (con o sin logo)
+    const descargarPNG = () => {
+      canvas.toBlob(b => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(b);
+        const name = (currentResult?.birth_data?.name || 'carta_natal').replace(/[^a-z0-9]/gi, '_');
+        a.download = `${name}_carta_natal.png`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }, 'image/png');
+      URL.revokeObjectURL(url);
+    };
+
+    // Cargar el logo completo y dibujarlo debajo de la carta
+    try {
+      const logoResponse = await fetch('assets/logo-completo.svg');
+      let logoSvgText = await logoResponse.text();
+      // Reemplazar currentColor por el color final según modo
+      const logoColor = dark ? '#efece5' : '#1a1a1a';
+      logoSvgText = logoSvgText.replace(/currentColor/g, logoColor);
+      const logoBlob = new Blob([logoSvgText], { type: 'image/svg+xml;charset=utf-8' });
+      const logoUrl = URL.createObjectURL(logoBlob);
+
+      const logoImg = new Image();
+      logoImg.onload = () => {
+        // Logo centrado horizontalmente, debajo de la carta
+        const logoSize = 400;
+        const logoX = (CANVAS_WIDTH - logoSize) / 2;
+        const logoY = CHART_SIZE + 60;
+        ctx.globalAlpha = 0.85;
+        ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize * 0.55);
+        ctx.globalAlpha = 1.0;
+        URL.revokeObjectURL(logoUrl);
+        descargarPNG();
+      };
+      logoImg.onerror = () => {
+        console.warn('No se pudo cargar el logo para la marca de agua');
+        descargarPNG();
+      };
+      logoImg.src = logoUrl;
+    } catch (err) {
+      console.warn('Error cargando logo:', err);
+      descargarPNG();
+    }
   };
   img.src = url;
 });
