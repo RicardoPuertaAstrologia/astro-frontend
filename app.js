@@ -2266,8 +2266,8 @@ document.getElementById('download-png-btn').addEventListener('click', async () =
   const url = URL.createObjectURL(blob);
 
   // Tamaños: carta con padding + zona del logo
-  const CANVAS_WIDTH = 1300;
-  const CHART_PADDING = 50;  // Margen para que no se corten MC/IC
+  const CANVAS_WIDTH = 1400;
+  const CHART_PADDING = 100;  // Margen amplio para MC/IC/C/D
   const CHART_SIZE = 1200;
   const LOGO_AREA_HEIGHT = 280;
   const CANVAS_HEIGHT = CHART_SIZE + (CHART_PADDING * 2) + LOGO_AREA_HEIGHT;
