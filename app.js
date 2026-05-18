@@ -2260,14 +2260,20 @@ document.getElementById('download-pdf-btn').addEventListener('click', () => {
 
 document.getElementById('download-png-btn').addEventListener('click', async () => {
   // Convert SVG to PNG via canvas with logo watermark
-  const svg = document.getElementById('natal-chart');
+  const originalSvg = document.getElementById('natal-chart');
+
+  // Clonar el SVG y expandir su viewBox para que MC/IC/C/D no se corten
+  const svg = originalSvg.cloneNode(true);
+  const VIEWBOX_EXPAND = 20; // píxeles de expansión en cada lado del viewBox
+  svg.setAttribute('viewBox', `-${VIEWBOX_EXPAND} -${VIEWBOX_EXPAND} ${480 + (VIEWBOX_EXPAND * 2)} ${480 + (VIEWBOX_EXPAND * 2)}`);
+
   const svgData = new XMLSerializer().serializeToString(svg);
   const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(blob);
 
   // Tamaños: carta con padding + zona del logo
   const CANVAS_WIDTH = 1400;
-  const CHART_PADDING = 100;  // Margen amplio para MC/IC/C/D
+  const CHART_PADDING = 60;
   const CHART_SIZE = 1200;
   const LOGO_AREA_HEIGHT = 280;
   const CANVAS_HEIGHT = CHART_SIZE + (CHART_PADDING * 2) + LOGO_AREA_HEIGHT;
@@ -2314,32 +2320,28 @@ document.getElementById('download-png-btn').addEventListener('click', async () =
       URL.revokeObjectURL(url);
     };
 
-    // Función auxiliar: dibujar texto del logo con canvas (más confiable que SVG text)
+    // Función auxiliar: dibujar texto del logo con canvas
     const dibujarTextoLogo = (centerY) => {
-      // Nombre principal
       ctx.fillStyle = inkColor;
       ctx.font = '600 38px "Inter", "Source Sans Pro", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('RICARDO PUERTA ISAZA', CANVAS_WIDTH / 2, centerY);
-      // Subtítulo
       ctx.fillStyle = inkFaintColor;
       ctx.font = '400 italic 22px "Inter", "Source Sans Pro", sans-serif';
       ctx.fillText('arquitecto y astrólogo', CANVAS_WIDTH / 2, centerY + 38);
     };
 
-    // Cargar el SÍMBOLO del logo (sin texto, más confiable)
+    // Cargar el SÍMBOLO del logo y dibujarlo debajo
     try {
       const logoResponse = await fetch('assets/logo-simbolo.svg');
       let logoSvgText = await logoResponse.text();
-      // Reemplazar currentColor por el color final según modo
       logoSvgText = logoSvgText.replace(/currentColor/g, inkColor);
       const logoBlob = new Blob([logoSvgText], { type: 'image/svg+xml;charset=utf-8' });
       const logoUrl = URL.createObjectURL(logoBlob);
 
       const logoImg = new Image();
       logoImg.onload = () => {
-        // Símbolo del logo: 120x120, centrado, debajo de la línea divisoria
         const symbolSize = 120;
         const symbolX = (CANVAS_WIDTH - symbolSize) / 2;
         const symbolY = dividerY + 30;
@@ -2347,16 +2349,12 @@ document.getElementById('download-png-btn').addEventListener('click', async () =
         ctx.drawImage(logoImg, symbolX, symbolY, symbolSize, symbolSize);
         ctx.globalAlpha = 1.0;
         URL.revokeObjectURL(logoUrl);
-
-        // Dibujar el texto del logo debajo del símbolo
         const textCenterY = symbolY + symbolSize + 30;
         dibujarTextoLogo(textCenterY);
-
         descargarPNG();
       };
       logoImg.onerror = () => {
         console.warn('No se pudo cargar el símbolo del logo');
-        // Aún así dibujar el texto (al menos la firma queda)
         const textCenterY = dividerY + 60;
         dibujarTextoLogo(textCenterY);
         descargarPNG();
@@ -2364,7 +2362,6 @@ document.getElementById('download-png-btn').addEventListener('click', async () =
       logoImg.src = logoUrl;
     } catch (err) {
       console.warn('Error cargando logo:', err);
-      // Dibujar solo el texto si falla el fetch
       const textCenterY = dividerY + 60;
       dibujarTextoLogo(textCenterY);
       descargarPNG();
