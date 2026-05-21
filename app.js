@@ -26,9 +26,9 @@ function getDefaultBackendUrl() {
 const i18n = {
   es: {
     backendLabel: "API Backend",
-    eyebrow: "Astrología occidental · Tránsitos planetarios",
-    title1: "Descubre cómo", title2: "los planetas lentos", title3: "impactan tu vida ahora",
-    subtitle: "Cálculos validados contra Solar Fire profesional. Júpiter, Saturno, Urano, Neptuno y Plutón sobre tu carta natal. Plácidus · Tropical · Geocéntrico.",
+    eyebrow: "Astrología occidental · Carta natal",
+    title1: "Descubre el", title2: "mapa de vida", title3: "con el que naciste",
+    subtitle: "Conocerlo te permite guiarte por el camino que ya tienes escrito.",
     formTitle: "Datos de nacimiento",
     labelName: "Nombre", labelDate: "Fecha de nacimiento", labelTime: "Hora exacta", labelCity: "Ciudad de nacimiento",
     hintTime: "Si no la sabes con precisión, usa 12:00",
@@ -63,9 +63,9 @@ const i18n = {
   },
   en: {
     backendLabel: "API Backend",
-    eyebrow: "Western astrology · Planetary transits",
-    title1: "Discover how", title2: "the slow planets", title3: "are impacting your life now",
-    subtitle: "Calculations validated against professional Solar Fire. Jupiter, Saturn, Uranus, Neptune and Pluto over your natal chart. Placidus · Tropical · Geocentric.",
+    eyebrow: "Western astrology · Natal chart",
+    title1: "Discover the", title2: "map of life", title3: "you were born with",
+    subtitle: "Knowing it lets you navigate the path already written for you.",
     formTitle: "Birth data",
     labelName: "Name", labelDate: "Birth date", labelTime: "Exact time", labelCity: "Birth city",
     hintTime: "If you don't know it precisely, use 12:00",
