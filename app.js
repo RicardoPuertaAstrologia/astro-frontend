@@ -1852,6 +1852,7 @@ function renderSummary(data) {
 // Etiquetas de cada tipo de interpretación
 const RP_TIPO_LABELS = {
   es: {
+    ascendente: 'Ascendente',
     planeta_en_signo: 'Planetas en signos',
     planeta_en_casa: 'Planetas en casas',
     nodo_norte: 'Nodo Norte',
@@ -1861,6 +1862,7 @@ const RP_TIPO_LABELS = {
     aspecto: 'Aspectos planetarios'
   },
   en: {
+    ascendente: 'Ascendant',
     planeta_en_signo: 'Planets in signs',
     planeta_en_casa: 'Planets in houses',
     nodo_norte: 'North Node',
@@ -1871,7 +1873,7 @@ const RP_TIPO_LABELS = {
   }
 };
 
-const RP_ORDEN_CATEGORIAS = ['planeta_en_signo', 'planeta_en_casa', 'nodo_norte', 'nodo_sur', 'fortuna_signo', 'fortuna_casa', 'aspecto'];
+const RP_ORDEN_CATEGORIAS = ['ascendente', 'planeta_en_signo', 'planeta_en_casa', 'nodo_norte', 'nodo_sur', 'fortuna_signo', 'fortuna_casa', 'aspecto'];
 
 // Convierte texto plano con \n\n y **bold** a HTML con párrafos y negritas
 // Si se pasa aspectoFiltrar, filtra el texto para mostrar solo ese aspecto específico
