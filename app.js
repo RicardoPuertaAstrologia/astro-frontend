@@ -1998,6 +1998,9 @@ function rpTituloInterpretacion(clave, item, lang) {
     const aspectoLabel = item.aspecto || '';
     return `${PLANETA_LABEL[lang][item.planeta1]} — ${PLANETA_LABEL[lang][item.planeta2]} (${aspectoLabel})`;
   }
+  if (item.tipo === 'ascendente') {
+    return `${en ? 'Ascendant' : 'Ascendente'} ${inWord} ${SIGNO_LABEL[lang][item.signo]}`;
+  }
   return clave;
 }
 
