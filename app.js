@@ -1914,9 +1914,15 @@ function rpFiltrarPorAspecto(texto, nombreAspecto) {
 
   // Los 5 tipos de aspectos en el orden en que aparecen en los textos
   const aspectos = ['Conjunción', 'Sextil', 'Cuadratura', 'Trígono', 'Oposición'];
+  const aspectosEN = ['Conjunction', 'Sextile', 'Square', 'Trine', 'Opposition']; 
 
   // Verificar que el aspecto a filtrar es uno de los conocidos
-  if (!aspectos.includes(nombreAspecto)) return texto;
+  const idxAsp = aspectos.indexOf(nombreAspecto) >= 0
+    ? aspectos.indexOf(nombreAspecto)
+    : aspectosEN.indexOf(nombreAspecto);
+  if (idxAsp < 0) return texto;
+  const listaAsp = aspectosEN.includes(nombreAspecto) ? aspectosEN : aspectos;
+  const aspectoBuscado = listaAsp[idxAsp];
 
   // Dividir en párrafos
   const parrafos = texto.split(/\n\n+/);
@@ -1931,7 +1937,7 @@ function rpFiltrarPorAspecto(texto, nombreAspecto) {
     // Detectar si el párrafo empieza con un encabezado de aspecto (**Conjunción...**, **Sextil...**, etc.)
     let esEncabezadoAspecto = false;
     let aspectoDelParrafo = null;
-    for (const asp of aspectos) {
+    for (const asp of listaAsp) {
       // Regex: empieza con **Aspecto (signo glyph)** o **Aspecto X-Y**
       const regex = new RegExp(`^\\*\\*${asp}\\b`, 'i');
       if (regex.test(p.trim())) {
@@ -1942,10 +1948,10 @@ function rpFiltrarPorAspecto(texto, nombreAspecto) {
     }
 
     // Detectar si el párrafo empieza con "Spoiler ácido" o cierre típico
-    const esCierre = /^(Spoiler ácido|Otro pecado|Y un tercer|Otro riesgo|Tu camino evolutivo|Tu trabajo evolutivo|Cuando alineas)/i.test(p.trim());
+    const esCierre = /^(Spoiler ácido|Otro pecado|Y un tercer|Otro riesgo|Tu camino evolutivo|Tu trabajo evolutivo|Cuando alineas|Acidic spoiler|Another typical sin|And a third|Another risk|Your evolutionary|When you align)/i.test(p.trim());
 
     if (esEncabezadoAspecto) {
-      if (aspectoDelParrafo === nombreAspecto) {
+      if (aspectoDelParrafo === aspectoBuscado) {
         estadoActual = 'aspecto_actual';
         aspectoElegido.push(p);
       } else {
