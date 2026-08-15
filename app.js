@@ -113,7 +113,11 @@ function applyLang() {
   });
   document.documentElement.lang = currentLang;
   checkBackend();
-  if (currentResult) renderResult(currentResult);
+  if (currentResult) {
+    rpCachedKey = null;
+    rpCachedHtml = null;
+    refreshFocusPlanet();
+  }
 }
 
 document.querySelectorAll('.lang-btn').forEach(btn => {
@@ -2030,7 +2034,7 @@ async function cargarLecturaRP() {
   const backendUrl = backendUrlInput.value.trim().replace(/\/$/, '');
 
   try {
-    const res = await fetch(backendUrl + '/interpret-chart', {
+    const res = await fetch(backendUrl + `/interpret-chart?lang=${currentLang}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -2148,7 +2152,7 @@ async function refreshFocusPlanet() {
   document.getElementById('loading').classList.add('visible');
   document.getElementById('result-view').classList.remove('visible');
   try {
-    const res = await fetch(backendUrl + '/calculate', {
+    const res = await fetch(backendUrl + `/calculate?lang=${currentLang}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -2222,7 +2226,7 @@ submitBtn.addEventListener('click', async () => {
   loadingView.classList.add('visible');
 
   try {
-    const res = await fetch(backendUrl + '/calculate', {
+    const res = await fetch(backendUrl + `/calculate?lang=${currentLang}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
