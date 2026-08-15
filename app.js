@@ -1861,6 +1861,9 @@ const RP_TIPO_LABELS = {
     planeta_en_casa: 'Planetas en casas',
     nodo_norte: 'Nodo Norte',
     nodo_sur: 'Nodo Sur',
+    nodo_norte_casa: 'Nodo Norte en casa',
+    nodo_sur_casa: 'Nodo Sur en casa',
+    puente_nodal: 'Síntesis del eje nodal',
     fortuna_signo: 'Parte de la Fortuna en signo',
     fortuna_casa: 'Parte de la Fortuna en casa',
     aspecto: 'Aspectos planetarios'
@@ -1871,13 +1874,16 @@ const RP_TIPO_LABELS = {
     planeta_en_casa: 'Planets in houses',
     nodo_norte: 'North Node',
     nodo_sur: 'South Node',
+    nodo_norte_casa: 'North Node in house',
+    nodo_sur_casa: 'South Node in house',
+    puente_nodal: 'Nodal axis synthesis', 
     fortuna_signo: 'Part of Fortune in sign',
     fortuna_casa: 'Part of Fortune in house',
     aspecto: 'Planetary aspects'
   }
 };
 
-const RP_ORDEN_CATEGORIAS = ['ascendente', 'planeta_en_signo', 'planeta_en_casa', 'nodo_norte', 'nodo_sur', 'fortuna_signo', 'fortuna_casa', 'aspecto'];
+const RP_ORDEN_CATEGORIAS = ['ascendente', 'planeta_en_signo', 'planeta_en_casa', 'nodo_norte', 'nodo_sur', 'nodo_norte_casa', 'nodo_sur_casa', 'puente_nodal', 'fortuna_signo', 'fortuna_casa', 'aspecto'];
 
 // Convierte texto plano con \n\n y **bold** a HTML con párrafos y negritas
 // Si se pasa aspectoFiltrar, filtra el texto para mostrar solo ese aspecto específico
@@ -2001,6 +2007,17 @@ function rpTituloInterpretacion(clave, item, lang) {
   if (item.tipo === 'aspecto') {
     const aspectoLabel = item.aspecto || '';
     return `${PLANETA_LABEL[lang][item.planeta1]} — ${PLANETA_LABEL[lang][item.planeta2]} (${aspectoLabel})`;
+  }
+  if (item.tipo === 'nodo_norte_casa') {
+    return `${en ? 'North Node' : 'Nodo Norte'} ${inWord} ${casaWord} ${item.casa}`;
+  }
+  if (item.tipo === 'nodo_sur_casa') {
+    return `${en ? 'South Node' : 'Nodo Sur'} ${inWord} ${casaWord} ${item.casa}`;
+  }
+  if (item.tipo === 'puente_nodal') {
+    const nn = `${en ? 'North Node' : 'Nodo Norte'} ${inWord} ${SIGNO_LABEL[lang][item.signo_norte]} · ${casaWord} ${item.casa_norte}`;
+    const sn = `${en ? 'South Node' : 'Nodo Sur'} ${inWord} ${SIGNO_LABEL[lang][item.signo_sur]} · ${casaWord} ${item.casa_sur}`;
+    return `${nn} ⇄ ${sn}`;
   }
   if (item.tipo === 'ascendente') {
     return `${en ? 'Ascendant' : 'Ascendente'} ${inWord} ${SIGNO_LABEL[lang][item.signo]}`;
