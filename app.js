@@ -1938,8 +1938,9 @@ function rpFiltrarPorAspecto(texto, nombreAspecto) {
     let esEncabezadoAspecto = false;
     let aspectoDelParrafo = null;
     for (const asp of listaAsp) {
-      // Regex: empieza con **Aspecto (signo glyph)** o **Aspecto X-Y**
-      const regex = new RegExp(`^\\*\\*${asp}\\b`, 'i');
+      // El aspecto puede ir al inicio (ES: **Conjunción Marte-Plutón**)
+      // o al final del encabezado (EN: **Mars-Pluto conjunction**)
+      const regex = new RegExp(`^\\*\\*[^*]*\\b${asp}\\b`, 'i');
       if (regex.test(p.trim())) {
         esEncabezadoAspecto = true;
         aspectoDelParrafo = asp;
