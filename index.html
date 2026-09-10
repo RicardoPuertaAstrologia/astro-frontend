@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ricardo Puerta Isaza · Astrología</title>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+<!-- ARREGLO 1 — Las fuentes se cargan aquí, con <link>, no con @import dentro del CSS.
+     Así el navegador las descarga en paralelo y no las ignora. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
   /* ============================================================
      CSS Variables — Modo claro (default) y oscuro (auto)
@@ -55,12 +62,10 @@
     }
   }
 
-  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700&display=swap');
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background: var(--bg);
     color: var(--ink);
     line-height: 1.6;
@@ -69,32 +74,61 @@
     transition: background 0.3s, color 0.3s;
   }
 
-  .display-font { font-family: 'Cormorant Garamond', serif; font-weight: 400; letter-spacing: -0.01em; }
+  .display-font { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 400; letter-spacing: -0.01em; }
   .uranus-glyph, .planet-glyph-svg { display: inline-block; width: 1em; height: 1em; vertical-align: -0.12em; }
 
   /* HEADER */
   .top-bar {
     display: flex; justify-content: space-between; align-items: center;
     padding: 1.5rem 2rem; border-bottom: 1px solid var(--line);
-    background: var(--surface); position: sticky; top: 0; z-index: 100;
+    position: sticky; top: 0; z-index: 100;
     backdrop-filter: blur(8px); background: color-mix(in srgb, var(--surface) 85%, transparent);
   }
-  .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 500; display: flex; align-items: center; gap: 0.7rem; }
-.logo .uranus-glyph { color: var(--uranus); width: 1.4em; height: 1.4em; }
-.brand-logo { width: 38px; height: 38px; color: var(--ink); display: block; }
-.brand-text { display: flex; flex-direction: column; line-height: 1.1; }
-.brand-name { font-size: 1.05rem; font-weight: 500; letter-spacing: 0.01em; color: var(--ink); }
-.brand-tagline { font-family: 'Inter', sans-serif; font-size: 0.7rem; font-weight: 400; color: var(--ink-faint); letter-spacing: 0.05em; font-style: italic; margin-top: 0.1rem; }
-@media (max-width: 600px) {
-  .brand-tagline { display: none; }
-  .brand-name { font-size: 0.95rem; }
-  .brand-logo { width: 32px; height: 32px; }
+  .logo { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.4rem; font-weight: 500; display: flex; align-items: center; gap: 0.7rem; }
+  .logo .uranus-glyph { color: var(--uranus); width: 1.4em; height: 1.4em; }
+  .brand-logo { width: 38px; height: 38px; color: var(--ink); display: block; }
+  .brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+  .brand-name { font-size: 1.05rem; font-weight: 500; letter-spacing: 0.01em; color: var(--ink); }
+  .brand-tagline { font-family: 'Inter', sans-serif; font-size: 0.7rem; font-weight: 400; color: var(--ink-faint); letter-spacing: 0.05em; font-style: italic; margin-top: 0.1rem; }
+
+  /* ARREGLO 2 — Estilos del selector de idioma, que faltaban por completo */
+  .top-actions { display: flex; align-items: center; gap: 1rem; }
+  .lang-switch {
+    display: inline-flex; align-items: center;
+    border: 1px solid var(--line-strong); border-radius: 999px;
+    padding: 2px; background: var(--surface);
+  }
+  .lang-btn {
+    appearance: none; border: none; background: none; cursor: pointer;
+    font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 600;
+    letter-spacing: 0.12em; color: var(--ink-faint);
+    padding: 0.4rem 0.85rem; border-radius: 999px;
+    transition: color 0.2s, background 0.2s;
+  }
+  .lang-btn:hover { color: var(--ink-soft); }
+  .lang-btn.active { background: var(--ink); color: var(--bg); }
+
+  @media (max-width: 600px) {
+    .top-bar { padding: 1rem 1.25rem; }
+    .brand-tagline { display: none; }
+    .brand-name { font-size: 0.95rem; }
+    .brand-logo { width: 32px; height: 32px; }
+    .lang-btn { padding: 0.35rem 0.7rem; font-size: 0.68rem; }
   }
 
   .container { max-width: 1180px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+  @media (max-width: 600px) { .container { padding: 2rem 1.25rem 3rem; } }
 
-  /* BACKEND CONFIG */
-  .backend-config { max-width: 640px; margin: 0 auto 2rem; padding: 0.85rem 1.25rem; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; box-shadow: var(--shadow); }
+  /* ARREGLO 3 — El panel de backend queda oculto en producción.
+     Para verlo, abre la página añadiendo ?dev a la URL:
+     https://transitosastrales.vercel.app/?dev
+     El campo sigue existiendo en el HTML, así que app.js funciona igual. */
+  .backend-config { display: none; }
+  body.dev-mode .backend-config {
+    max-width: 640px; margin: 0 auto 2rem; padding: 0.85rem 1.25rem;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 4px;
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; box-shadow: var(--shadow);
+  }
   .backend-config label { font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.15em; color: var(--ink-faint); white-space: nowrap; }
   .backend-config input { flex: 1; min-width: 200px; padding: 0.5rem 0.75rem; border: 1px solid var(--line-strong); border-radius: 3px; font-family: 'Inter', monospace; font-size: 0.85rem; background: var(--bg); color: var(--ink); }
   .backend-status { font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: 3px; font-weight: 500; }
@@ -111,6 +145,7 @@
 
   /* FORM */
   .form-card { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 2.5rem; max-width: 640px; margin: 0 auto 3rem; box-shadow: var(--shadow); }
+  @media (max-width: 600px) { .form-card { padding: 1.5rem; } }
   .form-title { font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
   .field-full { grid-column: 1 / -1; }
@@ -149,7 +184,7 @@
   .transit-pill { padding: 0.6rem 1.2rem; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; font-size: 0.85rem; font-weight: 500; color: var(--ink-soft); cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; }
   .transit-pill:hover { border-color: var(--line-strong); }
   .transit-pill.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-  .transit-pill .glyph { font-family: serif; font-size: 1.1em; }
+  .transit-pill .glyph { font-family: Georgia, serif; font-size: 1.1em; }
 
   .result-split { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-bottom: 4rem; align-items: start; }
   @media (max-width: 900px) { .result-split { grid-template-columns: 1fr; gap: 2rem; } .form-grid { grid-template-columns: 1fr; } }
@@ -165,7 +200,7 @@
   .transit-info { display: flex; flex-direction: column; gap: 1rem; }
   .info-block { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 1.5rem; box-shadow: var(--shadow); }
   .info-label { font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.18em; color: var(--ink-faint); margin-bottom: 0.6rem; }
-  .info-value { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 500; color: var(--ink); line-height: 1.3; }
+  .info-value { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.5rem; font-weight: 500; color: var(--ink); line-height: 1.3; }
   .info-value-sub { font-family: 'Inter', sans-serif; font-size: 0.85rem; color: var(--ink-soft); margin-top: 0.4rem; }
   .uranus-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.3rem 0.75rem; background: var(--uranus-soft); border-radius: 999px; font-size: 0.75rem; font-weight: 500; color: var(--uranus); margin-top: 0.5rem; }
 
@@ -183,7 +218,7 @@
   .planets-table th, .planets-table td { padding: 0.75rem 1rem; text-align: left; font-size: 0.9rem; border-bottom: 1px solid var(--line); }
   .planets-table th { background: var(--surface-2); font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.15em; color: var(--ink-faint); }
   .planets-table tr:last-child td { border-bottom: none; }
-  .planets-table .glyph-cell { font-family: serif; font-size: 1.2em; width: 40px; }
+  .planets-table .glyph-cell { font-family: Georgia, serif; font-size: 1.2em; width: 40px; }
   .planets-table .pos-cell { font-variant-numeric: tabular-nums; font-family: 'Inter', monospace; font-size: 0.85rem; }
   .planets-table .retro { color: var(--error); font-weight: 500; margin-left: 0.4rem; }
   .planets-table .dignity-pill { display: inline-block; padding: 0.15rem 0.55rem; border-radius: 3px; font-size: 0.7rem; font-weight: 500; text-transform: lowercase; }
@@ -198,13 +233,13 @@
   .houses-table-wrap th, .houses-table-wrap td { padding: 0.7rem 1rem; text-align: left; font-size: 0.88rem; border-bottom: 1px solid var(--line); }
   .houses-table-wrap th { background: var(--surface-2); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--ink-faint); }
   .houses-table-wrap tr:last-child td { border-bottom: none; }
-  .houses-table-wrap .num { font-family: 'Cormorant Garamond', serif; font-size: 1.2em; color: var(--ink-soft); width: 40px; }
+  .houses-table-wrap .num { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.2em; color: var(--ink-soft); width: 40px; }
   .houses-table-wrap .pos { font-variant-numeric: tabular-nums; font-family: 'Inter', monospace; font-size: 0.82rem; }
 
   /* SECTIONS */
   .section { margin-bottom: 4rem; }
   .section-title { font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
-  .section-title-display { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 500; color: var(--ink); margin-bottom: 1.5rem; line-height: 1.2; }
+  .section-title-display { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.6rem; font-weight: 500; color: var(--ink); margin-bottom: 1.5rem; line-height: 1.2; }
 
   /* ASPECTS GRID */
   .aspects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1rem; }
@@ -216,7 +251,7 @@
   .aspect-card.transit-neptune { border-left-color: var(--neptune); }
   .aspect-card.transit-pluto { border-left-color: var(--pluto); }
   .aspect-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem; }
-  .aspect-type { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 500; }
+  .aspect-type { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.3rem; font-weight: 500; }
   .aspect-orb { font-size: 0.75rem; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
   .aspect-planets { font-size: 0.95rem; color: var(--ink-soft); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
   .aspect-planets .uranus-glyph { color: var(--uranus); }
@@ -231,7 +266,7 @@
   .cal-event:hover { background: var(--surface-2); }
   .cal-date { font-variant-numeric: tabular-nums; font-size: 0.85rem; color: var(--ink-soft); font-weight: 500; }
   .cal-aspect { display: flex; align-items: center; gap: 0.75rem; font-size: 0.95rem; flex-wrap: wrap; }
-  .cal-aspect-glyph { font-family: serif; font-size: 1.2em; color: var(--uranus); }
+  .cal-aspect-glyph { font-family: Georgia, serif; font-size: 1.2em; color: var(--uranus); }
   .cal-relative { font-size: 0.75rem; color: var(--ink-faint); font-style: italic; }
   .cal-month-header { padding: 0.5rem 1.25rem; background: var(--surface-2); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.18em; color: var(--ink-faint); border-bottom: 1px solid var(--line); }
 
@@ -248,16 +283,17 @@
 
   /* INTERPRETATION */
   .interpretation { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 3rem; box-shadow: var(--shadow); }
-  .interpretation h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 500; margin-bottom: 1.25rem; margin-top: 2rem; line-height: 1.2; color: var(--ink); }
+  @media (max-width: 600px) { .interpretation { padding: 1.5rem; } }
+  .interpretation h3 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.6rem; font-weight: 500; margin-bottom: 1.25rem; margin-top: 2rem; line-height: 1.2; color: var(--ink); }
   .interpretation h3:first-child { margin-top: 0; }
   .interpretation p { font-size: 1rem; line-height: 1.75; color: var(--ink-soft); margin-bottom: 1.25rem; }
-  .interpretation .lead { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; line-height: 1.5; color: var(--ink); font-weight: 400; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--line); }
-  .interpretation .pull { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.15rem; color: var(--ink); border-left: 2px solid var(--uranus); padding-left: 1.25rem; margin: 2rem 0; }
+  .interpretation .lead { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.3rem; line-height: 1.5; color: var(--ink); font-weight: 400; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--line); }
+  .interpretation .pull { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 1.15rem; color: var(--ink); border-left: 2px solid var(--uranus); padding-left: 1.25rem; margin: 2rem 0; }
 
   /* SUMMARY GRID */
   .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
   .summary-card { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 1.5rem; box-shadow: var(--shadow); }
-  .summary-card h4 { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 500; margin-bottom: 0.75rem; color: var(--ink); }
+  .summary-card h4 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.25rem; font-weight: 500; margin-bottom: 0.75rem; color: var(--ink); }
   .summary-card p { font-size: 0.9rem; line-height: 1.65; color: var(--ink-soft); }
 
   /* ACTIONS */
@@ -270,7 +306,7 @@
   /* LOADING */
   .loading { display: none; text-align: center; padding: 3rem; }
   .loading.visible { display: block; }
-  .loading-text { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.2rem; color: var(--ink-soft); }
+  .loading-text { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 1.2rem; color: var(--ink-soft); }
   .loading-dots::after { content: '...'; animation: dots 1.5s steps(4) infinite; }
   @keyframes dots { 0%, 20% { content: ''; } 40% { content: '.'; } 60% { content: '..'; } 80%, 100% { content: '...'; } }
 
@@ -455,7 +491,7 @@
     <div class="tab-content" id="tab-interpretation">
   <article class="interpretation" id="interpretation-content"></article>
     </div>
-    
+
     <div class="tab-content" id="tab-lectura-rp">
   <article class="interpretation" id="lectura-rp-content">
     <p style="text-align:center; color: var(--ink-faint); padding: 2rem;">Cargando lectura profunda...</p>
@@ -493,6 +529,11 @@
     <p class="footer-note" data-i18n="footerNote">Cálculos realizados con Swiss Ephemeris · Validado contra Solar Fire v9.1.0 con precisión menor a 1 minuto de arco · Sistema Plácidus · Zodíaco tropical · Geocéntrico</p>
   </div>
 </div>
+
+<!-- ARREGLO 3 (parte 2) — activa el panel de backend solo si la URL lleva ?dev -->
+<script>
+  if (location.search.indexOf('dev') !== -1) document.body.classList.add('dev-mode');
+</script>
 
 <script src="app.js"></script>
 </body>
