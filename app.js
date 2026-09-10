@@ -105,6 +105,14 @@ let currentResult = null;
 let currentFocusPlanet = 'uranus';
 
 function t(key) { return i18n[currentLang][key] || key; }
+function formatName(n) {
+  if (!n) return '';
+  const particulas = ['de','del','la','las','los','y','da','das','dos','van','von','di','du','le'];
+  return n.trim().toLowerCase().split(/\s+/).map((w, i) => {
+    if (i > 0 && particulas.includes(w)) return w;
+    return w.charAt(0).toUpperCase() + w.slice(1);
+  }).join(' ');
+}
 
 function applyLang() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -1097,9 +1105,9 @@ function generateInterpretation(data, name, focusPlanet) {
 
   // LEAD
   if (lang === 'es') {
-    html += `<p class="lead">Hola${name ? ' ' + name : ''}. <strong>${planetName}</strong>, el planeta de la <em>${archetype.word}</em>, está atravesando hoy <strong>${planetData.formatted}</strong> ${planetData.retrograde ? '(retrógrado)' : ''}, y sobre tu carta natal está activando tu <strong>Casa ${houseNum} — ${houseInfo.short}</strong>. Eso significa que durante este período, todo lo relacionado con ${houseInfo.full} está siendo ${archetype.verb} desde dentro.</p>`;
+    html += `<p class="lead">Hola${name ? ' ' + formatName(name) : ''}. <strong>${planetName}</strong>, el planeta de la <em>${archetype.word}</em>, está atravesando hoy <strong>${planetData.formatted}</strong>${planetData.retrograde ? ' (retrógrado)' : ''}, y sobre tu carta natal está activando tu <strong>Casa ${houseNum}&nbsp;— ${houseInfo.short}</strong>. Eso significa que durante este período, todo lo relacionado con ${houseInfo.full} está recibiendo la ${archetype.word} de ${planetName} desde dentro.</p>`;
   } else {
-    html += `<p class="lead">Hello${name ? ' ' + name : ''}. <strong>${planetName}</strong>, the planet of <em>${archetype.word}</em>, is currently crossing <strong>${planetData.formatted}</strong> ${planetData.retrograde ? '(retrograde)' : ''}, and on your natal chart is activating your <strong>House ${houseNum} — ${houseInfo.short}</strong>. This means that during this period, everything related to ${houseInfo.full} is being ${archetype.verb} from within.</p>`;
+    html += `<p class="lead">Hello${name ? ' ' + formatName(name) : ''}. <strong>${planetName}</strong>, the planet of <em>${archetype.word}</em>, is currently crossing <strong>${planetData.formatted}</strong>${planetData.retrograde ? ' (retrograde)' : ''}, and on your natal chart is activating your <strong>House ${houseNum}&nbsp;— ${houseInfo.short}</strong>. This means that during this period, everything related to ${houseInfo.full} is receiving ${planetName}'s ${archetype.word} from within.</p>`;
   }
 
   // ARCHETYPE
@@ -2362,13 +2370,16 @@ document.getElementById('download-png-btn').addEventListener('click', async () =
       ctx.fillText('RICARDO PUERTA ISAZA', CANVAS_WIDTH / 2, centerY);
       ctx.fillStyle = inkFaintColor;
       ctx.font = '400 italic 22px "Inter", "Source Sans Pro", sans-serif';
-      ctx.fillText('arquitecto y astrólogo', CANVAS_WIDTH / 2, centerY + 38);
+      ctx.fillText('arquitecto & astrólogo', CANVAS_WIDTH / 2, centerY + 38);
     };
 
     // Cargar el SÍMBOLO del logo y dibujarlo debajo
     try {
-      const logoResponse = await fetch('assets/logo-simbolo.svg');
-      let logoSvgText = await logoResponse.text();
+      // El símbolo ya está incrustado en el HTML: lo tomamos de ahí
+      // en vez de pedir un archivo al servidor.
+      const logoEnPagina = document.querySelector('svg.brand-logo');
+      if (!logoEnPagina) throw new Error('No se encontró el símbolo en la página');
+      let logoSvgText = new XMLSerializer().serializeToString(logoEnPagina);
       logoSvgText = logoSvgText.replace(/currentColor/g, inkColor);
       const logoBlob = new Blob([logoSvgText], { type: 'image/svg+xml;charset=utf-8' });
       const logoUrl = URL.createObjectURL(logoBlob);
