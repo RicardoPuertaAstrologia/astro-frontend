@@ -114,6 +114,21 @@ function formatName(n) {
   }).join(' ');
 }
 
+// Recorre el texto ya renderizado y pega un espacio irrompible antes de
+// cada raya larga, para que nunca quede una raya abriendo renglón.
+// Trabaja sobre los nodos de texto, así que no toca atributos ni estilos.
+function noPartirRayas(elemento) {
+  if (!elemento) return;
+  const paseo = document.createTreeWalker(elemento, NodeFilter.SHOW_TEXT);
+  const nodos = [];
+  while (paseo.nextNode()) nodos.push(paseo.currentNode);
+  nodos.forEach(n => {
+    if (n.nodeValue.indexOf(' — ') !== -1) {
+      n.nodeValue = n.nodeValue.replace(/ — /g, '\u00A0— ');
+    }
+  });
+}
+
 function applyLang() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
@@ -1362,6 +1377,9 @@ function renderResult(data) {
   // Draw chart
   drawNatalChart(data);
 
+  // Protege las rayas de todo el resultado
+  noPartirRayas(document.getElementById('result-view'));
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -2058,6 +2076,7 @@ async function cargarLecturaRP() {
   // Si ya cargamos lo mismo, no volver a llamar al backend
   if (rpCachedKey === cacheKey && rpCachedHtml) {
     container.innerHTML = rpCachedHtml;
+    noPartirRayas(container);
     return;
   }
 
@@ -2169,6 +2188,7 @@ async function cargarLecturaRP() {
     rpCachedHtml = html;
 
     container.innerHTML = html;
+    noPartirRayas(container);
   } catch (err) {
     console.error('Error cargando Lectura RP:', err);
     container.innerHTML = `<p style="text-align:center; color: var(--error); padding: 2rem;">${lang === 'es' ? 'Error al cargar la lectura. Verifica la conexión con el backend.' : 'Error loading reading. Check backend connection.'}<br><small style="opacity:0.7;">${err.message}</small></p>`;
