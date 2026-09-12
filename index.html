@@ -218,6 +218,24 @@
   @media (max-width: 900px) { .result-split { grid-template-columns: 1fr; gap: 2rem; } .form-grid { grid-template-columns: 1fr; } }
   .chart-wrapper { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 1.5rem 1.5rem 1rem; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: var(--shadow); }
   .chart-svg { width: 100%; max-width: 100%; aspect-ratio: 1; }
+
+  /* Título y leyenda de la rueda */
+  .chart-title {
+    width: 100%; text-align: center;
+    font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.18em;
+    color: var(--ink-faint);
+    padding-bottom: 0.85rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--line);
+  }
+  .chart-title strong { color: var(--ink); font-weight: 600; }
+  .chart-legend {
+    width: 100%; display: flex; justify-content: center; gap: 1.4rem; flex-wrap: wrap;
+    padding-top: 0.85rem; margin-top: 0.5rem; border-top: 1px solid var(--line);
+    font-size: 0.7rem; color: var(--ink-soft);
+  }
+  .chart-legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .legend-dot { width: 13px; height: 13px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+  .legend-dot.natal { background: var(--surface); border: 1.4px solid var(--ink); }
+  .legend-dot.transit { background: color-mix(in srgb, var(--uranus) 15%, transparent); border: 1.6px dashed var(--uranus); }
   .chart-watermark { width: 100%; display: flex; justify-content: center; padding-top: 0.75rem; margin-top: 0.5rem; border-top: 1px solid var(--line); }
   .chart-watermark img { width: 130px; height: auto; color: var(--ink-faint); opacity: 0.7; transition: opacity 0.2s; }
   .chart-watermark:hover img { opacity: 1; }
@@ -236,11 +254,26 @@
   .info-value-sub { font-family: 'Inter', sans-serif; font-size: 0.85rem; color: var(--ink-soft); margin-top: 0.4rem; }
   .uranus-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.3rem 0.75rem; background: var(--uranus-soft); border-radius: 999px; font-size: 0.75rem; font-weight: 500; color: var(--uranus); margin-top: 0.5rem; }
 
-  /* TABS */
-  .tabs { display: flex; gap: 0.25rem; border-bottom: 1px solid var(--line); margin-bottom: 2rem; overflow-x: auto; }
-  .tab { padding: 0.85rem 1.25rem; background: none; border: none; border-bottom: 2px solid transparent; font-family: inherit; font-size: 0.85rem; font-weight: 500; color: var(--ink-faint); cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-  .tab:hover { color: var(--ink-soft); }
-  .tab.active { color: var(--ink); border-bottom-color: var(--uranus); }
+  /* TABS — botones redondeados, se envuelven en varias filas */
+  .tabs {
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 1.15rem; margin-bottom: 2rem;
+    overflow: visible;
+  }
+  .tab {
+    padding: 0.7rem 1.15rem;
+    background: var(--surface); border: 1px solid var(--line-strong); border-radius: 999px;
+    font-family: inherit; font-size: 0.9rem; font-weight: 500;
+    color: var(--ink-soft); cursor: pointer; white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .tab:hover { border-color: var(--ink-soft); color: var(--ink); }
+  .tab.active { background: var(--ink); border-color: var(--ink); color: var(--bg); font-weight: 600; }
+  @media (max-width: 600px) {
+    .tabs { gap: 0.4rem; padding-bottom: 1rem; }
+    .tab { padding: 0.6rem 0.9rem; font-size: 0.82rem; }
+  }
   .tab-content { display: none; animation: fadeIn 0.3s ease-out; }
   .tab-content.active { display: block; }
 
@@ -483,7 +516,13 @@
     <!-- Carta visual + Info principal del tránsito -->
     <div class="result-split">
       <div class="chart-wrapper">
-        <svg id="natal-chart" class="chart-svg" viewBox="0 0 480 480"></svg>
+        <div class="chart-title" data-i18n="chartWheelTitle"><strong>Carta natal</strong> + <strong>tránsitos actuales</strong></div>
+        <!-- El viewBox va 20 puntos más ancho por cada lado para que AC, DC, MC e IC no se corten -->
+        <svg id="natal-chart" class="chart-svg" viewBox="-20 -20 520 520"></svg>
+        <div class="chart-legend">
+          <span><i class="legend-dot natal"></i><span data-i18n="legendNatal">Planetas natales</span></span>
+          <span><i class="legend-dot transit"></i><span data-i18n="legendTransit">Tránsitos de hoy</span></span>
+        </div>
         <div class="chart-watermark">
           <img src="assets/logo-completo.svg" alt="Ricardo Puerta Isaza · arquitecto y astrólogo">
         </div>
