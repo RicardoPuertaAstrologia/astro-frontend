@@ -799,6 +799,49 @@ function shortDate(dateStr) {
 // ============================================================
 // CHART DRAWING (SVG)
 // ============================================================
+// Reparte los planetas en dos niveles y los abre en abanico dentro de cada uno,
+// para que un racimo apretado siga siendo legible. Cada glifo conserva una
+// línea guía hasta su grado real.
+function colocarPlanetas(items, rBase, rAlt, glifo) {
+  const n = items.length;
+  if (!n) return [];
+  const sep = r => 2 * Math.asin(Math.min(1, (glifo + 1.5) / r)) * 180 / Math.PI;
+  const idx = items.map((p, i) => i).sort((a, b) => items[a].lon - items[b].lon);
+  const nivel = new Array(n).fill(0);
+  const puestos = [[], []];
+  const sep0 = sep(rBase), sep1 = sep(rAlt);
+  idx.forEach(i => {
+    const lon = items[i].lon;
+    const libre = lv => puestos[lv].every(j => {
+      let d = Math.abs(items[j].lon - lon); if (d > 180) d = 360 - d;
+      return d >= (lv === 0 ? sep0 : sep1);
+    });
+    const lv = libre(0) ? 0 : 1;
+    nivel[i] = lv; puestos[lv].push(i);
+  });
+  const ang = items.map(p => p.lon);
+  [0, 1].forEach(lv => {
+    const g = idx.filter(i => nivel[i] === lv);
+    if (g.length < 2) return;
+    const s = lv === 0 ? sep0 : sep1;
+    for (let pase = 0; pase < 60; pase++) {
+      let movido = false;
+      for (let k = 0; k < g.length; k++) {
+        const a = g[k], b = g[(k + 1) % g.length];
+        let d = (ang[b] - ang[a] + 360) % 360;
+        if (d < s && d > 0) {
+          const e = (s - d) / 2;
+          ang[a] = (ang[a] - e + 360) % 360;
+          ang[b] = (ang[b] + e) % 360;
+          movido = true;
+        }
+      }
+      if (!movido) break;
+    }
+  });
+  return items.map((p, i) => ({ r: nivel[i] === 0 ? rBase : rAlt, ang: ang[i], nivel: nivel[i] }));
+}
+
 function drawNatalChart(data) {
   const svg = document.getElementById('natal-chart');
   const cx = 240, cy = 240;
@@ -878,9 +921,9 @@ function drawNatalChart(data) {
     s += `<text x="${nx}" y="${ny}" font-size="10" text-anchor="middle" dominant-baseline="middle" fill="${inkFaintColor}" font-weight="500">${houseNum}</text>`;
 
     const deg = Math.floor(lon % 30);
-    const dx = cx + (rTransit - 8) * Math.cos(angle);
-    const dy = cy - (rTransit - 8) * Math.sin(angle);
-    s += `<text x="${dx}" y="${dy}" font-size="7" text-anchor="middle" dominant-baseline="middle" fill="${inkFaintColor}">${deg}°</text>`;
+    const dx = cx + (rTransit - 7) * Math.cos(angle);
+    const dy = cy - (rTransit - 7) * Math.sin(angle);
+    s += `<text x="${dx}" y="${dy}" font-size="7.5" text-anchor="middle" dominant-baseline="middle" fill="${inkFaintColor}" opacity="0.85">${deg}°</text>`;
   }
 
   // ASC, DC, MC, IC labels outside
@@ -950,27 +993,21 @@ function drawNatalChart(data) {
     }
   });
 
-  positions.sort((a,b) => a.lon - b.lon);
-  const placedRadii = positions.map(() => rPlanet);
-  for (let i = 0; i < positions.length; i++) {
-    for (let j = i+1; j < positions.length; j++) {
-      let diff = Math.abs(positions[i].lon - positions[j].lon);
-      if (diff > 180) diff = 360 - diff;
-      if (diff < 8 && placedRadii[i] === placedRadii[j]) placedRadii[j] = rPlanet - 24;
-    }
-  }
+  const colocacion = colocarPlanetas(positions, rPlanet, rPlanet - 28, 12);
 
   positions.forEach((p, idx) => {
-    const angle = lonToAngle(p.lon);
-    const r = placedRadii[idx];
+    const angReal = lonToAngle(p.lon);
+    const c = colocacion[idx];
+    const angle = lonToAngle(c.ang);
+    const r = c.r;
     const px = cx + r * Math.cos(angle);
     const py = cy - r * Math.sin(angle);
 
-    // Marca radial hasta la frontera de los tránsitos
-    const tickIn = cx + (rCusp + 1) * Math.cos(angle);
-    const tickInY = cy - (rCusp + 1) * Math.sin(angle);
-    const tickOut = cx + (rTransit - 1) * Math.cos(angle);
-    const tickOutY = cy - (rTransit - 1) * Math.sin(angle);
+    // Marca radial en el GRADO REAL, hasta la frontera de los tránsitos
+    const tickIn = cx + (rCusp + 1) * Math.cos(angReal);
+    const tickInY = cy - (rCusp + 1) * Math.sin(angReal);
+    const tickOut = cx + (rTransit - 1) * Math.cos(angReal);
+    const tickOutY = cy - (rTransit - 1) * Math.sin(angReal);
     s += `<line x1="${tickIn}" y1="${tickInY}" x2="${tickOut}" y2="${tickOutY}" stroke="${inkSoftColor}" stroke-width="0.4"/>`;
 
     const isExtra = p.kind === 'extra';
@@ -980,13 +1017,28 @@ function drawNatalChart(data) {
     const strokeWidth = isExtra ? 0.7 : 1.3;
     const textColor = isExtra ? inkSoftColor : inkColor;
 
+    // Línea guía del glifo a su grado real, cuando se ha desplazado
+    let desv = ((c.ang - p.lon + 540) % 360) - 180;
+    if (Math.abs(desv) > 0.4 || c.nivel > 0) {
+      const gx = cx + (r + radius + 1) * Math.cos(angle);
+      const gy = cy - (r + radius + 1) * Math.sin(angle);
+      const hx = cx + (rCusp - 1) * Math.cos(angReal);
+      const hy = cy - (rCusp - 1) * Math.sin(angReal);
+      s += `<line x1="${gx}" y1="${gy}" x2="${hx}" y2="${hy}" stroke="${inkFaintColor}" stroke-width="0.45" opacity="0.7"/>`;
+    }
+
     s += `<circle cx="${px}" cy="${py}" r="${radius}" fill="${natalFill}" stroke="${inkColor}" stroke-width="${strokeWidth}" opacity="${opacity}"/>`;
     s += `<text x="${px}" y="${py}" font-size="${fontSize}" text-anchor="middle" dominant-baseline="middle" fill="${textColor}" font-family="serif" opacity="${opacity}">${PLANET_GLYPHS[p.name]}</text>`;
 
     if (p.retro) {
       s += `<text x="${px+10}" y="${py-9}" font-size="7" text-anchor="middle" fill="#b85c5c" font-weight="600">℞</text>`;
     }
-    s += `<text x="${px}" y="${py+22}" font-size="7" text-anchor="middle" fill="${inkFaintColor}">${p.deg}°${String(p.min).padStart(2,'0')}'</text>`;
+    // El grado se coloca en dirección radial: hacia fuera en el nivel exterior
+    // y hacia dentro en el interior, para que no lo tape el planeta vecino.
+    const rTexto = c.nivel === 0 ? r + radius + 8 : r - radius - 8;
+    const lx = cx + rTexto * Math.cos(angle);
+    const ly = cy - rTexto * Math.sin(angle);
+    s += `<text x="${lx}" y="${ly}" font-size="7" text-anchor="middle" dominant-baseline="middle" fill="${inkFaintColor}">${p.deg}°${String(p.min).padStart(2,'0')}'</text>`;
   });
 
   // ══ PLANETAS EN TRÁNSITO — borde punteado y relleno tenue, en su propio anillo ══
