@@ -1269,8 +1269,9 @@ function generateInterpretation(data, name, focusPlanet) {
     else html += `<p>${planetName} is not forming tight aspects (within 2° of orb) to your natal planets. The simple passage through your natal house is already moving things. Check the 12-month calendar for upcoming aspects.</p>`;
   }
 
-  // PUNTOS ADICIONALES (Quirón, Nodos, Lilith, Fortuna, Infortunio)
-  html += generateExtraPointsInterpretation(data);
+   // PUNTOS ADICIONALES (Quirón, Nodos, Lilith, Fortuna, Infortunio)
+   // Movidos a la pestaña «Tu carta natal detallada»: son cálculos natales, no tránsitos.
+   // html += generateExtraPointsInterpretation(data);
 
   // CLOSING
   html += `<h3>${lang === 'es' ? 'Cómo navegar este tiempo' : 'How to navigate this time'}</h3>`;
@@ -2167,10 +2168,11 @@ async function cargarLecturaRP() {
 
   // Si ya cargamos lo mismo, no volver a llamar al backend
   if (rpCachedKey === cacheKey && rpCachedHtml) {
-    container.innerHTML = rpCachedHtml;
-    noPartirRayas(container);
-    return;
+  container.innerHTML = rpCachedHtml + generateExtraPointsInterpretation(currentResult);
+  noPartirRayas(container);
+  return;
   }
+
 
   container.innerHTML = `<p style="text-align:center; color: var(--ink-faint); padding: 2rem;">${lang === 'es' ? 'Cargando lectura profunda...' : 'Loading deep reading...'}</p>`;
 
@@ -2279,8 +2281,9 @@ async function cargarLecturaRP() {
     rpCachedKey = cacheKey;
     rpCachedHtml = html;
 
-    container.innerHTML = html;
+    container.innerHTML = html + generateExtraPointsInterpretation(currentResult);
     noPartirRayas(container);
+
   } catch (err) {
     console.error('Error cargando Lectura RP:', err);
     container.innerHTML = `<p style="text-align:center; color: var(--error); padding: 2rem;">${lang === 'es' ? 'Error al cargar la lectura. Verifica la conexión con el backend.' : 'Error loading reading. Check backend connection.'}<br><small style="opacity:0.7;">${err.message}</small></p>`;
