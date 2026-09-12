@@ -1396,6 +1396,13 @@ function generateSummary(data) {
 // RENDER MAIN
 // ============================================================
 function renderResult(data) {
+  // Solo se tienen en cuenta los planetas que el backend devuelve de verdad.
+  // Si el planeta enfocado no viene, se pasa al primero disponible.
+  const posicionesTransito = (data.transits && data.transits.positions) || {};
+  const transitosDisponibles = TRANSIT_PLANETS.filter(p => posicionesTransito[p]);
+  if (transitosDisponibles.length && !transitosDisponibles.includes(currentFocusPlanet)) {
+    currentFocusPlanet = transitosDisponibles[0];
+  }
   currentResult = data;
   const tabs = i18n[currentLang];
 
@@ -1407,7 +1414,7 @@ function renderResult(data) {
 
   // Transit selector pills
   const selector = document.getElementById('transit-selector');
-  selector.innerHTML = TRANSIT_PLANETS.map(tp => {
+  selector.innerHTML = transitosDisponibles.map(tp => {
     const active = tp === currentFocusPlanet ? 'active' : '';
     const glyph = tp === 'uranus' ? uranusGlyphHTML() : `<span class="glyph">${PLANET_GLYPHS[tp]}</span>`;
     const aspectCount = (data.transits.aspects[tp] || []).length;
