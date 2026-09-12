@@ -191,7 +191,7 @@ const PLANET_NAMES = {
     lilith:'Lilith', fortuna:'Part of Fortune', infortunio:'Part of Misfortune'
   }
 };
-const TRANSIT_PLANETS = ['jupiter', 'saturn', 'uranus', 'neptune', 'pluto'];
+const TRANSIT_PLANETS = ['jupiter', 'saturn', 'uranus', 'neptune', 'pluto', 'chiron', 'lilith'];
 
 // Puntos adicionales en el orden en que se procesan
 const EXTRA_POINTS = ['chiron', 'true_node', 'south_node', 'lilith', 'fortuna', 'infortunio'];
@@ -1478,9 +1478,10 @@ function renderAspectsByTransit(data) {
   const lang = currentLang;
   let html = '';
 
-  TRANSIT_PLANETS.forEach(tp => {
+    TRANSIT_PLANETS.forEach(tp => {
     const aspects = data.transits.aspects[tp] || [];
     const tp_data = data.transits.positions[tp];
+    if (!tp_data) return;
     const planetName = PLANET_NAMES[lang][tp];
     const tp_glyph = `<span style="color:${PLANET_COLORS[tp]};font-family:serif;font-size:1.2em">${PLANET_GLYPHS[tp]}</span>`;
 
