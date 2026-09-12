@@ -794,14 +794,14 @@ function shortDate(dateStr) {
 function drawNatalChart(data) {
   const svg = document.getElementById('natal-chart');
   const cx = 240, cy = 240;
-  const rOuter = 230, rZodiac = 200, rCusp = 165, rPlanet = 130, rInner = 75;
+  // rTransit marca la frontera entre la carta natal y el anillo de tránsitos
+  const rOuter = 230, rZodiac = 200, rTransit = 162, rCusp = 152, rPlanet = 128, rInner = 75;
+  // Dos filas dentro del anillo, por si dos tránsitos coinciden en grados
+  const rTransitMid = 186, rTransitAlt = 172;
   const asc = data.natal_chart.asc.longitude;
 
   // Map ecliptic longitude to chart angle (counter-clockwise convention)
   // ASC (longitude = asc) -> 180° (left side of chart, 9 o'clock)
-  // Increasing longitude -> counter-clockwise (towards bottom, then right, then top)
-  // SVG y-axis is inverted, so we negate the sin in plot calls — but the angle math
-  // here returns standard math angles where increasing angle = counter-clockwise
   function lonToAngle(lon) {
     return ((180 + (lon - asc)) % 360 + 360) % 360 * Math.PI / 180;
   }
@@ -813,12 +813,18 @@ function drawNatalChart(data) {
   const inkSoftColor = dark ? '#b5b0a3' : '#57564f';
   const inkFaintColor = dark ? '#807a6e' : '#8a897f';
   const bgColor = dark ? '#1a1816' : '#fafaf7';
+  const natalFill = dark ? '#1a1816' : '#ffffff';
 
   let s = '';
 
-  // Outer ring (zodiac)
+  // Banda tintada del anillo de tránsitos (se dibuja primero, va al fondo)
+  s += `<circle cx="${cx}" cy="${cy}" r="${rTransitMid}" fill="none" stroke="#4a8fb8" stroke-opacity="${dark ? 0.10 : 0.055}" stroke-width="${rZodiac - rTransit}"/>`;
+
+  // Aros principales
   s += `<circle cx="${cx}" cy="${cy}" r="${rOuter}" fill="none" stroke="${lineColor}" stroke-width="0.5"/>`;
   s += `<circle cx="${cx}" cy="${cy}" r="${rZodiac}" fill="none" stroke="${inkColor}" stroke-width="0.8"/>`;
+  // Frontera entre carta natal y tránsitos
+  s += `<circle cx="${cx}" cy="${cy}" r="${rTransit}" fill="none" stroke="${inkColor}" stroke-width="1.1" stroke-opacity="0.55"/>`;
   s += `<circle cx="${cx}" cy="${cy}" r="${rCusp}" fill="none" stroke="${lineColor}" stroke-width="0.4" stroke-dasharray="2,3"/>`;
   s += `<circle cx="${cx}" cy="${cy}" r="${rInner}" fill="none" stroke="${lineColor}" stroke-width="0.5"/>`;
 
@@ -828,11 +834,10 @@ function drawNatalChart(data) {
     const isMajor = i % 30 === 0;
     const isMid = i % 10 === 0;
     const tickIn = isMajor ? rZodiac : (isMid ? rZodiac + 4 : rZodiac + 6);
-    const tickOut = rOuter;
     const x1 = cx + tickIn * Math.cos(angle);
     const y1 = cy - tickIn * Math.sin(angle);
-    const x2 = cx + tickOut * Math.cos(angle);
-    const y2 = cy - tickOut * Math.sin(angle);
+    const x2 = cx + rOuter * Math.cos(angle);
+    const y2 = cy - rOuter * Math.sin(angle);
     s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${isMajor ? inkColor : (isMid ? inkSoftColor : lineColor)}" stroke-width="${isMajor ? 0.7 : 0.3}"/>`;
   }
 
@@ -844,19 +849,18 @@ function drawNatalChart(data) {
     s += `<text x="${gx}" y="${gy}" font-size="15" text-anchor="middle" dominant-baseline="middle" fill="${inkSoftColor}" font-family="serif">${SIGN_GLYPHS[i]}</text>`;
   }
 
-  // House cusps + degrees
+  // House cusps + degrees — se detienen en la frontera, no invaden los tránsitos
   for (let i = 0; i < 12; i++) {
     const lon = data.natal_chart.houses[i].longitude;
     const angle = lonToAngle(lon);
     const x1 = cx + rInner * Math.cos(angle);
     const y1 = cy - rInner * Math.sin(angle);
-    const x2 = cx + rZodiac * Math.cos(angle);
-    const y2 = cy - rZodiac * Math.sin(angle);
+    const x2 = cx + rTransit * Math.cos(angle);
+    const y2 = cy - rTransit * Math.sin(angle);
     const houseNum = i + 1;
     const isAngle = (houseNum === 1 || houseNum === 4 || houseNum === 7 || houseNum === 10);
     s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${isAngle ? inkColor : lineColor}" stroke-width="${isAngle ? 1.2 : 0.5}" ${isAngle ? '' : 'stroke-dasharray="3,3"'}/>`;
 
-    // House number (in inner area)
     const nextLon = data.natal_chart.houses[(i + 1) % 12].longitude;
     let arc = (nextLon - lon + 360) % 360;
     let midLon = (lon + arc/2) % 360;
@@ -865,10 +869,9 @@ function drawNatalChart(data) {
     const ny = cy - (rInner + 14) * Math.sin(nAngle);
     s += `<text x="${nx}" y="${ny}" font-size="10" text-anchor="middle" dominant-baseline="middle" fill="${inkFaintColor}" font-weight="500">${houseNum}</text>`;
 
-    // Cusp degree label (small)
     const deg = Math.floor(lon % 30);
-    const dx = cx + (rZodiac - 10) * Math.cos(angle);
-    const dy = cy - (rZodiac - 10) * Math.sin(angle);
+    const dx = cx + (rTransit - 8) * Math.cos(angle);
+    const dy = cy - (rTransit - 8) * Math.sin(angle);
     s += `<text x="${dx}" y="${dy}" font-size="7" text-anchor="middle" dominant-baseline="middle" fill="${inkFaintColor}">${deg}°</text>`;
   }
 
@@ -896,7 +899,6 @@ function drawNatalChart(data) {
       'Oposición': '#8b3a62', 'Opposition': '#8b3a62'
     };
     data.natal_chart.aspects.forEach(asp => {
-      // Skip aspects involving ASC/MC for visual clarity (they're shown separately)
       if (asp.planet1 === 'asc' || asp.planet2 === 'asc' || asp.planet1 === 'mc' || asp.planet2 === 'mc') return;
       const a1 = lonToAngle(asp.lon1);
       const a2 = lonToAngle(asp.lon2);
@@ -910,12 +912,10 @@ function drawNatalChart(data) {
     });
   }
 
-  // Natal planets — anti-collision
-  // Combinar planetas principales + puntos extras (si existen)
+  // ══ PLANETAS NATALES — borde continuo y grueso ══
   const planetList = ['sun','moon','mercury','venus','mars','jupiter','saturn','uranus','neptune','pluto'];
   const extras = data.natal_chart.extras || {};
 
-  // Construir lista combinada
   const positions = [];
   planetList.forEach(p => {
     if (data.natal_chart.planets[p]) {
@@ -958,48 +958,70 @@ function drawNatalChart(data) {
     const px = cx + r * Math.cos(angle);
     const py = cy - r * Math.sin(angle);
 
-    // Tick from planet to zodiac
+    // Marca radial hasta la frontera de los tránsitos
     const tickIn = cx + (rCusp + 1) * Math.cos(angle);
     const tickInY = cy - (rCusp + 1) * Math.sin(angle);
-    const tickOut = cx + (rZodiac - 1) * Math.cos(angle);
-    const tickOutY = cy - (rZodiac - 1) * Math.sin(angle);
+    const tickOut = cx + (rTransit - 1) * Math.cos(angle);
+    const tickOutY = cy - (rTransit - 1) * Math.sin(angle);
     s += `<line x1="${tickIn}" y1="${tickInY}" x2="${tickOut}" y2="${tickOutY}" stroke="${inkSoftColor}" stroke-width="0.4"/>`;
 
-    // Estilo distinto para puntos extras (más sutil)
     const isExtra = p.kind === 'extra';
     const radius = isExtra ? 10 : 12;
     const fontSize = isExtra ? 12 : 14;
     const opacity = isExtra ? 0.75 : 1.0;
-    const strokeWidth = isExtra ? 0.4 : 0.6;
+    const strokeWidth = isExtra ? 0.7 : 1.3;
     const textColor = isExtra ? inkSoftColor : inkColor;
 
-    s += `<circle cx="${px}" cy="${py}" r="${radius}" fill="${bgColor}" stroke="${inkColor}" stroke-width="${strokeWidth}" opacity="${opacity}"/>`;
+    s += `<circle cx="${px}" cy="${py}" r="${radius}" fill="${natalFill}" stroke="${inkColor}" stroke-width="${strokeWidth}" opacity="${opacity}"/>`;
     s += `<text x="${px}" y="${py}" font-size="${fontSize}" text-anchor="middle" dominant-baseline="middle" fill="${textColor}" font-family="serif" opacity="${opacity}">${PLANET_GLYPHS[p.name]}</text>`;
 
     if (p.retro) {
       s += `<text x="${px+10}" y="${py-9}" font-size="7" text-anchor="middle" fill="#b85c5c" font-weight="600">℞</text>`;
     }
-
-    // Degree label below planet
     s += `<text x="${px}" y="${py+22}" font-size="7" text-anchor="middle" fill="${inkFaintColor}">${p.deg}°${String(p.min).padStart(2,'0')}'</text>`;
   });
 
-  // Transit planets (the 5 slow ones)
+  // ══ PLANETAS EN TRÁNSITO — borde punteado y relleno tenue, en su propio anillo ══
+  const tPos = [];
   TRANSIT_PLANETS.forEach(tp => {
     if (!data.transits.positions[tp]) return;
-    const tLon = data.transits.positions[tp].longitude;
-    const tRetro = data.transits.positions[tp].retrograde;
-    const angle = lonToAngle(tLon);
-    const r = rZodiac - 14;
+    tPos.push({
+      name: tp,
+      lon: data.transits.positions[tp].longitude,
+      retro: data.transits.positions[tp].retrograde
+    });
+  });
+
+  // Anticolisión: si dos tránsitos están muy juntos, uno se separa hacia dentro
+  tPos.sort((a,b) => a.lon - b.lon);
+  const tRadii = tPos.map(() => rTransitMid);
+  for (let i = 0; i < tPos.length; i++) {
+    for (let j = i+1; j < tPos.length; j++) {
+      let diff = Math.abs(tPos[i].lon - tPos[j].lon);
+      if (diff > 180) diff = 360 - diff;
+      if (diff < 9 && tRadii[i] === tRadii[j]) tRadii[j] = rTransitAlt;
+    }
+  }
+
+  tPos.forEach((t, idx) => {
+    const angle = lonToAngle(t.lon);
+    const r = tRadii[idx];
     const tx = cx + r * Math.cos(angle);
     const ty = cy - r * Math.sin(angle);
-    const color = PLANET_COLORS[tp];
-    const isFocus = tp === currentFocusPlanet;
-    const sz = isFocus ? 13 : 10;
+    const color = PLANET_COLORS[t.name] || inkSoftColor;
+    const isFocus = t.name === currentFocusPlanet;
+    const sz = isFocus ? 13 : 11;
 
-    s += `<circle cx="${tx}" cy="${ty}" r="${sz}" fill="${bgColor}" stroke="${color}" stroke-width="${isFocus ? 1.8 : 1.2}" opacity="${isFocus ? 1 : 0.7}"/>`;
-    s += `<text x="${tx}" y="${ty}" font-size="${sz*1.05}" text-anchor="middle" dominant-baseline="middle" fill="${color}" font-family="serif" opacity="${isFocus ? 1 : 0.85}">${PLANET_GLYPHS[tp]}</text>`;
-    if (tRetro) {
+    // Marca radial del tránsito hacia el zodíaco
+    const mIn = cx + rTransit * Math.cos(angle);
+    const mInY = cy - rTransit * Math.sin(angle);
+    const mOut = cx + rZodiac * Math.cos(angle);
+    const mOutY = cy - rZodiac * Math.sin(angle);
+    s += `<line x1="${mIn}" y1="${mInY}" x2="${mOut}" y2="${mOutY}" stroke="${color}" stroke-width="${isFocus ? 1.1 : 0.6}" opacity="0.55"/>`;
+
+    s += `<circle cx="${tx}" cy="${ty}" r="${sz}" fill="${color}" fill-opacity="${dark ? 0.22 : 0.13}" stroke="${color}" stroke-width="${isFocus ? 1.9 : 1.2}"${isFocus ? '' : ' stroke-dasharray="2.5,2"'} opacity="${isFocus ? 1 : 0.85}"/>`;
+    s += `<text x="${tx}" y="${ty}" font-size="${sz*1.05}" text-anchor="middle" dominant-baseline="middle" fill="${color}" font-family="serif" opacity="${isFocus ? 1 : 0.9}">${PLANET_GLYPHS[t.name]}</text>`;
+    if (t.retro) {
       s += `<text x="${tx+sz*0.7}" y="${ty-sz*0.7}" font-size="7" text-anchor="middle" fill="#b85c5c" font-weight="600">℞</text>`;
     }
   });
@@ -1007,6 +1029,7 @@ function drawNatalChart(data) {
   s += `<circle cx="${cx}" cy="${cy}" r="2" fill="${inkColor}"/>`;
   svg.innerHTML = s;
 }
+
 
 // ============================================================
 // EXTRA POINTS INTERPRETATION
