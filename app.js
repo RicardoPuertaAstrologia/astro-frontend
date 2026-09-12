@@ -191,14 +191,15 @@ const PLANET_NAMES = {
     lilith:'Lilith', fortuna:'Part of Fortune', infortunio:'Part of Misfortune'
   }
 };
-const TRANSIT_PLANETS = ['jupiter', 'saturn', 'uranus', 'neptune', 'pluto'];
+const TRANSIT_PLANETS = ['jupiter', 'saturn', 'uranus', 'neptune', 'pluto', 'chiron', 'lilith'];
 
 // Puntos adicionales en el orden en que se procesan
 const EXTRA_POINTS = ['chiron', 'true_node', 'south_node', 'lilith', 'fortuna', 'infortunio'];
 
 const PLANET_COLORS = {
   jupiter: '#d4823c', saturn: '#6b6b6b', uranus: '#4a8fb8',
-  neptune: '#5e7fb6', pluto: '#8b3a62'
+  neptune: '#5e7fb6', pluto: '#8b3a62', chiron: '#7a9a5b',
+  lilith: '#453a6e' 
 };
 
 // Función ya no necesaria con Unicode pero la mantengo para compatibilidad
