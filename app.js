@@ -191,7 +191,7 @@ const PLANET_NAMES = {
     lilith:'Lilith', fortuna:'Part of Fortune', infortunio:'Part of Misfortune'
   }
 };
-const TRANSIT_PLANETS = ['jupiter', 'saturn', 'uranus', 'neptune', 'pluto', 'chiron'];
+const TRANSIT_PLANETS = ['jupiter', 'saturn', 'uranus', 'neptune', 'pluto', 'chiron', 'lilith'];
 
 // Puntos adicionales en el orden en que se procesan
 const EXTRA_POINTS = ['chiron', 'true_node', 'south_node', 'lilith', 'fortuna', 'infortunio'];
