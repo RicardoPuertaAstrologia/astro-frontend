@@ -359,7 +359,8 @@ const transitArchetypes = {
     uranus:  { word: "ruptura",       phrase: "Urano sacude, libera, ilumina con destellos lo que estaba estancado.", verb: "despertar" },
     neptune: { word: "disolución",    phrase: "Neptuno disuelve, espiritualiza, conecta con lo sutil y lo invisible.", verb: "disolver" },
     pluto:   { word: "transformación", phrase: "Plutón transforma desde la raíz, pone en crisis y regenera con poder.", verb: "transformar" },
-    chiron:  { word: "sanación",      phrase: "Quirón toca donde duele, y al tocarlo abre la puerta de lo que todavía puede curarse.", verb: "sanar" }
+    chiron:  { word: "sanación",      phrase: "Quirón toca donde duele, y al tocarlo abre la puerta de lo que todavía puede curarse.", verb: "sanar" },
+    lilith:  { word: "revelación",    phrase: "Lilith revela la insatisfacción: indica el origen de lo que no te deja en paz, y saca a la luz lo que te apasiona y mantienes oculto.", verb: "identificar" }   
   },
   en: {
     jupiter: { word: "expansion",     phrase: "Jupiter opens doors, magnifies what it touches, fills with faith and opportunity.", verb: "expanding" },
@@ -367,7 +368,8 @@ const transitArchetypes = {
     uranus:  { word: "rupture",       phrase: "Uranus shakes, liberates, illuminates with sudden flashes what was stuck.", verb: "awakening" },
     neptune: { word: "dissolution",   phrase: "Neptune dissolves, spiritualizes, connects with the subtle and invisible.", verb: "dissolving" },
     pluto:   { word: "transformation", phrase: "Pluto transforms from the root, throws into crisis and regenerates with power.", verb: "transforming" },
-    chiron:  { word: "healing",       phrase: "Chiron touches where it hurts, and in touching it opens the door to what can still be healed.", verb: "healing" }
+    chiron:  { word: "healing",       phrase: "Chiron touches where it hurts, and in touching it opens the door to what can still be healed.", verb: "healing" },
+    lilith:  { word: "revelation",    phrase: "Lilith reveals dissatisfaction: it points to the source of what won't leave you in peace, and brings to light what you're passionate about and keep hidden.", verb: "identifying" }
   }
 };
 
@@ -539,7 +541,13 @@ const planetProfile = {
       rules: "es corregente de Virgo, el puente entre Saturno y Urano, entre el límite que conoces y la libertad que no, la herida de origen y la maestría que nace de ella",
       facilitates: "la sanación de lo que otros no saben tocar, la maestría nacida del propio dolor, la compasión sin lástima, acompañar a quien atraviesa lo que tú ya atravesaste",
       hinders: "la herida convertida en identidad, curar a todo el mundo menos a uno mismo, el victimismo que se instala, la sabiduría que se predica y no se aplica"
-      }
+    },
+    lilith: {
+      archetype: "La Luna Negra / La que no se sometió",
+      rules: "rige lo reprimido, lo que no te permitiste expresar, la rabia legítima, la pasión que mantienes oculta, el deseo que no pidió permiso para existir, la insatisfacción que señala lo no vivido, tu poder más salvaje y autónomo",
+      facilitates: "reconocer de dónde viene el malestar, sacar a la luz lo que te apasiona y escondes, decir que no sin pedir disculpas, recuperar lo que cediste por encajar, la pasión puesta al servicio de un cambio real",
+      hinders: "tragarse las cosas para mantener la paz, la conformidad que se disfraza de madurez, agradar a costa de uno mismo, confundir la calma con el acuerdo"
+      } 
   },
   en: {
     sun: {
@@ -619,7 +627,13 @@ const planetProfile = {
       rules: "corules Virgo, the bridge between Saturn and Uranus, between the limit you know and the freedom you don't, the original wound and the mastery born from it",
       facilitates: "healing what other people don't know how to touch, mastery born of your own pain, compassion without pity, accompanying whoever is crossing what you already crossed",
       hinders: "the wound turned into an identity, healing everyone except yourself, victimhood that settles in, wisdom you preach and don't apply"
-      }
+      },
+    lilith: {
+      archetype: "The Black Moon / The One Who Didn't Submit",
+      rules: "rules the repressed, what you didn't let yourself express, legitimate anger, the passion you keep hidden, desire that never asked permission to exist, the dissatisfaction that points to what goes unlived, your wildest and most autonomous power",
+      facilitates: "recognizing where the discomfort comes from, bringing to light what you're passionate about and hide, saying no without apologizing, taking back what you gave up in order to fit, passion put to the service of real change",
+      hinders: "swallowing things to keep the peace, conformity disguised as maturity, pleasing at your own expense, mistaking quiet for agreement"
+      } 
   }
 };
 
@@ -776,7 +790,21 @@ const transitToNatalMeaning = {
     pluto: { es: "Quirón toca tu poder profundo. Lo que duele viene de muy atrás, a veces de antes de ti. Es de los tránsitos más intensos que existen y, trabajado, de los que más liberan.", en: "Chiron touches your deep power. What hurts comes from far back, sometimes from before you. It's one of the most intense transits there is, and, worked with, one of the most freeing." },
     asc: { es: "Quirón toca tu manera de presentarte al mundo. La máscara empieza a pesar. Período de cambiar cómo te muestras, no para esconderte mejor sino para no tener que esconderte.", en: "Chiron touches the way you present yourself to the world. The mask starts to weigh. A period for changing how you show up — not to hide better, but so you don't have to hide." },
     mc: { es: "Quirón toca tu vocación y tu lugar público. Se revisa si lo que haces es tuyo o es lo que esperaban de ti. Muchas vocaciones verdaderas nacen en este tránsito.", en: "Chiron touches your calling and your public place. Whether what you do is yours or what was expected of you comes up for review. A great many real callings are born in this transit." }
-    }
+    },
+  lilith: {
+    sun: { es: "Lilith toca tu Sol. Aparece qué parte de ti quedó fuera cuando te construiste a la medida de lo que se esperaba. Y aparece también lo que te apasiona de verdad y nunca dejaste salir.", en: "Lilith touches your Sun. Which part of you was left out when you built yourself to fit what was expected comes up. And so does what you're truly passionate about and never let out." },
+    moon: { es: "Lilith toca tu Luna. Sale a la superficie lo que llevas tragando en tu vida íntima, y con ello el afecto que nunca pediste porque te pareció demasiado.", en: "Lilith touches your Moon. What you've been swallowing in your private life surfaces, and with it the care you never asked for because it seemed like too much." },
+    mercury: { es: "Lilith toca tu Mercurio. Aparece lo que no dijiste por prudencia o por no incomodar, y también lo que piensas de verdad y no compartes con nadie.", en: "Lilith touches your Mercury. What you didn't say out of prudence or to avoid trouble comes up, and so does what you actually think and share with no one." },
+    venus: { es: "Lilith toca tu Venus. Se hace evidente lo que aceptaste en tus vínculos para no quedarte solo, y al mismo tiempo lo que deseas y no te has permitido nombrar.", en: "Lilith touches your Venus. What you accepted in your bonds so as not to end up alone becomes obvious, and at the same time what you desire and haven't allowed yourself to name." },
+    mars: { es: "Lilith toca tu Marte. Vuelve la rabia que no te permitiste, y con ella el deseo que llevas tiempo sin atreverte a perseguir. Bien dirigida cambia cosas; sin dirección rompe lo que no molestaba.", en: "Lilith touches your Mars. The anger you didn't allow yourself comes back, and with it the desire you haven't dared to go after in a long time. Well aimed it changes things; with no aim it breaks what wasn't in the way." },
+    jupiter: { es: "Lilith toca tu Júpiter. Se revela dónde tu manera de ver el mundo te pedía conformarte, y aparece el apetito de algo más grande que llevas callando.", en: "Lilith touches your Jupiter. Where your way of seeing the world was asking you to settle gets revealed, and the appetite for something larger that you've been keeping quiet appears." },
+    saturn: { es: "Lilith toca tu Saturno. Lo que construiste por deber empieza a resultarte insoportable, y debajo aparece lo que habrías hecho si nadie estuviera mirando. Tránsito incómodo y honesto: señala qué parte de tu disciplina era miedo.", en: "Lilith touches your Saturn. What you built out of duty starts to feel unbearable, and underneath it appears what you would have done if nobody had been watching. An uncomfortable, honest transit: it points out which part of your discipline was fear." },
+    uranus: { es: "Lilith toca tu Urano. Los dos empujan en la misma dirección, y eso puede ser enorme o temerario. Lo que decidas ahora tiende a ser irreversible.", en: "Lilith touches your Uranus. The two push in the same direction, and that can be enormous or reckless. What you decide now tends to be irreversible." },
+    neptune: { es: "Lilith toca tu Neptuno. Se disuelve la niebla que te permitía no ver tu propia insatisfacción, y aparece con nitidez aquello que sueñas y no te has atrevido a decir en voz alta. Lo que llamabas aceptación empieza a parecerse a resignación.", en: "Lilith touches your Neptune. The fog that let you not see your own dissatisfaction dissolves, and what you dream of and haven't dared say out loud comes into focus. What you called acceptance starts to look like resignation." },
+    pluto: { es: "Lilith toca tu Plutón. Lo reprimido y lo enterrado se encuentran, y con ellos sale a la luz el poder que llevas guardado sin usar. Sale con una intensidad que asusta: es de los tránsitos más difíciles y de los más retadores.", en: "Lilith touches your Pluto. The repressed and the buried meet, and with them the power you've kept stored and unused comes to light. It comes out with a frightening intensity: it's one of the hardest transits, and one of the most challenging." },
+    asc: { es: "Lilith toca tu Ascendente. Aparece con claridad qué de tu imagen no te gusta: la personalidad que sostienes, la manera de presentarte. Y detrás de ella, lo que te apasiona y mantienes oculto.", en: "Lilith touches your Ascendant. What you don't like about your image comes into focus: the personality you keep up, the way you present yourself. And behind it, what you're passionate about and keep hidden." },
+    mc: { es: "Lilith toca tu Medio Cielo. Se revela cuánto de tu carrera elegiste tú y cuánto para que no dijeran nada, y qué vocación verdadera dejaste sin tocar.", en: "Lilith touches your Midheaven. How much of your career you chose yourself and how much so nobody would object gets revealed, and which real calling you left untouched." }
+    } 
 };
 
 // Hash de aspecto en español/inglés a clave canónica
@@ -1249,6 +1277,7 @@ function generateInterpretation(data, name, focusPlanet) {
     else if (focusPlanet === 'neptune') html += `<p>Neptuno pasa unos 14 años por cada signo. Su tránsito por una casa de tu carta indica el área donde se están disolviendo límites, donde lo espiritual entra en escena, donde puedes sentirte más sensible o confundido. También donde más arte, intuición y compasión pueden florecer.</p>`;
     else if (focusPlanet === 'pluto') html += `<p>Plutón pasa entre 12 y 30 años por cada signo (varía mucho). Su tránsito por una casa de tu carta indica el área que está en transformación profunda, en muerte y renacimiento. Es lento, intenso, y al final lo que queda es más auténtico que lo que había.</p>`;
     else if (focusPlanet === 'chiron') html += `<p>Quirón tarda unos 50 años en dar la vuelta completa, pero su órbita es irregular: pasa entre 2 y 8 años por cada signo. Su tránsito por una casa marca el área donde una herida antigua vuelve a abrirse — no para castigarte, sino porque ya estás en condiciones de mirarla.</p>`;
+    else if (focusPlanet === 'lilith') html += `<p>Lilith completa su ciclo en unos 9 años, así que pasa cerca de 9 meses por cada signo. Es más rápida que los planetas lentos: su tránsito por una casa no abre un proceso de años, sino un tiempo en el que algo que llevabas tragando se vuelve imposible de seguir ignorando.</p>`;
   } else {
     if (focusPlanet === 'jupiter') html += `<p>Jupiter passes through each sign in about one year. Its transit through a house of your chart indicates the area in expansion, receiving opportunities, journeys, learnings, encounters that broaden your vision. A time to say "yes" more often, to ask for more, to trust more.</p>`;
     else if (focusPlanet === 'saturn') html += `<p>Saturn spends 2-3 years in each sign. Its transit through a house of your chart indicates the area where life is asking you to mature, take responsibility, build structure. It can feel like a burden, but at the end the area is strengthened.</p>`;
@@ -1256,6 +1285,7 @@ function generateInterpretation(data, name, focusPlanet) {
     else if (focusPlanet === 'neptune') html += `<p>Neptune spends about 14 years in each sign. Its transit through a house of your chart indicates where boundaries are dissolving, where the spiritual enters, where you may feel more sensitive or confused. Also where art, intuition, and compassion can flourish.</p>`;
     else if (focusPlanet === 'pluto') html += `<p>Pluto spends between 12 and 30 years in each sign (varies). Its transit through a house indicates the area in deep transformation, death and rebirth. Slow, intense, and what remains at the end is more authentic.</p>`;
     else if (focusPlanet === 'chiron') html += `<p>Chiron takes about 50 years to complete a full circuit, but its orbit is irregular: it spends between 2 and 8 years in each sign. Its transit through a house marks the area where an old wound reopens — not to punish you, but because you're finally able to look at it.</p>`;
+    else if (focusPlanet === 'lilith') html += `<p>Lilith completes her cycle in about 9 years, so she spends around 9 months in each sign. She moves faster than the slow planets: her transit through a house doesn't open a process of years but a time in which something you'd been swallowing becomes impossible to keep ignoring.</p>`; 
   }
 
   // HOUSE
@@ -1313,6 +1343,7 @@ function generateInterpretation(data, name, focusPlanet) {
     else if (focusPlanet === 'neptune') html += `<p>Neptuno disuelve estructuras viejas y a veces también la claridad. Cuídate de idealizaciones, de promesas vagas, de personas que parecen "salvadoras". Pero también ábrete: el arte, la meditación, la espiritualidad están más vivas que nunca.</p>`;
     else if (focusPlanet === 'pluto') html += `<p>Plutón es lento e intenso. Lo que muere en este tránsito muere para que algo más auténtico nazca. No te aferres a lo que ya no eres. La transformación de Plutón te entrega más poder real del que tenías antes.</p>`;
     else if (focusPlanet === 'chiron') html += `<p>Quirón no promete que deje de doler. Promete que el dolor deje de ser el centro. Lo que se toca en este tránsito no se resuelve rápido, pero se vuelve tuyo en vez de poseerte.</p>`;
+    else if (focusPlanet === 'lilith') html += `<p>Lilith no viene a que te portes bien. Lo que aparece como molestia, rabia reprimida o contenida, o ganas de romper algo, está señalando dónde cediste. Escúchalo antes de actuar: la rebeldía sin identificar de qué se rebela solo hace ruido.</p>`;
   } else {
     if (focusPlanet === 'jupiter') html += `<p>Jupiter rewards those who act with confidence. Don't wait for opportunities to find you: move toward them. Jupiter's trap is exaggerating, promising too much, scattering. Keep focus as you expand.</p>`;
     else if (focusPlanet === 'saturn') html += `<p>Saturn rewards work and discipline. Not a time for shortcuts. What you build with effort will last. The trap is discouragement: if everything seems uphill, remember you're polishing something that will endure for years.</p>`;
@@ -1320,6 +1351,7 @@ function generateInterpretation(data, name, focusPlanet) {
     else if (focusPlanet === 'neptune') html += `<p>Neptune dissolves old structures and sometimes clarity itself. Beware of idealizations, vague promises, "savior" figures. But also open up: art, meditation, spirituality are more alive than ever.</p>`;
     else if (focusPlanet === 'pluto') html += `<p>Pluto is slow and intense. What dies in this transit dies so something more authentic can be born. Don't cling to who you no longer are. Pluto's transformation gives you more real power than you had before.</p>`;
     else if (focusPlanet === 'chiron') html += `<p>Chiron doesn't promise the pain will stop. It promises the pain will stop being the center. What gets touched in this transit isn't resolved quickly, but it becomes yours instead of possessing you.</p>`;
+    else if (focusPlanet === 'lilith') html += `<p>Lilith doesn't come to make you behave. What shows up as irritation, repressed or held-back anger, or the urge to break something, is pointing at where you gave way. Listen to it before you act: rebellion that hasn't identified what it's rebelling against only makes noise.</p>`;
   }
 
   return html;
@@ -1776,7 +1808,8 @@ function getTransitContext(transitPlanet, aspectKey, lang) {
       uranus: { short: 'Urano pasa por cada aspecto en períodos de 1 a 3 meses, con dos o tres pases por retrogradación', long: 'los cambios que activa son irreversibles cuando se permiten' },
       neptune: { short: 'Neptuno tarda meses en formar y disolver cada aspecto, con múltiples pases por retrogradación', long: 'su efecto es sutil pero profundo: lo que sucede ahora se entiende años después' },
       pluto: { short: 'Plutón puede permanecer en aspecto durante uno o dos años con sus retrogradaciones', long: 'lo que transforma queda definitivamente cambiado, sin posibilidad de regresar a la versión anterior' },
-      chiron: { short: 'Quirón puede permanecer en aspecto durante meses, con varios pases por retrogradación', long: 'lo que se remueve aquí no se cierra rápido: vuelve hasta que lo miras de frente' }
+      chiron: { short: 'Quirón puede permanecer en aspecto durante meses, con varios pases por retrogradación', long: 'lo que se remueve aquí no se cierra rápido: vuelve hasta que lo miras de frente' },
+      lilith: { short: 'Lilith forma y deshace cada aspecto en semanas, y puede volver dos veces por retrogradación', long: 'lo que destapa no se olvida: una vez visto, deja de poder ignorarse' }
     },
     en: {
       jupiter: { short: 'Jupiter passes through each aspect quickly (days or a few weeks)', long: 'but leaves seeds that bloom over the following year' },
@@ -1784,7 +1817,8 @@ function getTransitContext(transitPlanet, aspectKey, lang) {
       uranus: { short: 'Uranus passes through each aspect in periods of 1 to 3 months, with two or three passes through retrogradation', long: 'the changes it activates are irreversible when allowed' },
       neptune: { short: 'Neptune takes months to form and dissolve each aspect, with multiple retrograde passes', long: 'its effect is subtle but profound: what happens now is understood years later' },
       pluto: { short: 'Pluto can remain in aspect for one or two years with its retrogradations', long: 'what it transforms remains definitively changed, with no possibility of returning to the previous version' },
-      chiron: { short: 'Chiron can stay in aspect for months, with several passes through retrogradation', long: 'what gets stirred here doesn\'t close quickly: it comes back until you look at it straight on' }
+      chiron: { short: 'Chiron can stay in aspect for months, with several passes through retrogradation', long: 'what gets stirred here doesn\'t close quickly: it comes back until you look at it straight on' },
+      lilith: { short: 'Lilith forms and undoes each aspect within weeks, and can return twice through retrogradation', long: 'what it uncovers isn\'t forgotten: once seen, it can no longer be ignored' } 
     }
   };
 
