@@ -1775,14 +1775,16 @@ function getTransitContext(transitPlanet, aspectKey, lang) {
       saturn: { short: 'Saturno permanece en cada aspecto entre 2 y 6 semanas, y suele volver dos veces más por retrogradación', long: 'lo que se trabaja durante este tiempo se consolida por décadas' },
       uranus: { short: 'Urano pasa por cada aspecto en períodos de 1 a 3 meses, con dos o tres pases por retrogradación', long: 'los cambios que activa son irreversibles cuando se permiten' },
       neptune: { short: 'Neptuno tarda meses en formar y disolver cada aspecto, con múltiples pases por retrogradación', long: 'su efecto es sutil pero profundo: lo que sucede ahora se entiende años después' },
-      pluto: { short: 'Plutón puede permanecer en aspecto durante uno o dos años con sus retrogradaciones', long: 'lo que transforma queda definitivamente cambiado, sin posibilidad de regresar a la versión anterior' }
+      pluto: { short: 'Plutón puede permanecer en aspecto durante uno o dos años con sus retrogradaciones', long: 'lo que transforma queda definitivamente cambiado, sin posibilidad de regresar a la versión anterior' },
+      chiron: { short: 'Quirón puede permanecer en aspecto durante meses, con varios pases por retrogradación', long: 'lo que se remueve aquí no se cierra rápido: vuelve hasta que lo miras de frente' }
     },
     en: {
       jupiter: { short: 'Jupiter passes through each aspect quickly (days or a few weeks)', long: 'but leaves seeds that bloom over the following year' },
       saturn: { short: 'Saturn stays in each aspect for 2 to 6 weeks, and usually returns two more times through retrogradation', long: 'what is worked on during this time consolidates for decades' },
       uranus: { short: 'Uranus passes through each aspect in periods of 1 to 3 months, with two or three passes through retrogradation', long: 'the changes it activates are irreversible when allowed' },
       neptune: { short: 'Neptune takes months to form and dissolve each aspect, with multiple retrograde passes', long: 'its effect is subtle but profound: what happens now is understood years later' },
-      pluto: { short: 'Pluto can remain in aspect for one or two years with its retrogradations', long: 'what it transforms remains definitively changed, with no possibility of returning to the previous version' }
+      pluto: { short: 'Pluto can remain in aspect for one or two years with its retrogradations', long: 'what it transforms remains definitively changed, with no possibility of returning to the previous version' },
+      chiron: { short: 'Chiron can stay in aspect for months, with several passes through retrogradation', long: 'what gets stirred here doesn\'t close quickly: it comes back until you look at it straight on' }
     }
   };
 
@@ -1804,6 +1806,7 @@ function getTransitContext(transitPlanet, aspectKey, lang) {
   };
 
   const dur = durations[lang][transitPlanet];
+    if (!dur) return '';
   const closing = aspectKey && closings[lang][aspectKey] ? closings[lang][aspectKey] : '';
 
   if (lang === 'es') {
