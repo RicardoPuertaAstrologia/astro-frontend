@@ -1343,7 +1343,7 @@ function generateInterpretation(data, name, focusPlanet) {
     else if (focusPlanet === 'neptune') html += `<p>Neptuno disuelve estructuras viejas y a veces también la claridad. Cuídate de idealizaciones, de promesas vagas, de personas que parecen "salvadoras". Pero también ábrete: el arte, la meditación, la espiritualidad están más vivas que nunca.</p>`;
     else if (focusPlanet === 'pluto') html += `<p>Plutón es lento e intenso. Lo que muere en este tránsito muere para que algo más auténtico nazca. No te aferres a lo que ya no eres. La transformación de Plutón te entrega más poder real del que tenías antes.</p>`;
     else if (focusPlanet === 'chiron') html += `<p>Quirón no promete que deje de doler. Promete que el dolor deje de ser el centro. Lo que se toca en este tránsito no se resuelve rápido, pero se vuelve tuyo en vez de poseerte.</p>`;
-    else if (focusPlanet === 'lilith') html += `<p>Lilith no viene a que te portes bien. Lo que aparece como molestia, rabia reprimida o contenida, o ganas de romper algo, está señalando dónde cediste. Escúchalo antes de actuar: la rebeldía sin identificar de qué se rebela solo hace ruido.</p>`;
+    else if (focusPlanet === 'lilith') html += `<p>Lilith no viene a que te portes bien. Lo que aparece como molestia, rabia reprimida o contenida, o ganas de romper algo, está señalando dónde cediste. Escúchalo antes de actuar: la rebeldía sin identificar de qué se rebela, solo hace ruido.</p>`;
   } else {
     if (focusPlanet === 'jupiter') html += `<p>Jupiter rewards those who act with confidence. Don't wait for opportunities to find you: move toward them. Jupiter's trap is exaggerating, promising too much, scattering. Keep focus as you expand.</p>`;
     else if (focusPlanet === 'saturn') html += `<p>Saturn rewards work and discipline. Not a time for shortcuts. What you build with effort will last. The trap is discouragement: if everything seems uphill, remember you're polishing something that will endure for years.</p>`;
@@ -1351,7 +1351,7 @@ function generateInterpretation(data, name, focusPlanet) {
     else if (focusPlanet === 'neptune') html += `<p>Neptune dissolves old structures and sometimes clarity itself. Beware of idealizations, vague promises, "savior" figures. But also open up: art, meditation, spirituality are more alive than ever.</p>`;
     else if (focusPlanet === 'pluto') html += `<p>Pluto is slow and intense. What dies in this transit dies so something more authentic can be born. Don't cling to who you no longer are. Pluto's transformation gives you more real power than you had before.</p>`;
     else if (focusPlanet === 'chiron') html += `<p>Chiron doesn't promise the pain will stop. It promises the pain will stop being the center. What gets touched in this transit isn't resolved quickly, but it becomes yours instead of possessing you.</p>`;
-    else if (focusPlanet === 'lilith') html += `<p>Lilith doesn't come to make you behave. What shows up as irritation, repressed or held-back anger, or the urge to break something, is pointing at where you gave way. Listen to it before you act: rebellion that hasn't identified what it's rebelling against only makes noise.</p>`;
+    else if (focusPlanet === 'lilith') html += `<p>Lilith doesn't come to make you behave. What shows up as irritation, repressed or held-back anger, or the urge to break something, is pointing at where you gave way. Listen to it before you act: rebellion that hasn't identified what it's rebelling against, only makes noise.</p>`;
   }
 
   return html;
