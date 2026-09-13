@@ -353,19 +353,21 @@ const planetMeanings = {
 
 // Características arquetípicas de cada planeta de tránsito
 const transitArchetypes = {
-  es: {
-    jupiter: { word: "expansión", phrase: "Júpiter abre puertas, agranda lo que toca, llena de fe y oportunidades.", verb: "expande" },
-    saturn:  { word: "estructura", phrase: "Saturno consolida, prueba, exige madurez y enseña los límites necesarios.", verb: "estructura" },
-    uranus:  { word: "ruptura", phrase: "Urano sacude, libera, ilumina con destellos lo que estaba estancado.", verb: "despierta" },
-    neptune: { word: "disolución", phrase: "Neptuno disuelve, espiritualiza, conecta con lo sutil y lo invisible.", verb: "disuelve" },
-    pluto:   { word: "transformación", phrase: "Plutón transforma desde la raíz, pone en crisis y regenera con poder.", verb: "transforma" }
+    es: {
+    jupiter: { word: "expansión",     phrase: "Júpiter abre puertas, agranda lo que toca, llena de fe y oportunidades.", verb: "expandir" },
+    saturn:  { word: "estructura",    phrase: "Saturno consolida, prueba, exige madurez y enseña los límites necesarios.", verb: "estructurar" },
+    uranus:  { word: "ruptura",       phrase: "Urano sacude, libera, ilumina con destellos lo que estaba estancado.", verb: "despertar" },
+    neptune: { word: "disolución",    phrase: "Neptuno disuelve, espiritualiza, conecta con lo sutil y lo invisible.", verb: "disolver" },
+    pluto:   { word: "transformación", phrase: "Plutón transforma desde la raíz, pone en crisis y regenera con poder.", verb: "transformar" },
+    chiron:  { word: "sanación",      phrase: "Quirón toca donde duele, y al tocarlo abre la puerta de lo que todavía puede curarse.", verb: "sanar" }
   },
   en: {
-    jupiter: { word: "expansion", phrase: "Jupiter opens doors, magnifies what it touches, fills with faith and opportunity.", verb: "expands" },
-    saturn:  { word: "structure", phrase: "Saturn consolidates, tests, demands maturity and teaches necessary limits.", verb: "structures" },
-    uranus:  { word: "rupture", phrase: "Uranus shakes, liberates, illuminates with sudden flashes what was stuck.", verb: "awakens" },
-    neptune: { word: "dissolution", phrase: "Neptune dissolves, spiritualizes, connects with the subtle and invisible.", verb: "dissolves" },
-    pluto:   { word: "transformation", phrase: "Pluto transforms from the root, throws into crisis and regenerates with power.", verb: "transforms" }
+    jupiter: { word: "expansion",     phrase: "Jupiter opens doors, magnifies what it touches, fills with faith and opportunity.", verb: "expanding" },
+    saturn:  { word: "structure",     phrase: "Saturn consolidates, tests, demands maturity and teaches necessary limits.", verb: "structuring" },
+    uranus:  { word: "rupture",       phrase: "Uranus shakes, liberates, illuminates with sudden flashes what was stuck.", verb: "awakening" },
+    neptune: { word: "dissolution",   phrase: "Neptune dissolves, spiritualizes, connects with the subtle and invisible.", verb: "dissolving" },
+    pluto:   { word: "transformation", phrase: "Pluto transforms from the root, throws into crisis and regenerates with power.", verb: "transforming" },
+    chiron:  { word: "healing",       phrase: "Chiron touches where it hurts, and in touching it opens the door to what can still be healed.", verb: "healing" }
   }
 };
 
@@ -531,7 +533,13 @@ const planetProfile = {
       rules: "rige tu vocación, tu rol social, tu carrera profesional, tu autoridad pública, tu lugar visible en la sociedad",
       facilitates: "el reconocimiento, los logros profesionales, la visibilidad pública, el ejercicio de autoridad",
       hinders: "la vida privada protegida, los caminos profesionales tradicionales sin pasión, mantener bajo perfil"
-    }
+    },
+    chiron: {
+      archetype: "El Centauro Herido / El Sanador que no se cura",
+      rules: "es corregente de Virgo, el puente entre Saturno y Urano, entre el límite que conoces y la libertad que no, la herida de origen y la maestría que nace de ella",
+      facilitates: "la sanación de lo que otros no saben tocar, la maestría nacida del propio dolor, la compasión sin lástima, acompañar a quien atraviesa lo que tú ya atravesaste",
+      hinders: "la herida convertida en identidad, curar a todo el mundo menos a uno mismo, el victimismo que se instala, la sabiduría que se predica y no se aplica"
+      }
   },
   en: {
     sun: {
@@ -605,7 +613,13 @@ const planetProfile = {
       rules: "rules your vocation, social role, professional career, public authority, your visible place in society",
       facilitates: "recognition, professional achievements, public visibility, exercise of authority",
       hinders: "protected private life, traditional professional paths without passion, keeping low profile"
-    }
+    },
+    chiron: {
+      archetype: "The Wounded Centaur / The Healer Who Can't Heal Himself",
+      rules: "corules Virgo, the bridge between Saturn and Uranus, between the limit you know and the freedom you don't, the original wound and the mastery born from it",
+      facilitates: "healing what other people don't know how to touch, mastery born of your own pain, compassion without pity, accompanying whoever is crossing what you already crossed",
+      hinders: "the wound turned into an identity, healing everyone except yourself, victimhood that settles in, wisdom you preach and don't apply"
+      }
   }
 };
 
@@ -748,7 +762,21 @@ const transitToNatalMeaning = {
     pluto: { es: "Plutón hace cuadratura/oposición a sí mismo (mediana edad). Iniciación profunda, encuentro con la mortalidad o el poder real, total redefinición de lo que importa.", en: "Pluto squares/opposes itself (midlife). Deep initiation, encounter with mortality or real power, total redefinition of what matters." },
     asc: { es: "Plutón cruza tu Ascendente. Renacimiento total de tu identidad visible. Pasados varios años, no eres ni físicamente ni psicológicamente la misma persona. Iniciación profunda.", en: "Pluto crosses your Ascendant. Total rebirth of your visible identity. After several years, you are neither physically nor psychologically the same person. Deep initiation." },
     mc: { es: "Plutón toca tu Medio Cielo. Transformación radical de tu carrera o vocación, posible derrumbe de la fachada profesional para que emerja lo auténtico. Reinvención total.", en: "Pluto touches your Midheaven. Radical transformation of career or vocation, possible collapse of professional facade so the authentic can emerge. Total reinvention." }
-  }
+  },
+  chiron: {
+    sun: { es: "Quirón toca tu identidad. Vuelve la pregunta de si tienes derecho a ocupar tu lugar, y con ella la posibilidad de responderla de otro modo. Lo que duele aquí es antiguo; lo que puede sanar, no.", en: "Chiron touches your identity. The question of whether you have the right to take up your place comes back, and with it the chance to answer it differently. What hurts here is old; what can heal is not." },
+    moon: { es: "Quirón toca tus emociones y tu memoria temprana. Aparece lo que no te dieron cuando lo necesitabas. Es un período incómodo y fértil: puedes darte ahora, con conciencia, parte de lo que entonces faltó.", en: "Chiron touches your emotions and your early memory. What you weren't given when you needed it surfaces. It's an uncomfortable, fertile period: you can now give yourself, consciously, part of what was missing then." },
+    mercury: { es: "Quirón toca tu mente y tu voz. Reaparece la herida de no ser escuchado, de haber sido corregido o callado. Buen momento para escribir lo que no pudiste decir.", en: "Chiron touches your mind and your voice. The wound of not being heard — of having been corrected, or silenced — comes back. A good time to write what you couldn't say." },
+    venus: { es: "Quirón toca tu manera de amar y de valorarte. Se activa la sensación de no ser suficiente para ser querido. Duele, y a la vez es la ocasión de revisar qué llamas amor y qué llamas rescate.", en: "Chiron touches the way you love and value yourself. The sense of not being enough to be loved gets activated. It hurts, and it's also the chance to review what you call love and what you call rescue." },
+    mars: { es: "Quirón toca tu capacidad de actuar y de defenderte. Vuelve la duda sobre tu derecho a querer lo que quieres. Si la trabajas, sales con una fuerza que ya no necesita pedir permiso.", en: "Chiron touches your capacity to act and to defend yourself. The doubt about your right to want what you want returns. If you work it, you come out with a strength that no longer asks permission." },
+    jupiter: { es: "Quirón toca tu fe y tu sentido de expansión. Se pone a prueba aquello en lo que creías, y lo que sobrevive a la prueba es lo único que valía. Tránsito de sabiduría ganada, no heredada.", en: "Chiron touches your faith and your sense of expansion. What you believed gets tested, and what survives the test is the only part that was worth anything. A transit of wisdom earned rather than inherited." },
+    saturn: { es: "Quirón toca tu estructura y tu relación con la autoridad. Duele lo que construiste sobre exigencia en vez de sobre el deseo. Es un tránsito duro y de los más transformadores que existen.", en: "Chiron touches your structure and your relationship with authority. What you built on demand rather than on desire starts to hurt. It's a hard transit, and one of the most transformative there is." },
+    uranus: { es: "Quirón toca tu necesidad de libertad. Aparece la herida de haber sido distinto, de no haber encajado. Y con ella la posibilidad de dejar de defenderte de eso y empezar a habitarlo.", en: "Chiron touches your need for freedom. The wound of having been different, of not fitting, surfaces. And with it the chance to stop defending yourself against that and start inhabiting it." },
+    neptune: { es: "Quirón toca tu sensibilidad y tu vida espiritual. Se difumina la frontera entre tu dolor y el ajeno. Cuida esa frontera: aquí la compasión sana o disuelve, según cómo la sostengas.", en: "Chiron touches your sensitivity and your spiritual life. The border between your pain and other people's blurs. Look after that border: here compassion either heals or dissolves, depending on how you hold it." },
+    pluto: { es: "Quirón toca tu poder profundo. Lo que duele viene de muy atrás, a veces de antes de ti. Es de los tránsitos más intensos que existen y, trabajado, de los que más liberan.", en: "Chiron touches your deep power. What hurts comes from far back, sometimes from before you. It's one of the most intense transits there is, and, worked with, one of the most freeing." },
+    asc: { es: "Quirón toca tu manera de presentarte al mundo. La máscara empieza a pesar. Período de cambiar cómo te muestras, no para esconderte mejor sino para no tener que esconderte.", en: "Chiron touches the way you present yourself to the world. The mask starts to weigh. A period for changing how you show up — not to hide better, but so you don't have to hide." },
+    mc: { es: "Quirón toca tu vocación y tu lugar público. Se revisa si lo que haces es tuyo o es lo que esperaban de ti. Muchas vocaciones verdaderas nacen en este tránsito.", en: "Chiron touches your calling and your public place. Whether what you do is yours or what was expected of you comes up for review. A great many real callings are born in this transit." }
+    }
 };
 
 // Hash de aspecto en español/inglés a clave canónica
@@ -1211,7 +1239,8 @@ function generateInterpretation(data, name, focusPlanet) {
 
   // ARCHETYPE
   html += `<h3>${lang === 'es' ? `Lo que significa este tránsito de ${planetName}` : `What this transit of ${planetName} means`}</h3>`;
-  html += `<p>${archetype.phrase}</p>`;
+  // El planeta señala el terreno; la acción es de la persona.
+    html += `<p>${archetype.phrase} <strong>${planetName} ${lang === 'es' ? 'promueve' : 'promotes'} ${archetype.verb}</strong>: ${lang === 'es' ? 'señala el terreno, pero el trabajo es tuyo.' : 'it marks out the ground, but the work is yours.'}</p>`;
 
   if (lang === 'es') {
     if (focusPlanet === 'jupiter') html += `<p>Júpiter pasa por cada signo aproximadamente un año. Su tránsito por una casa de tu carta indica el área que está en expansión, que recibe oportunidades, viajes, aprendizajes, encuentros que amplían tu visión. Es un tiempo para decir "sí" más a menudo, para pedir más, para confiar más.</p>`;
@@ -1219,12 +1248,14 @@ function generateInterpretation(data, name, focusPlanet) {
     else if (focusPlanet === 'uranus') html += `<p>Urano pasa unos 7 años por cada signo. Su tránsito por una casa de tu carta indica el área donde estás siendo invitado a romper con lo establecido, a probar lo nuevo, a liberarte de lo que ya no eres. No siempre es cómodo, pero es donde más originalidad puede emerger.</p>`;
     else if (focusPlanet === 'neptune') html += `<p>Neptuno pasa unos 14 años por cada signo. Su tránsito por una casa de tu carta indica el área donde se están disolviendo límites, donde lo espiritual entra en escena, donde puedes sentirte más sensible o confundido. También donde más arte, intuición y compasión pueden florecer.</p>`;
     else if (focusPlanet === 'pluto') html += `<p>Plutón pasa entre 12 y 30 años por cada signo (varía mucho). Su tránsito por una casa de tu carta indica el área que está en transformación profunda, en muerte y renacimiento. Es lento, intenso, y al final lo que queda es más auténtico que lo que había.</p>`;
+    else if (focusPlanet === 'chiron') html += `<p>Quirón tarda unos 50 años en dar la vuelta completa, pero su órbita es irregular: pasa entre 2 y 8 años por cada signo. Su tránsito por una casa marca el área donde una herida antigua vuelve a abrirse — no para castigarte, sino porque ya estás en condiciones de mirarla.</p>`;
   } else {
     if (focusPlanet === 'jupiter') html += `<p>Jupiter passes through each sign in about one year. Its transit through a house of your chart indicates the area in expansion, receiving opportunities, journeys, learnings, encounters that broaden your vision. A time to say "yes" more often, to ask for more, to trust more.</p>`;
     else if (focusPlanet === 'saturn') html += `<p>Saturn spends 2-3 years in each sign. Its transit through a house of your chart indicates the area where life is asking you to mature, take responsibility, build structure. It can feel like a burden, but at the end the area is strengthened.</p>`;
     else if (focusPlanet === 'uranus') html += `<p>Uranus spends about 7 years in each sign. Its transit through a house of your chart indicates the area where you're invited to break with the established, try the new, free yourself from what you no longer are. Not always comfortable, but where the most originality can emerge.</p>`;
     else if (focusPlanet === 'neptune') html += `<p>Neptune spends about 14 years in each sign. Its transit through a house of your chart indicates where boundaries are dissolving, where the spiritual enters, where you may feel more sensitive or confused. Also where art, intuition, and compassion can flourish.</p>`;
     else if (focusPlanet === 'pluto') html += `<p>Pluto spends between 12 and 30 years in each sign (varies). Its transit through a house indicates the area in deep transformation, death and rebirth. Slow, intense, and what remains at the end is more authentic.</p>`;
+    else if (focusPlanet === 'chiron') html += `<p>Chiron takes about 50 years to complete a full circuit, but its orbit is irregular: it spends between 2 and 8 years in each sign. Its transit through a house marks the area where an old wound reopens — not to punish you, but because you're finally able to look at it.</p>`;
   }
 
   // HOUSE
