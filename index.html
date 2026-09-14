@@ -218,15 +218,27 @@
   }
   .tab:hover { background: #3d7a9e; border-color: #3d7a9e; }
   .tab.active { background: var(--ink); border-color: var(--ink); }
+  .tab-content { display: none; animation: fadeIn 0.3s ease-out; }
+  .tab-content.active { display: block; }
   @media (max-width: 600px) { .tabs { gap: 0.4rem; } .tab { padding: 0.65rem 1rem; font-size: 0.84rem; } }
 
-  /* SUBMENÚ DE PLANETAS — solo dentro de la pestaña de tránsitos */
-  .transit-selector {
+  /* SUBMENÚ — solo dentro de la pestaña de tránsitos */
+  .transit-bar {
     display: none; justify-content: center; align-items: center; gap: 0.45rem; flex-wrap: wrap;
     margin-bottom: 1.5rem; padding: 0.9rem 1rem; background: var(--uranus-soft); border-radius: 8px;
   }
-  .transit-selector.visible { display: flex; }
-  .transit-selector .selector-label {
+  .transit-bar.visible { display: flex; }
+  .transit-selector { display: contents; }
+  .tab-inline {
+    padding: 0.5rem 1rem; font-size: 0.84rem; border-radius: 999px;
+    margin-left: 0.6rem; border-left: 1px solid var(--line-strong);
+  }
+  .panel-title {
+    font-size: 0.66rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.18em;
+    color: var(--ink-faint); text-align: center;
+    padding-bottom: 0.85rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--line);
+  }
+  .transit-bar .selector-label {
     font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.14em;
     color: var(--uranus); font-weight: 600; margin-right: 0.4rem;
   }
@@ -523,72 +535,38 @@
       <div class="result-meta" id="result-meta"></div>
     </header>
 
-    <!-- PESTAÑAS -->
+    <!-- PESTAÑAS — cuatro; «Los datos de tu carta» es la vista por defecto -->
     <div class="tabs">
-  <button class="tab" data-tab="summary" data-i18n="tabSummary">Tus áreas de vida activadas</button>
-  <button class="tab" data-tab="calendar" data-i18n="tabCalendar">Tu calendario · 12 meses</button>
-  <button class="tab" data-tab="interpretation" data-i18n="tabInterpret">Tránsitos de los planetas lentos</button>
-  <button class="tab" data-tab="aspects" data-i18n="tabAspects">Aspectos de los tránsitos</button>
-  <button class="tab" data-tab="lectura-rp" data-i18n="tabLecturaRP">Tu carta natal detallada</button>
+      <button class="tab" data-tab="lectura-rp" data-i18n="tabLecturaRP">Tu carta natal detallada</button>
+      <button class="tab" data-tab="interpretation" data-i18n="tabInterpret">Tránsitos de los planetas lentos</button>
+      <button class="tab" data-tab="calendar" data-i18n="tabCalendar">Tu calendario · 12 meses</button>
+      <button class="tab" data-tab="summary" data-i18n="tabSummary">Tus áreas de vida activadas</button>
     </div>
 
-    <!-- SUBMENÚ DE PLANETAS — solo visible en la pestaña de tránsitos -->
-    <div class="transit-selector" id="transit-selector"></div>
+    <!-- SUBMENÚ — solo dentro de «Tránsitos de los planetas lentos» -->
+    <div class="transit-bar" id="transit-bar">
+      <span class="selector-label" data-i18n="labelPlanet">Planeta</span>
+      <div class="transit-selector" id="transit-selector"></div>
+      <button class="tab tab-inline" data-tab="aspects" data-i18n="tabAspects">Aspectos de los tránsitos</button>
+    </div>
 
-    <!-- DOS COLUMNAS: la carta a la izquierda, el contenido a la derecha -->
+    <!-- DOS COLUMNAS -->
     <div class="result-split">
       <div class="chart-wrapper">
-        <div class="chart-title"><strong data-i18n="chartWheelNatal">Carta natal</strong> + <strong data-i18n="chartWheelTransits">tránsitos actuales</strong></div>
-        <!-- El viewBox va 20 puntos más ancho por cada lado para que AC, DC, MC e IC no se corten -->
+        <div class="chart-title" data-i18n-html="chartWheel"><strong data-i18n="chartWheelNatal">Carta natal</strong> + <strong data-i18n="chartWheelTransits">tránsitos actuales</strong></div>
         <svg id="natal-chart" class="chart-svg" viewBox="-20 -20 520 520"></svg>
         <div class="chart-legend">
           <span><i class="legend-dot natal"></i><span data-i18n="legendNatal">Planetas natales</span></span>
           <span><i class="legend-dot transit"></i><span data-i18n="legendTransit">Tránsitos de hoy</span></span>
         </div>
         <div class="chart-watermark">
-          <img src="assets/logo-completo.svg" alt="Ricardo Puerta Isaza · arquitecto y astrólogo">
+          <img src="assets/logo-completo.svg" alt="Ricardo Puerta Isaza · arquitecto & astrólogo">
         </div>
       </div>
+
       <div class="content-panel">
-    <!-- TAB CONTENTS -->
-    <div class="tab-content" id="tab-interpretation">
-      <div class="transit-info">
-        <div class="info-block">
-          <div class="info-label" id="info-label-pos" data-i18n="planetNow">Planeta en este momento</div>
-          <div class="info-value" id="planet-position">—</div>
-          <div class="info-value-sub" id="planet-motion"></div>
-        </div>
-        <div class="info-block">
-          <div class="info-label" data-i18n="planetHouse">Casa natal que está transitando</div>
-          <div class="info-value" id="planet-house">—</div>
-          <div class="info-value-sub" id="planet-house-meaning"></div>
-        </div>
-        <div class="info-block">
-          <div class="info-label" data-i18n="aspectCount">Aspectos exactos a tus planetas natales</div>
-          <div class="info-value" id="aspect-count">—</div>
-        </div>
-      </div>
-
-  <article class="interpretation" id="interpretation-content"></article>
-    </div>
-
-    <div class="tab-content" id="tab-lectura-rp">
-  <article class="interpretation" id="lectura-rp-content">
-    <p style="text-align:center; color: var(--ink-faint); padding: 2rem;">Cargando lectura profunda...</p>
-  </article>
-    </div>
-
-    <div class="tab-content" id="tab-aspects">
-      <h3 class="section-title-display" data-i18n="aspectsTitle">Aspectos exactos por tránsito</h3>
-      <div id="aspects-by-transit"></div>
-    </div>
-
-    <div class="tab-content" id="tab-calendar">
-      <h3 class="section-title-display" id="calendar-title">Próximos 12 meses</h3>
-      <div class="calendar-list" id="calendar-list"></div>
-    </div>
-
-    <div class="tab-content active" id="tab-chart-detail">
+        <div class="tab-content active" id="tab-chart-detail">
+        <div class="panel-title" data-i18n="chartTitle">Los datos de tu carta natal</div>
       <h3 class="section-title-display" data-i18n="chartTitle">Tu carta natal completa</h3>
 
       <h4 class="section-title" data-i18n="planetsTitle">Planetas natales</h4>
@@ -600,10 +578,41 @@
       <h4 class="section-title" data-i18n="natalAspectsTitle">Aspectos entre tus planetas natales</h4>
       <div class="aspects-grid" id="natal-aspects-grid"></div>
     </div>
-
-    <div class="tab-content" id="tab-summary">
+        <div class="tab-content" id="tab-lectura-rp">
+  <article class="interpretation" id="lectura-rp-content">
+    <p style="text-align:center; color: var(--ink-faint); padding: 2rem;">Cargando lectura profunda...</p>
+  </article>
+    </div>
+        <div class="tab-content" id="tab-interpretation">
+        <div class="transit-info">
+          <div class="info-block">
+            <div class="info-label" id="info-label-pos" data-i18n="planetNow">Planeta en este momento</div>
+            <div class="info-value" id="planet-position">—</div>
+            <div class="info-value-sub" id="planet-motion"></div>
+          </div>
+          <div class="info-block">
+            <div class="info-label" data-i18n="planetHouse">Casa natal que está transitando</div>
+            <div class="info-value" id="planet-house">—</div>
+            <div class="info-value-sub" id="planet-house-meaning"></div>
+          </div>
+          <div class="info-block">
+            <div class="info-label" data-i18n="aspectCount">Aspectos exactos a tus planetas natales</div>
+            <div class="info-value" id="aspect-count">—</div>
+          </div>
+        </div>
+        <article class="interpretation" id="interpretation-content"></article>
+      </div>
+        <div class="tab-content" id="tab-calendar">
+      <h3 class="section-title-display" id="calendar-title">Próximos 12 meses</h3>
+      <div class="calendar-list" id="calendar-list"></div>
+    </div>
+        <div class="tab-content" id="tab-summary">
       <h3 class="section-title-display" data-i18n="summaryTitle">Sumario interpretativo por áreas</h3>
       <div class="summary-grid" id="summary-grid"></div>
+    </div>
+        <div class="tab-content" id="tab-aspects">
+      <h3 class="section-title-display" data-i18n="aspectsTitle">Aspectos exactos por tránsito</h3>
+      <div id="aspects-by-transit"></div>
     </div>
       </div>
     </div>
@@ -617,12 +626,8 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         <span data-i18n="downloadPdf">Imprimir / PDF</span>
       </button>
-      <button class="action-btn" id="reset-btn">
-        <span data-i18n="resetBtn">← Otra carta</span>
-      </button>
+      <button class="action-btn" id="reset-btn"><span data-i18n="resetBtn">← Otra carta</span></button>
     </div>
-
-    <!-- TABS -->
 
     <p class="footer-note" data-i18n="footerNote">Cálculos realizados con Swiss Ephemeris · Validado contra Solar Fire v9.1.0 con precisión menor a 1 minuto de arco · Sistema Plácidus · Zodíaco tropical · Geocéntrico</p>
   </div>
@@ -632,24 +637,43 @@
 <script>
   if (location.search.indexOf('dev') !== -1) document.body.classList.add('dev-mode');
 
-  // El submenú de planetas solo se muestra dentro de «Tránsitos de los planetas lentos».
-  // Y al volver a pulsar la pestaña activa, se regresa a los datos de la carta.
-  document.addEventListener('click', function (e) {
-    const t = e.target.closest('.tab');
-    if (!t) return;
-    const sel = document.getElementById('transit-selector');
-    const esTransitos = t.dataset.tab === 'interpretation';
-    if (sel) sel.classList.toggle('visible', esTransitos && t.classList.contains('active'));
-    // si ninguna pestaña queda activa, se muestran los datos de la carta
-    setTimeout(function () {
+  // El submenú se muestra en «Tránsitos de los planetas lentos» y en «Aspectos».
+  // Al volver a pulsar la pestaña activa se regresa a los datos de la carta.
+  (function () {
+    const CON_SUBMENU = ['interpretation', 'aspects'];
+    let estabaActiva = false;
+
+    function sincronizar() {
       const activa = document.querySelector('.tab.active');
+      const barra = document.getElementById('transit-bar');
+      if (barra) barra.classList.toggle('visible', !!activa && CON_SUBMENU.includes(activa.dataset.tab));
       if (!activa) {
         const datos = document.getElementById('tab-chart-detail');
         if (datos) datos.classList.add('active');
-        if (sel) sel.classList.remove('visible');
       }
-    }, 0);
-  });
+    }
+
+    // Fase de captura: corre ANTES que el manejador de app.js,
+    // así sabemos si la pestaña ya estaba activa antes del clic.
+    document.addEventListener('click', function (e) {
+      const t = e.target.closest && e.target.closest('.tab');
+      estabaActiva = !!t && t.classList.contains('active');
+    }, true);
+
+    document.addEventListener('click', function (e) {
+      const t = e.target.closest && e.target.closest('.tab');
+      if (!t) return;
+      setTimeout(function () {
+        if (estabaActiva) {
+          t.classList.remove('active');
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        }
+        sincronizar();
+      }, 0);
+    });
+
+    sincronizar();
+  })();
 </script>
 
 <script src="app.js"></script>
