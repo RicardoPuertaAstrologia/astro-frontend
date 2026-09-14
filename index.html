@@ -77,74 +77,23 @@
   .display-font { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 400; letter-spacing: -0.01em; }
   .uranus-glyph, .planet-glyph-svg { display: inline-block; width: 1em; height: 1em; vertical-align: -0.12em; }
 
-  /* HEADER */
+  /* HEADER — logotipo horizontal sobre el fondo de la página */
   .top-bar {
     display: flex; justify-content: space-between; align-items: center;
     padding: 1.35rem 2rem; border-bottom: 1px solid var(--line);
     position: sticky; top: 0; z-index: 100; gap: 1rem;
     backdrop-filter: blur(8px); background: color-mix(in srgb, var(--surface) 85%, transparent);
   }
-
-  .logo { display: flex; align-items: center; gap: 0.9rem; min-width: 0; }
-
-  /* El símbolo va incrustado como <svg>, no como <img>.
-     Así hereda el color del texto y se adapta solo al modo claro/oscuro.
-     flex-shrink: 0 impide que el navegador lo aplaste en pantallas estrechas. */
-  .brand-logo {
-    width: 58px; height: 58px; flex-shrink: 0;
-    color: var(--ink); display: block;
-  }
-
-  .brand-text { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
-  .brand-name {
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 1.4rem; font-weight: 500; letter-spacing: 0.01em; color: var(--ink);
-    white-space: nowrap;
-  }
-  .brand-tagline {
-    font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 400;
-    color: var(--ink-faint); letter-spacing: 0.06em; font-style: italic;
-    margin-top: 0.18rem; white-space: nowrap;
-  }
-
-  /* Selector de idioma */
+  .brand-logo { width: 290px; height: auto; color: var(--ink); display: block; flex-shrink: 0; }
   .top-actions { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
-  .lang-switch {
-    display: inline-flex; align-items: center;
-    border: 1px solid var(--line-strong); border-radius: 999px;
-    padding: 2px; background: var(--surface);
-  }
-  .lang-btn {
-    appearance: none; border: none; background: none; cursor: pointer;
-    font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 600;
-    letter-spacing: 0.12em; color: var(--ink-faint);
-    padding: 0.4rem 0.85rem; border-radius: 999px;
-    transition: color 0.2s, background 0.2s;
-  }
+  .lang-switch { display: inline-flex; align-items: center; border: 1px solid var(--line-strong); border-radius: 999px; padding: 2px; background: var(--surface); }
+  .lang-btn { appearance: none; border: none; background: none; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; color: var(--ink-faint); padding: 0.4rem 0.85rem; border-radius: 999px; transition: color 0.2s, background 0.2s; }
   .lang-btn:hover { color: var(--ink-soft); }
   .lang-btn.active { background: var(--ink); color: var(--bg); }
+  @media (max-width: 780px) { .top-bar { padding: 1rem 1.25rem; } .brand-logo { width: 220px; } }
+  @media (max-width: 480px) { .brand-logo { width: 178px; } .lang-btn { padding: 0.35rem 0.65rem; font-size: 0.66rem; } }
 
-  @media (max-width: 780px) {
-    .top-bar { padding: 1.05rem 1.5rem; }
-    .brand-logo { width: 50px; height: 50px; }
-    .brand-name { font-size: 1.2rem; }
-    .brand-tagline { font-size: 0.71rem; }
-  }
-  @media (max-width: 600px) {
-    .top-bar { padding: 0.85rem 1rem; gap: 0.5rem; }
-    .logo { gap: 0.65rem; }
-    .brand-logo { width: 44px; height: 44px; }
-    .brand-name { font-size: 1.05rem; }
-    .brand-tagline { font-size: 0.63rem; letter-spacing: 0.04em; }
-    .lang-btn { padding: 0.35rem 0.65rem; font-size: 0.66rem; }
-  }
-  @media (max-width: 360px) {
-    .brand-tagline { display: none; }
-    .brand-logo { width: 40px; height: 40px; }
-    .brand-name { font-size: 0.94rem; }
-  }
-
-  .container { max-width: 1180px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+  .container { max-width: 1500px; margin: 0 auto; padding: 3rem 2rem 5rem; }
   @media (max-width: 600px) { .container { padding: 2rem 1.25rem 3rem; } }
 
   /* ARREGLO 3 — El panel de backend queda oculto en producción.
@@ -202,8 +151,11 @@
   @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   .result-header { text-align: center; margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--line); }
   .result-name { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); margin-bottom: 0.75rem; }
-  .result-title { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 300; line-height: 1.1; margin-bottom: 1rem; }
-  .result-title em { font-style: italic; color: var(--uranus); }
+  .result-title {
+    font-size: clamp(2rem, 4.5vw, 3.4rem); font-weight: 700; line-height: 1.1;
+    text-transform: uppercase; letter-spacing: 0.02em; color: var(--uranus); margin-bottom: 1rem;
+  }
+  .result-title em { font-style: normal; color: var(--uranus); }
   .result-subtitle { font-size: clamp(1.05rem, 2vw, 1.4rem); color: var(--ink-soft); font-weight: 400; line-height: 1.4; max-width: 720px; margin: 0.75rem auto 1.25rem; font-style: italic; letter-spacing: -0.01em; }
   .result-meta { font-size: 0.9rem; color: var(--ink-soft); }
 
@@ -254,28 +206,50 @@
   .info-value-sub { font-family: 'Inter', sans-serif; font-size: 0.85rem; color: var(--ink-soft); margin-top: 0.4rem; }
   .uranus-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.3rem 0.75rem; background: var(--uranus-soft); border-radius: 999px; font-size: 0.75rem; font-weight: 500; color: var(--uranus); margin-top: 0.5rem; }
 
-  /* TABS — botones redondeados, se envuelven en varias filas */
+  /* TABS — píldoras en el azul de la marca */
   .tabs {
-    display: flex; flex-wrap: wrap; gap: 0.5rem;
-    border-bottom: 1px solid var(--line);
-    padding-bottom: 1.15rem; margin-bottom: 2rem;
-    overflow: visible;
+    display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;
+    margin: 2.2rem 0 1rem; border: none; padding: 0; overflow: visible;
   }
   .tab {
-    padding: 0.7rem 1.15rem;
-    background: var(--surface); border: 1px solid var(--line-strong); border-radius: 999px;
-    font-family: inherit; font-size: 0.9rem; font-weight: 500;
-    color: var(--ink-soft); cursor: pointer; white-space: nowrap;
-    transition: all 0.2s;
+    padding: 0.8rem 1.5rem; background: var(--uranus); border: 1px solid var(--uranus);
+    color: #fff; font-family: inherit; font-size: 0.92rem; font-weight: 500;
+    cursor: pointer; border-radius: 999px; white-space: nowrap; transition: all 0.2s; line-height: 1.25;
   }
-  .tab:hover { border-color: var(--ink-soft); color: var(--ink); }
-  .tab.active { background: var(--ink); border-color: var(--ink); color: var(--bg); font-weight: 600; }
-  @media (max-width: 600px) {
-    .tabs { gap: 0.4rem; padding-bottom: 1rem; }
-    .tab { padding: 0.6rem 0.9rem; font-size: 0.82rem; }
+  .tab:hover { background: #3d7a9e; border-color: #3d7a9e; }
+  .tab.active { background: var(--ink); border-color: var(--ink); }
+  @media (max-width: 600px) { .tabs { gap: 0.4rem; } .tab { padding: 0.65rem 1rem; font-size: 0.84rem; } }
+
+  /* SUBMENÚ DE PLANETAS — solo dentro de la pestaña de tránsitos */
+  .transit-selector {
+    display: none; justify-content: center; align-items: center; gap: 0.45rem; flex-wrap: wrap;
+    margin-bottom: 1.5rem; padding: 0.9rem 1rem; background: var(--uranus-soft); border-radius: 8px;
   }
-  .tab-content { display: none; animation: fadeIn 0.3s ease-out; }
-  .tab-content.active { display: block; }
+  .transit-selector.visible { display: flex; }
+  .transit-selector .selector-label {
+    font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.14em;
+    color: var(--uranus); font-weight: 600; margin-right: 0.4rem;
+  }
+  .transit-pill { padding: 0.5rem 1rem; background: var(--surface); border: 1px solid var(--line-strong); border-radius: 999px; font-size: 0.84rem; font-weight: 500; color: var(--ink-soft); cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.45rem; }
+  .transit-pill:hover { border-color: var(--ink-soft); }
+  .transit-pill.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .transit-pill .glyph { font-family: Georgia, serif; font-size: 1.05em; }
+
+  /* DOS COLUMNAS — la rueda fija a la izquierda, el contenido a la derecha */
+  .result-split {
+    display: grid; grid-template-columns: minmax(400px, 1fr) 1.3fr;
+    gap: 1.75rem; align-items: start; margin-bottom: 2rem;
+  }
+  .chart-wrapper { position: sticky; top: 6rem; }
+  .content-panel {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 4px;
+    padding: 1.75rem; box-shadow: var(--shadow); min-height: 640px;
+  }
+  @media (max-width: 1100px) {
+    .result-split { grid-template-columns: 1fr; }
+    .chart-wrapper { position: static; }
+    .content-panel { padding: 1.25rem; min-height: 0; }
+  }
 
   /* PLANETS TABLE */
   .planets-table { width: 100%; margin-bottom: 4rem; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; box-shadow: var(--shadow); }
@@ -409,24 +383,63 @@
 </svg>
 
 <header class="top-bar">
-  <div class="logo">
-    <svg class="brand-logo" viewBox="92.2 35.2 212.5 212.5" xmlns="http://www.w3.org/2000/svg"
-         fill="currentColor" role="img" aria-label="Ricardo Puerta Isaza">
-      <g>
-      <circle cx="198.47" cy="141.45" r="1.03" style="fill: currentColor;"/>
-      <g>
-        <path d="M268.97,137.77v3.69c0,37.65-29.65,68.57-66.91,70.49v-17.56c27.59-1.85,49.46-24.87,49.46-52.97v-3.66h-23.28c-1.81-14.84-14.45-26.36-29.8-26.36s-27.99,11.51-29.83,26.36h-15.82c1.85-23.53,21.58-42.14,45.65-42.14h3.62v-32.01h-3.62c-42.94,0-77.91,34.94-77.91,77.84v3.66h7.28v-3.66c0-37.65,29.76-68.57,66.94-70.45v17.45c-27.59,1.88-49.46,24.91-49.46,52.97v3.69h23.32c1.85,14.84,14.48,26.43,29.83,26.43s27.99-11.59,29.76-26.43h15.86c-1.88,23.53-21.65,42.14-45.62,42.14h-3.69v32.08h3.69c42.94,0,77.84-34.94,77.84-77.88v-3.69h-7.31ZM220.85,145.12c-1.77,10.83-11.15,19.08-22.41,19.08s-20.67-8.25-22.41-19.08h19.08v-7.35h-19.08c1.7-10.75,11.15-19.04,22.41-19.04s20.64,8.29,22.41,19.04h-19.12v7.35h19.12Z" style="fill: currentColor; fill-rule: evenodd;"/>
-        <path d="M150.51,193.59c-2.51,0-4.57,2.02-4.57,4.53s2.06,4.6,4.57,4.6,4.6-2.02,4.6-4.6-2.06-4.53-4.6-4.53" style="fill: currentColor; fill-rule: evenodd;"/>
-        <path d="M246.35,89.35c2.51,0,4.56-2.07,4.56-4.57s-2.05-4.61-4.56-4.61-4.6,2.06-4.6,4.61,2.06,4.57,4.6,4.57" style="fill: currentColor; fill-rule: evenodd;"/>
-        <path d="M198.44,35.53c-58.4,0-105.97,47.5-105.97,105.94s47.57,105.97,105.97,105.97,105.94-47.54,105.94-105.97-47.54-105.94-105.94-105.94ZM198.44,240.12c-54.42,0-98.69-44.24-98.69-98.66s44.28-98.66,98.69-98.66,98.62,44.28,98.62,98.66-44.21,98.66-98.62,98.66Z" style="fill: currentColor; fill-rule: evenodd;"/>
-      </g>
+  <svg class="brand-logo" viewBox="0 0 680.31 226.77" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+       role="img" aria-label="Ricardo Puerta Isaza · arquitecto &amp; astrólogo">
+    <metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTo2NzFiZTk3My04MmQ0LTRhMjQtYTFlOS0yNDVjMDMzZTM2NGYAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaMfk/P2LJB+ddrNN1yz9LvQAAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDo5NzVhYTdkYy0wYmY3LTQ2NGYtODdkNS1mZTAxOTBlMGM0YWZscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNoNKyAgqs8H44WY0saq+R1NAAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggQOqbQTVbdFD36JZnSuUuGrvpNuxS1FAGuaOiUC+wbhykZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaGS3egdXVG8/CEcoCxjx15wAAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRNAAAAAAAAAAAAAAAAAGRoYXNoWCC/fLOyazz9z+MnmAmi9wI286/RxEOnDAEAFTs7N5ppSmRuYW1lbmp1bWJmIG1hbmlmZXN0amV4Y2x1c2lvbnOBomVzdGFydBjjZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOjY3MWJlOTczLTgyZDQtNGEyNC1hMWU5LTI0NWMwMzNlMzY0Zi9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOjRjMzViZjFlLWIzYTgtNGU2NS1iMzllLTg5MTJlMGU2NWIxYXJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCBA6ptBNVt0UPfolmdK5S4au+k27FLUUAa5o6JQL7BuHKJjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggB8dc3of2g/LCj/40tGXpvhZW21j4W8foa0G2YF3K+jGiY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFgg4wW4su3+at0vjmzcQk6ZJTepzF/EkYmuuPz5XIZNrZN0Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQDokxWcZSIKxe7G3vuPWflfFnufbPgVt46GwNp/fhgfqIhF+Cttfv0FI8/sf5xa6Cc0P0cHhEN/hLddnd2WQAjM=</c2pa:manifest></metadata>
+<g>
+    <circle cx="109.27" cy="110.82" r=".82"/>
+    <g>
+      <path d="M165.85,107.86v2.96c0,30.22-23.8,55.04-53.7,56.58v-14.09c22.14-1.48,39.69-19.96,39.69-42.51v-2.93h-18.68c-1.45-11.91-11.59-21.15-23.91-21.15s-22.46,9.24-23.94,21.15h-12.7c1.48-18.89,17.32-33.82,36.64-33.82h2.91v-25.69h-2.91c-34.46,0-62.53,28.04-62.53,62.48v2.93h5.84v-2.93c0-30.22,23.89-55.04,53.73-56.55v14.01c-22.14,1.51-39.69,19.99-39.69,42.51v2.96h18.71c1.48,11.91,11.62,21.21,23.94,21.21s22.46-9.3,23.89-21.21h12.73c-1.51,18.89-17.38,33.82-36.61,33.82h-2.96v25.75h2.96c34.46,0,62.48-28.04,62.48-62.5v-2.96h-5.87ZM127.23,113.76c-1.42,8.69-8.95,15.31-17.99,15.31s-16.59-6.63-17.99-15.31h15.31v-5.9h-15.31c1.37-8.63,8.95-15.28,17.99-15.28s16.56,6.65,17.99,15.28h-15.34v5.9h15.34Z" fill-rule="evenodd"/>
+      <path d="M70.77,152.67c-2.01,0-3.67,1.62-3.67,3.64s1.65,3.69,3.67,3.69,3.69-1.62,3.69-3.69-1.65-3.64-3.69-3.64" fill-rule="evenodd"/>
+      <path d="M147.69,69c2.01,0,3.66-1.66,3.66-3.67s-1.65-3.7-3.66-3.7-3.69,1.65-3.69,3.7,1.65,3.67,3.69,3.67" fill-rule="evenodd"/>
+      <path d="M109.25,25.8c-46.87,0-85.05,38.12-85.05,85.02s38.18,85.05,85.05,85.05,85.02-38.15,85.02-85.05S156.12,25.8,109.25,25.8ZM109.25,190.01c-43.67,0-79.21-35.51-79.21-79.18S65.57,31.64,109.25,31.64s79.15,35.54,79.15,79.18-35.48,79.18-79.15,79.18Z" fill-rule="evenodd"/>
     </g>
-    </svg>
-    <div class="brand-text">
-      <span class="brand-name display-font">Ricardo Puerta Isaza</span>
-      <span class="brand-tagline">arquitecto &amp; astrólogo</span>
-    </div>
-  </div>
+  </g>
+  <g>
+    <g>
+      <path d="M276.04,142.79c0-1.71.75-3.03,2.24-3.96,1.5-.93,3.88-1.58,7.15-1.95,0-.41-.05-.81-.16-1.19-.11-.38-.28-.71-.5-1.01-.23-.29-.52-.52-.88-.68-.36-.16-.81-.24-1.35-.24-.8,0-1.58.15-2.32.46-.75.3-1.47.67-2.16,1.1l-1.36-2.5c.89-.56,1.88-1.05,2.97-1.46,1.09-.41,2.28-.62,3.56-.62,2.01,0,3.51.59,4.48,1.77.97,1.18,1.46,2.88,1.46,5.12v9.45h-3.06l-.29-1.76h-.1c-.71.61-1.48,1.12-2.29,1.53-.81.41-1.69.61-2.65.61-1.41,0-2.55-.43-3.43-1.28-.88-.85-1.32-1.99-1.32-3.39ZM279.68,142.49c0,.71.21,1.24.64,1.56.42.33.97.49,1.64.49s1.25-.15,1.79-.46c.54-.3,1.1-.74,1.69-1.3v-3.57c-1.08.13-1.99.31-2.73.52s-1.32.46-1.77.73c-.45.27-.76.58-.96.92-.19.35-.29.71-.29,1.1Z"/>
+      <path d="M293.71,131.12h3.09l.26,2.83h.13c.56-1.04,1.25-1.83,2.04-2.39.8-.55,1.63-.83,2.47-.83.76,0,1.36.11,1.82.33l-.65,3.25c-.28-.09-.54-.15-.78-.2-.24-.04-.53-.06-.88-.06-.63,0-1.29.24-1.98.73-.69.48-1.29,1.34-1.78,2.55v9.74h-3.74v-15.95Z"/>
+      <path d="M304.85,139.12c0-1.3.19-2.47.57-3.51.38-1.04.88-1.92,1.51-2.63.63-.71,1.35-1.27,2.16-1.66.82-.39,1.65-.59,2.52-.59s1.71.16,2.39.47,1.36.79,2.03,1.45h.1l.32-1.53h2.96v22.25h-3.74v-5.23l.13-2.63c-.59.56-1.25,1.03-2.01,1.4-.76.37-1.55.55-2.37.55-2.01,0-3.61-.73-4.79-2.19-1.18-1.46-1.77-3.52-1.77-6.16ZM308.72,139.08c0,1.73.31,3.05.92,3.95.62.9,1.51,1.35,2.68,1.35s2.3-.59,3.34-1.78v-7.44c-.56-.5-1.11-.84-1.64-1.04-.54-.19-1.07-.29-1.61-.29-1.04,0-1.92.46-2.63,1.37-.71.91-1.07,2.21-1.07,3.9Z"/>
+      <path d="M323.88,131.12h3.74v9.52c0,1.32.2,2.25.59,2.8.39.54,1.02.81,1.89.81.69,0,1.3-.17,1.83-.52s1.1-.91,1.71-1.69v-10.91h3.73v15.95h-3.05l-.29-2.34h-.1c-.69.82-1.45,1.48-2.26,1.99-.82.5-1.77.74-2.88.74-1.71,0-2.96-.55-3.74-1.64-.78-1.1-1.17-2.66-1.17-4.69v-10.01Z"/>
+      <path d="M343.99,128.33c-.67,0-1.22-.2-1.66-.59-.43-.39-.65-.9-.65-1.53s.22-1.14.65-1.54c.43-.4.98-.6,1.66-.6s1.22.2,1.66.6c.43.4.65.92.65,1.54s-.22,1.14-.65,1.53c-.43.39-.98.59-1.66.59ZM342.11,131.12h3.74v15.95h-3.74v-15.95Z"/>
+      <path d="M351.17,134.08h-2.27v-2.8l2.47-.16.46-4.35h3.12v4.35h4.06v2.96h-4.06v7.6c0,1.86.75,2.79,2.24,2.79.28,0,.57-.03.86-.1s.56-.15.79-.26l.65,2.76c-.43.15-.93.29-1.48.41-.55.12-1.14.18-1.77.18-.93,0-1.72-.14-2.36-.42s-1.16-.68-1.56-1.18c-.4-.51-.69-1.12-.88-1.82-.18-.7-.28-1.49-.28-2.35v-7.6Z"/>
+      <path d="M361.3,139.12c0-1.3.2-2.47.61-3.51.41-1.04.96-1.92,1.64-2.63s1.47-1.27,2.35-1.66c.89-.39,1.8-.59,2.73-.59,1.08,0,2.04.18,2.86.55.82.37,1.51.89,2.06,1.56.55.67.97,1.48,1.25,2.4.28.93.42,1.95.42,3.06,0,.74-.05,1.32-.16,1.75h-10.14c.17,1.45.68,2.57,1.51,3.35.84.78,1.9,1.17,3.2,1.17.69,0,1.34-.1,1.93-.31.6-.2,1.19-.49,1.77-.86l1.27,2.34c-.76.5-1.61.91-2.53,1.24-.93.32-1.91.48-2.93.48-1.1,0-2.13-.19-3.08-.57-.95-.38-1.78-.92-2.5-1.64s-1.27-1.59-1.68-2.62-.6-2.2-.6-3.52ZM371.99,137.69c0-1.27-.26-2.27-.79-2.99s-1.35-1.07-2.45-1.07c-.95,0-1.78.34-2.5,1.02-.71.68-1.16,1.69-1.33,3.03h7.08Z"/>
+      <path d="M377.77,139.12c0-1.32.21-2.5.65-3.54s1.02-1.91,1.76-2.63c.74-.71,1.58-1.26,2.55-1.64.96-.38,1.97-.57,3.03-.57s1.94.18,2.71.54c.77.36,1.43.8,1.96,1.32l-1.78,2.37c-.43-.37-.87-.65-1.3-.86-.43-.2-.9-.31-1.4-.31-1.3,0-2.35.48-3.15,1.44-.8.97-1.2,2.26-1.2,3.88s.39,2.88,1.18,3.85c.79.97,1.81,1.45,3.07,1.45.65,0,1.25-.14,1.8-.41.55-.27,1.04-.59,1.48-.96l1.56,2.37c-.76.67-1.59,1.18-2.5,1.53-.91.35-1.82.52-2.73.52-1.08,0-2.09-.18-3.03-.55-.94-.37-1.76-.91-2.45-1.62s-1.23-1.59-1.63-2.63c-.39-1.04-.58-2.22-.58-3.54Z"/>
+      <path d="M394.37,134.08h-2.27v-2.8l2.47-.16.46-4.35h3.12v4.35h4.06v2.96h-4.06v7.6c0,1.86.75,2.79,2.24,2.79.28,0,.57-.03.86-.1s.56-.15.79-.26l.65,2.76c-.43.15-.93.29-1.48.41-.55.12-1.14.18-1.77.18-.93,0-1.72-.14-2.36-.42s-1.16-.68-1.56-1.18c-.4-.51-.69-1.12-.88-1.82-.18-.7-.28-1.49-.28-2.35v-7.6Z"/>
+      <path d="M404.51,139.12c0-1.32.2-2.5.61-3.54.41-1.04.97-1.91,1.67-2.63.71-.71,1.51-1.26,2.42-1.64.91-.38,1.86-.57,2.86-.57s1.96.19,2.88.57c.92.38,1.73.93,2.42,1.64s1.25,1.59,1.67,2.63.64,2.22.64,3.54-.21,2.5-.64,3.54c-.42,1.04-.98,1.92-1.67,2.63-.69.71-1.5,1.25-2.42,1.62s-1.88.55-2.88.55-1.95-.18-2.86-.55c-.91-.37-1.71-.91-2.42-1.62-.7-.71-1.26-1.59-1.67-2.63-.41-1.04-.61-2.22-.61-3.54ZM408.34,139.12c0,1.61.33,2.88.99,3.85s1.58,1.45,2.74,1.45,2.09-.48,2.76-1.45c.67-.97,1.01-2.24,1.01-3.85s-.34-2.92-1.01-3.88c-.67-.96-1.59-1.44-2.76-1.44s-2.08.48-2.74,1.44c-.66.97-.99,2.26-.99,3.88Z"/>
+      <path d="M446.92,147.46c-.82-.19-1.67-.48-2.53-.86-.87-.38-1.74-.85-2.63-1.41-.84.69-1.8,1.25-2.86,1.66-1.06.41-2.24.61-3.54.61-1.06,0-2.01-.15-2.84-.47-.84-.31-1.54-.74-2.13-1.27-.59-.53-1.04-1.16-1.35-1.88-.31-.73-.47-1.51-.47-2.36,0-.74.1-1.4.32-1.98s.51-1.12.89-1.61c.38-.49.81-.93,1.3-1.33.48-.4,1-.79,1.54-1.15-.43-.82-.77-1.62-1.01-2.4-.24-.78-.36-1.54-.36-2.27s.12-1.42.37-2.06c.25-.64.61-1.2,1.09-1.68.48-.47,1.04-.85,1.69-1.14.65-.28,1.39-.42,2.21-.42,1.45,0,2.59.41,3.43,1.24.83.82,1.25,1.91,1.25,3.28,0,.69-.13,1.33-.39,1.91-.26.59-.61,1.12-1.04,1.61-.43.48-.93.94-1.48,1.38s-1.12.86-1.71,1.27c.65.89,1.39,1.75,2.23,2.58.83.83,1.71,1.6,2.61,2.29.59-.78,1.1-1.64,1.56-2.58.46-.94.84-1.96,1.14-3.07h3.44c-.39,1.34-.89,2.63-1.49,3.86-.61,1.24-1.32,2.4-2.14,3.51.69.43,1.36.79,2.01,1.09.65.29,1.26.49,1.82.6l-.94,3.05ZM432.14,141.26c0,.99.35,1.8,1.04,2.4.69.61,1.57.91,2.63.91.58,0,1.16-.12,1.73-.34.58-.23,1.13-.54,1.68-.92-.96-.8-1.86-1.65-2.71-2.55-.86-.9-1.63-1.84-2.32-2.81-.61.5-1.1,1.02-1.48,1.54-.38.53-.57,1.12-.57,1.77ZM434.39,130.7c0,.5.08,1,.23,1.51.15.51.36,1.04.62,1.61.89-.56,1.63-1.14,2.24-1.72.61-.59.91-1.29.91-2.11,0-.56-.13-1.04-.39-1.43-.26-.39-.7-.58-1.33-.58-.67,0-1.22.25-1.64.74-.42.5-.63,1.16-.63,1.98Z"/>
+      <path d="M456.76,142.79c0-1.71.75-3.03,2.24-3.96,1.5-.93,3.88-1.58,7.15-1.95,0-.41-.05-.81-.16-1.19-.11-.38-.28-.71-.5-1.01-.23-.29-.52-.52-.88-.68-.36-.16-.81-.24-1.35-.24-.8,0-1.58.15-2.32.46-.75.3-1.47.67-2.16,1.1l-1.36-2.5c.89-.56,1.88-1.05,2.97-1.46,1.09-.41,2.28-.62,3.56-.62,2.01,0,3.51.59,4.48,1.77.97,1.18,1.46,2.88,1.46,5.12v9.45h-3.06l-.29-1.76h-.1c-.71.61-1.48,1.12-2.29,1.53-.81.41-1.69.61-2.65.61-1.41,0-2.55-.43-3.43-1.28-.88-.85-1.32-1.99-1.32-3.39ZM460.4,142.49c0,.71.21,1.24.64,1.56.42.33.97.49,1.64.49s1.25-.15,1.79-.46c.54-.3,1.1-.74,1.69-1.3v-3.57c-1.08.13-1.99.31-2.73.52s-1.32.46-1.77.73c-.45.27-.76.58-.96.92-.19.35-.29.71-.29,1.1Z"/>
+      <path d="M474.6,142.85c.71.56,1.43,1,2.13,1.31.7.32,1.47.47,2.29.47.87,0,1.5-.18,1.92-.54.41-.36.61-.82.61-1.38,0-.33-.1-.61-.29-.86-.19-.25-.46-.47-.78-.67-.33-.19-.69-.37-1.1-.54-.41-.16-.82-.33-1.24-.5-.52-.2-1.05-.42-1.59-.68-.54-.26-1.02-.58-1.44-.94s-.77-.79-1.04-1.28c-.27-.48-.41-1.07-.41-1.74,0-1.4.52-2.55,1.56-3.44,1.04-.89,2.46-1.33,4.25-1.33,1.1,0,2.1.2,2.99.59.89.39,1.66.83,2.31,1.33l-1.72,2.27c-.56-.41-1.13-.74-1.71-.99-.58-.25-1.17-.38-1.81-.38-.8,0-1.39.17-1.77.51-.38.33-.57.75-.57,1.25,0,.3.09.57.28.79.18.23.43.43.73.62.3.18.65.35,1.05.5.4.15.82.31,1.25.46.54.2,1.08.42,1.63.66.54.25,1.03.56,1.48.93.44.37.8.82,1.07,1.35.27.53.41,1.17.41,1.9,0,.69-.13,1.34-.41,1.93-.27.6-.66,1.12-1.19,1.56-.52.45-1.17.8-1.95,1.06-.78.26-1.67.39-2.66.39-1.1,0-2.19-.21-3.26-.63-1.07-.42-2-.95-2.78-1.58l1.75-2.4Z"/>
+      <path d="M488.98,134.08h-2.27v-2.8l2.47-.16.46-4.35h3.12v4.35h4.06v2.96h-4.06v7.6c0,1.86.75,2.79,2.24,2.79.28,0,.57-.03.86-.1s.56-.15.79-.26l.65,2.76c-.43.15-.93.29-1.48.41-.55.12-1.14.18-1.77.18-.93,0-1.72-.14-2.36-.42s-1.16-.68-1.56-1.18c-.4-.51-.69-1.12-.88-1.82-.18-.7-.28-1.49-.28-2.35v-7.6Z"/>
+      <path d="M500.16,131.12h3.09l.26,2.83h.13c.56-1.04,1.25-1.83,2.04-2.39.8-.55,1.63-.83,2.47-.83.76,0,1.36.11,1.82.33l-.65,3.25c-.28-.09-.54-.15-.78-.2-.24-.04-.53-.06-.88-.06-.63,0-1.29.24-1.98.73-.69.48-1.29,1.34-1.78,2.55v9.74h-3.74v-15.95Z"/>
+      <path d="M511.23,139.12c0-1.32.2-2.5.61-3.54.41-1.04.97-1.91,1.67-2.63.71-.71,1.51-1.26,2.42-1.64.91-.38,1.86-.57,2.86-.57s1.96.19,2.88.57c.92.38,1.73.93,2.42,1.64s1.25,1.59,1.67,2.63.64,2.22.64,3.54-.21,2.5-.64,3.54c-.42,1.04-.98,1.92-1.67,2.63s-1.5,1.25-2.42,1.62-1.88.55-2.88.55-1.95-.18-2.86-.55c-.91-.37-1.71-.91-2.42-1.62-.7-.71-1.26-1.59-1.67-2.63-.41-1.04-.61-2.22-.61-3.54ZM515.07,139.12c0,1.61.33,2.88.99,3.85.66.97,1.58,1.45,2.74,1.45s2.09-.48,2.76-1.45c.67-.97,1.01-2.24,1.01-3.85s-.34-2.92-1.01-3.88c-.67-.96-1.59-1.44-2.76-1.44s-2.08.48-2.74,1.44c-.66.97-.99,2.26-.99,3.88ZM519.19,128.46h-2.8l2.93-4.74h3.7l-3.83,4.74Z"/>
+      <path d="M530.1,124.14h3.74v19.03c0,.46.09.78.26.96.18.18.36.28.55.28h.25c.08,0,.19-.02.34-.07l.49,2.8c-.5.21-1.16.32-1.98.32-1.35,0-2.29-.4-2.83-1.2-.54-.8-.82-1.9-.82-3.28v-18.84Z"/>
+      <path d="M537.87,139.12c0-1.32.2-2.5.61-3.54.41-1.04.97-1.91,1.67-2.63.71-.71,1.51-1.26,2.42-1.64.91-.38,1.86-.57,2.86-.57s1.96.19,2.88.57c.92.38,1.73.93,2.42,1.64s1.25,1.59,1.67,2.63c.42,1.04.64,2.22.64,3.54s-.21,2.5-.64,3.54-.98,1.92-1.67,2.63c-.69.71-1.5,1.25-2.42,1.62-.92.37-1.88.55-2.88.55s-1.95-.18-2.86-.55c-.91-.37-1.71-.91-2.42-1.62-.7-.71-1.26-1.59-1.67-2.63-.41-1.04-.61-2.22-.61-3.54ZM541.7,139.12c0,1.61.33,2.88.99,3.85.66.97,1.58,1.45,2.74,1.45s2.09-.48,2.76-1.45c.67-.97,1.01-2.24,1.01-3.85s-.34-2.92-1.01-3.88c-.67-.96-1.59-1.44-2.76-1.44s-2.08.48-2.74,1.44c-.66.97-.99,2.26-.99,3.88Z"/>
+      <path d="M555.67,149.97c0-.67.19-1.3.59-1.87.39-.58.95-1.09,1.69-1.54v-.13c-.41-.26-.75-.61-1.02-1.04s-.41-.97-.41-1.63.18-1.2.54-1.71c.36-.51.76-.92,1.22-1.25v-.13c-.54-.41-1.02-.98-1.45-1.71-.42-.72-.64-1.56-.64-2.52s.18-1.72.52-2.44c.34-.71.8-1.32,1.38-1.8.57-.49,1.24-.86,2-1.11.76-.25,1.56-.37,2.4-.37.43,0,.85.04,1.25.11.4.08.76.17,1.09.28h5.72v2.76h-2.92c.26.31.48.69.65,1.15.17.46.26.98.26,1.54,0,.89-.15,1.67-.47,2.34-.32.67-.74,1.24-1.28,1.69-.54.45-1.18.8-1.92,1.04-.74.24-1.53.36-2.37.36-.35,0-.71-.03-1.07-.1-.37-.06-.74-.17-1.1-.32-.24.22-.43.43-.57.65s-.21.51-.21.88c0,.46.19.81.57,1.07.38.26,1.05.39,2.03.39h2.83c1.93,0,3.39.31,4.37.92.98.62,1.48,1.62,1.48,3.01,0,.78-.2,1.52-.6,2.21-.4.69-.97,1.29-1.71,1.79-.74.5-1.63.89-2.68,1.18-1.05.29-2.22.44-3.52.44-.95,0-1.83-.08-2.65-.26-.81-.17-1.51-.43-2.09-.78-.59-.35-1.04-.78-1.38-1.3-.33-.52-.5-1.13-.5-1.82ZM558.79,149.42c0,.71.36,1.27,1.09,1.67.73.4,1.73.6,3.01.6s2.34-.25,3.13-.76,1.19-1.11,1.19-1.8c0-.63-.25-1.05-.73-1.27-.49-.22-1.19-.33-2.09-.33h-2.18c-.87,0-1.59-.08-2.18-.23-.82.63-1.23,1.33-1.23,2.11ZM562.49,139.67c.76,0,1.4-.28,1.95-.83.54-.55.81-1.35.81-2.39s-.26-1.77-.79-2.32c-.53-.55-1.19-.83-1.96-.83s-1.44.27-1.98.81-.82,1.32-.82,2.34.27,1.83.82,2.39c.54.55,1.2.83,1.98.83Z"/>
+      <path d="M572.59,139.12c0-1.32.2-2.5.61-3.54.41-1.04.97-1.91,1.67-2.63.71-.71,1.51-1.26,2.42-1.64.91-.38,1.86-.57,2.86-.57s1.96.19,2.88.57c.92.38,1.73.93,2.42,1.64s1.25,1.59,1.67,2.63.64,2.22.64,3.54-.21,2.5-.64,3.54c-.42,1.04-.98,1.92-1.67,2.63-.69.71-1.5,1.25-2.42,1.62-.92.37-1.88.55-2.88.55s-1.95-.18-2.86-.55c-.91-.37-1.71-.91-2.42-1.62-.7-.71-1.26-1.59-1.67-2.63-.41-1.04-.61-2.22-.61-3.54ZM576.43,139.12c0,1.61.33,2.88.99,3.85.66.97,1.58,1.45,2.74,1.45s2.09-.48,2.76-1.45c.67-.97,1.01-2.24,1.01-3.85s-.34-2.92-1.01-3.88c-.67-.96-1.59-1.44-2.76-1.44s-2.08.48-2.74,1.44c-.66.97-.99,2.26-.99,3.88Z"/>
+    </g>
+    <g>
+      <path d="M228.6,84.36c3.38-1.16,5.61-3.68,5.61-7.96,0-6.25-4.49-8.3-10.31-8.3h-9.42v27.95h4.96v-10.96h4.24l6.03,10.96h5.56l-6.68-11.68ZM223.38,81.15h-3.94v-9.07h3.94c3.85,0,5.91,1.11,5.91,4.32s-2.05,4.75-5.91,4.75Z" fill-rule="evenodd"/>
+      <rect x="239.98" y="68.08" width="4.96" height="27.97"/>
+      <path d="M250.42,82.15c0,9.29,5.6,14.42,12.71,14.42,3.55,0,6.46-1.45,8.72-4.06l-2.74-3.04c-1.58,1.76-3.42,2.78-5.9,2.78-4.66,0-7.7-3.85-7.7-10.22s3.29-10.14,7.87-10.14c2.14,0,3.72.9,5.17,2.31l2.74-3.08c-1.75-1.88-4.53-3.55-7.95-3.55-7.19,0-12.92,5.43-12.92,14.59Z" fill-rule="evenodd"/>
+      <path d="M287.75,68.09h-5.82l-9.16,27.95h5.09l2.18-7.53h9.37l2.18,7.53h5.26l-9.12-27.95ZM281.16,84.61l.98-3.47c.9-2.95,1.71-6.08,2.48-9.2h.17c.81,3.08,1.67,6.25,2.53,9.2l.98,3.47h-7.15Z" fill-rule="evenodd"/>
+      <path d="M314.33,84.36c3.38-1.16,5.61-3.68,5.61-7.96,0-6.25-4.49-8.3-10.31-8.3h-9.42v27.95h4.96v-10.96h4.24l6.03,10.96h5.56l-6.68-11.68ZM309.11,81.15h-3.94v-9.07h3.94c3.85,0,5.91,1.11,5.91,4.32s-2.05,4.75-5.91,4.75Z" fill-rule="evenodd"/>
+      <path d="M333.16,68.09h-7.45v27.95h7.7c8.3,0,13.4-4.84,13.4-14.08s-5.09-13.87-13.65-13.87ZM332.82,92.02h-2.14v-19.9h2.14c5.65,0,8.9,3,8.9,9.84s-3.25,10.06-8.9,10.06Z" fill-rule="evenodd"/>
+      <path d="M363.25,67.58c-7.32,0-12.37,5.35-12.37,14.38s5.05,14.6,12.37,14.6,12.33-5.56,12.33-14.6-5.05-14.38-12.33-14.38ZM363.25,92.23c-4.41,0-7.28-4.02-7.28-10.27s2.87-10.06,7.28-10.06,7.23,3.81,7.23,10.06-2.87,10.27-7.23,10.27Z" fill-rule="evenodd"/>
+      <path d="M399.29,68.09h-9.42v27.95h4.96v-10.27h4.45c5.99,0,10.61-2.87,10.61-9.03,0-6.51-4.49-8.65-10.61-8.65ZM398.86,81.79h-4.02v-9.72h4.02c4.07,0,6.16,1.16,6.16,4.67s-1.97,5.05-6.16,5.05Z" fill-rule="evenodd"/>
+      <path d="M414.86,83.78c0,9.2,4.15,12.79,10.65,12.79s10.57-3.59,10.57-12.79v-15.7h-4.79v16.08c0,6.07-2.35,8.08-5.77,8.08s-5.69-2.01-5.69-8.08v-16.08h-4.96v15.7Z" fill-rule="evenodd"/>
+      <polygon points="442.93 96.05 460.17 96.05 460.17 91.86 447.89 91.86 447.89 83.61 457.95 83.61 457.95 79.42 447.89 79.42 447.89 72.27 459.74 72.27 459.74 68.08 442.93 68.08 442.93 96.05" fill-rule="evenodd"/>
+      <path d="M479.92,84.36c3.34-1.16,5.56-3.68,5.56-7.96,0-6.25-4.45-8.3-10.27-8.3h-9.42v27.95h4.96v-10.96h4.24l6.03,10.96h5.52l-6.63-11.68ZM474.7,81.15h-3.94v-9.07h3.94c3.85,0,5.91,1.11,5.91,4.32s-2.05,4.75-5.91,4.75Z" fill-rule="evenodd"/>
+      <polygon points="496.94 96.05 501.9 96.05 501.9 72.27 509.95 72.27 509.95 68.08 488.86 68.08 488.86 72.27 496.94 72.27 496.94 96.05" fill-rule="evenodd"/>
+      <path d="M525.85,68.09h-5.82l-9.16,27.95h5.09l2.18-7.53h9.37l2.18,7.53h5.26l-9.12-27.95ZM519.26,84.61l.98-3.47c.9-2.95,1.71-6.08,2.48-9.2h.17c.81,3.08,1.67,6.25,2.53,9.2l.98,3.47h-7.15Z" fill-rule="evenodd"/>
+      <rect x="547.07" y="68.08" width="4.96" height="27.97"/>
+      <path d="M557.08,92.46c2.65,2.62,6.29,4.11,10.05,4.11,6.29,0,10.05-3.77,10.05-8.3,0-4.06-2.31-6.16-5.65-7.57l-3.77-1.58c-2.31-.94-4.45-1.76-4.45-3.94,0-2.06,1.71-3.29,4.36-3.29,2.4,0,4.32.9,6.07,2.4l2.57-3.17c-2.18-2.18-5.35-3.55-8.64-3.55-5.43,0-9.37,3.43-9.37,7.87,0,4.1,2.87,6.29,5.65,7.44l3.81,1.67c2.57,1.07,4.36,1.8,4.36,4.1,0,2.18-1.75,3.59-4.88,3.59-2.61,0-5.3-1.29-7.31-3.17l-2.86,3.38Z" fill-rule="evenodd"/>
+      <path d="M593.52,68.09h-5.82l-9.16,27.95h5.09l2.18-7.53h9.37l2.18,7.53h5.22l-9.07-27.95ZM586.92,84.61l.98-3.47c.9-2.95,1.71-6.08,2.48-9.2h.17c.81,3.08,1.67,6.25,2.53,9.2l.98,3.47h-7.15Z" fill-rule="evenodd"/>
+      <polygon points="604.08 96.05 623.88 96.05 623.88 91.86 610.24 91.86 623.75 71.08 623.75 68.08 605.36 68.08 605.36 72.27 617.64 72.27 604.08 93.06 604.08 96.05" fill-rule="evenodd"/>
+      <path d="M640.25,68.09h-5.82l-9.16,27.95h5.09l2.18-7.53h9.37l2.18,7.53h5.22l-9.07-27.95ZM633.66,84.61l.98-3.47c.9-2.95,1.71-6.08,2.48-9.2h.17c.81,3.08,1.67,6.25,2.53,9.2l.98,3.47h-7.15Z" fill-rule="evenodd"/>
+    </g>
+  </g>
+  </svg>
   <div class="top-actions">
     <div class="lang-switch">
       <button class="lang-btn active" data-lang="es">ES</button>
@@ -510,10 +523,19 @@
       <div class="result-meta" id="result-meta"></div>
     </header>
 
-    <!-- Selector de planeta de tránsito -->
+    <!-- PESTAÑAS -->
+    <div class="tabs">
+  <button class="tab" data-tab="summary" data-i18n="tabSummary">Tus áreas de vida activadas</button>
+  <button class="tab" data-tab="calendar" data-i18n="tabCalendar">Tu calendario · 12 meses</button>
+  <button class="tab" data-tab="interpretation" data-i18n="tabInterpret">Tránsitos de los planetas lentos</button>
+  <button class="tab" data-tab="aspects" data-i18n="tabAspects">Aspectos de los tránsitos</button>
+  <button class="tab" data-tab="lectura-rp" data-i18n="tabLecturaRP">Tu carta natal detallada</button>
+    </div>
+
+    <!-- SUBMENÚ DE PLANETAS — solo visible en la pestaña de tránsitos -->
     <div class="transit-selector" id="transit-selector"></div>
 
-    <!-- Carta visual + Info principal del tránsito -->
+    <!-- DOS COLUMNAS: la carta a la izquierda, el contenido a la derecha -->
     <div class="result-split">
       <div class="chart-wrapper">
         <div class="chart-title"><strong data-i18n="chartWheelNatal">Carta natal</strong> + <strong data-i18n="chartWheelTransits">tránsitos actuales</strong></div>
@@ -527,6 +549,9 @@
           <img src="assets/logo-completo.svg" alt="Ricardo Puerta Isaza · arquitecto y astrólogo">
         </div>
       </div>
+      <div class="content-panel">
+    <!-- TAB CONTENTS -->
+    <div class="tab-content" id="tab-interpretation">
       <div class="transit-info">
         <div class="info-block">
           <div class="info-label" id="info-label-pos" data-i18n="planetNow">Planeta en este momento</div>
@@ -543,34 +568,7 @@
           <div class="info-value" id="aspect-count">—</div>
         </div>
       </div>
-    </div>
 
-    <div class="result-actions">
-      <button class="action-btn" id="download-png-btn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        <span data-i18n="downloadPng">Descargar imagen</span>
-      </button>
-      <button class="action-btn" id="download-pdf-btn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        <span data-i18n="downloadPdf">Imprimir / PDF</span>
-      </button>
-      <button class="action-btn" id="reset-btn">
-        <span data-i18n="resetBtn">← Otra carta</span>
-      </button>
-    </div>
-
-    <!-- TABS -->
-    <div class="tabs">
-  <button class="tab active" data-tab="chart-detail" data-i18n="tabChart">Los datos de tu carta</button>
-  <button class="tab" data-tab="summary" data-i18n="tabSummary">Tus áreas de vida activadas</button>
-  <button class="tab" data-tab="calendar" data-i18n="tabCalendar">Tu calendario · 12 meses</button>
-  <button class="tab" data-tab="interpretation" data-i18n="tabInterpret">Tránsitos de los planetas lentos</button>
-  <button class="tab" data-tab="aspects" data-i18n="tabAspects">Aspectos de los tránsitos</button>
-  <button class="tab" data-tab="lectura-rp" data-i18n="tabLecturaRP">Tu carta natal detallada</button>
-    </div>
-
-    <!-- TAB CONTENTS -->
-    <div class="tab-content" id="tab-interpretation">
   <article class="interpretation" id="interpretation-content"></article>
     </div>
 
@@ -607,6 +605,24 @@
       <h3 class="section-title-display" data-i18n="summaryTitle">Sumario interpretativo por áreas</h3>
       <div class="summary-grid" id="summary-grid"></div>
     </div>
+      </div>
+    </div>
+
+    <div class="result-actions">
+      <button class="action-btn" id="download-png-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span data-i18n="downloadPng">Descargar imagen</span>
+      </button>
+      <button class="action-btn" id="download-pdf-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span data-i18n="downloadPdf">Imprimir / PDF</span>
+      </button>
+      <button class="action-btn" id="reset-btn">
+        <span data-i18n="resetBtn">← Otra carta</span>
+      </button>
+    </div>
+
+    <!-- TABS -->
 
     <p class="footer-note" data-i18n="footerNote">Cálculos realizados con Swiss Ephemeris · Validado contra Solar Fire v9.1.0 con precisión menor a 1 minuto de arco · Sistema Plácidus · Zodíaco tropical · Geocéntrico</p>
   </div>
@@ -615,6 +631,25 @@
 <!-- ARREGLO 3 (parte 2) — activa el panel de backend solo si la URL lleva ?dev -->
 <script>
   if (location.search.indexOf('dev') !== -1) document.body.classList.add('dev-mode');
+
+  // El submenú de planetas solo se muestra dentro de «Tránsitos de los planetas lentos».
+  // Y al volver a pulsar la pestaña activa, se regresa a los datos de la carta.
+  document.addEventListener('click', function (e) {
+    const t = e.target.closest('.tab');
+    if (!t) return;
+    const sel = document.getElementById('transit-selector');
+    const esTransitos = t.dataset.tab === 'interpretation';
+    if (sel) sel.classList.toggle('visible', esTransitos && t.classList.contains('active'));
+    // si ninguna pestaña queda activa, se muestran los datos de la carta
+    setTimeout(function () {
+      const activa = document.querySelector('.tab.active');
+      if (!activa) {
+        const datos = document.getElementById('tab-chart-detail');
+        if (datos) datos.classList.add('active');
+        if (sel) sel.classList.remove('visible');
+      }
+    }, 0);
+  });
 </script>
 
 <script src="app.js"></script>
