@@ -365,12 +365,54 @@
   .error-box { max-width: 640px; margin: 1rem auto; padding: 1rem; background: color-mix(in srgb, var(--error) 12%, transparent); border: 1px solid var(--error); color: var(--error); border-radius: 4px; font-size: 0.9rem; }
 
   /* PRINT (for PDF export) */
+  /* Márgenes reales de la hoja: sin esto el contenido llega al borde
+     físico del papel y la impresora lo recorta. */
+  @page { size: letter; margin: 15mm 14mm; }
+
   @media print {
-    .top-bar, .backend-config, .form-card, .result-actions, .tabs, .footer-note, .transit-selector { display: none !important; }
-    body { background: white; color: black; }
-    .container { padding: 0; }
+    .top-bar, .backend-config, .form-card, .result-actions,
+    .tabs, .transit-bar, .footer-note { display: none !important; }
+
+    body { background: #fff; color: #000; }
+    .container { max-width: none; width: auto; padding: 0; margin: 0; }
+
+    /* Todas las secciones se imprimen, una detrás de otra */
     .tab-content { display: block !important; }
-    .interpretation, .summary-card, .info-block, .aspect-card, .planets-table, .houses-table-wrap, .calendar-list { box-shadow: none; break-inside: avoid; }
+
+    /* En papel no hay dos columnas: la carta arriba y el texto debajo */
+    .result-split { display: block; margin: 0; }
+    .chart-wrapper {
+      position: static; break-inside: avoid; break-after: page;
+      border: none; box-shadow: none; padding: 0; margin: 0 0 1rem;
+    }
+    .chart-svg { width: 100%; max-width: 160mm; margin: 0 auto; }
+    .content-panel {
+      border: none; box-shadow: none; padding: 0; min-height: 0; background: none;
+    }
+
+    /* Nada se sale de la caja ni se parte por la mitad */
+    .interpretation, .summary-card, .info-block, .aspect-card,
+    .planets-table, .houses-table-wrap, .calendar-list, .chart-wrapper {
+      box-shadow: none; break-inside: avoid;
+    }
+    .interpretation { padding: 0; border: none; }
+    .aspects-grid, .summary-grid { grid-template-columns: 1fr; }
+    .cal-event, .cal-event-main { grid-template-columns: 90px 1fr auto; }
+    .cal-event-keywords { grid-template-columns: 1fr 1fr; padding-left: 0; }
+
+    /* Tablas: reparto natural de columnas, con letra algo menor para que quepan */
+    table { width: 100%; }
+    th, td { padding: 0.4rem 0.5rem; font-size: 0.78rem; white-space: normal; }
+    .planets-table .glyph-cell, .houses-table-wrap .num { width: 26px; }
+    .planets-table .pos-cell, .houses-table-wrap .pos { font-size: 0.74rem; white-space: nowrap; }
+    th { font-size: 0.62rem; letter-spacing: 0.1em; }
+
+    /* Los títulos no se quedan solos al final de una página */
+    h3, h4, .section-title, .section-title-display, .panel-title { break-after: avoid; }
+    p, li { orphans: 3; widows: 3; }
+
+    /* Los colores de fondo de las píldoras de dignidad deben imprimirse */
+    .dignity-pill, .cal-month-header, th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 </style>
 </head>
