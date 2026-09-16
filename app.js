@@ -1204,10 +1204,12 @@ function generateExtraPointsInterpretation(data) {
       html += `<h3>⚸ Lilith en ${l.sign}, Casa ${l.house}</h3>`;
       html += `<p>Lilith es la <em>luna negra</em> — la primera mujer del mito hebreo que se negó a someterse y fue exiliada. En astrología representa lo que has reprimido, lo que la sociedad te dijo que no era aceptable expresar, tu poder más salvaje y autónomo. En <strong>${l.sign}</strong>, Casa ${l.house} (${houseInfo(l.house).short}), Lilith muestra el espacio de tu carta donde guardas tu sombra creativa y sexual.</p>`;
       html += `<p>Trabajar con Lilith no es dejarla salir descontroladamente — es dejar de avergonzarse de su existencia. Cuando integras a Lilith, dejas de pedir permiso para ser tú mismo en esa área de tu vida.</p>`;
+      html += `<p>Y hay una lectura práctica que conviene conocer: <strong>${l.sign}</strong> suele ser el signo que más trabajo te da de todo el zodíaco. Lo notarás sobre todo con las personas de ese signo con las que te asocias o te casas — ahí aparece, puesto afuera, aquello que no te permites a ti mismo.</p>`;
     } else {
       html += `<h3>⚸ Lilith in ${l.sign}, House ${l.house}</h3>`;
       html += `<p>Lilith is the <em>black moon</em> — the first woman of Hebrew myth who refused to submit and was exiled. In astrology she represents what you've repressed, what society told you wasn't acceptable to express, your wildest and most autonomous power. In <strong>${l.sign}</strong>, House ${l.house} (${houseInfo(l.house).short}), Lilith shows where you keep your creative and sexual shadow.</p>`;
       html += `<p>Working with Lilith isn't letting her out wildly — it's no longer being ashamed of her existence. When you integrate Lilith, you stop asking permission to be yourself in that area of your life.</p>`;
+      html += `<p>And there's a practical reading worth knowing: <strong>${l.sign}</strong> tends to be the hardest sign in the whole zodiac for you. You'll notice it above all with people of that sign you go into business with or marry — what you don't allow yourself shows up there, placed outside you.</p>`;
     }
   }
 
