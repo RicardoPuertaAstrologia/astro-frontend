@@ -662,7 +662,7 @@ const planetKeywords = {
     south_node: "talentos pasados, zona de confort",
     lilith: "sombra, poder reprimido, autonomía",
     fortuna: "flujo, suerte, prosperidad natural",
-    infortunio: "pruebas, esfuerzo, carácter forjado"
+    infortunio: "ataduras, límites, carácter templado"
   },
   en: {
     sun: "identity, vitality, will, purpose",
@@ -682,7 +682,7 @@ const planetKeywords = {
     south_node: "past talents, comfort zone",
     lilith: "shadow, repressed power, autonomy",
     fortuna: "flow, luck, natural prosperity",
-    infortunio: "trials, effort, forged character"
+    infortunio: "ties, limits, tempered character"
   }
 };
 
@@ -1228,17 +1228,50 @@ function generateExtraPointsInterpretation(data) {
     }
   }
 
-  // Infortunio
+  // Infortunio — lo que nos ata, leído por la casa donde cae
   if (extras.infortunio) {
     const i = extras.infortunio;
+    const ataduras = {
+      es: {
+        1: 'Lo que te ata está en ti mismo: en tu manera de ser, en la imagen que proyectas, a veces en el propio cuerpo. Hay algo de tu carácter o de tu físico que vives como una condena y que organiza tus decisiones sin que lo notes. Y como esta casa guarda también a la abuela paterna y al abuelo materno, la atadura puede venir de más atrás de lo que crees.',
+        2: 'Lo que te ata es el dinero y lo que posees. Puede ser la falta, puede ser el miedo a perder lo conseguido, o la sensación de valer lo que tienes. Aquí la seguridad material se vuelve una cadena tan pronto como se convierte en la medida de todo.',
+        3: 'Lo que te ata está cerca: los hermanos, los primos, los vecinos, el barrio de siempre. También tu propia manera de pensar y de hablar. Hay conversaciones que se repiten hace años y un modo de ver las cosas que heredaste sin revisarlo.',
+        4: 'Lo que te ata viene de la familia en la que naciste: el progenitor que es su eje, la casa de la infancia, lo que se espera de ti por ser quien eres. Es la atadura más antigua, porque estaba antes de que pudieras opinar.',
+        5: 'Lo que te ata son los hijos, los romances, o aquello que creaste y ahora te obliga. Lo que empezó como placer o como libre expresión se volvió compromiso, y hoy pesa donde antes daba alegría.',
+        6: 'Lo que te ata es la rutina: el trabajo cotidiano, los horarios, el cuerpo que hay que atender, las obligaciones pequeñas que nunca terminan. No es una cadena dramática sino una malla fina, y por eso cuesta tanto verla.',
+        7: 'Lo que te ata es el otro: la pareja, los socios, a veces un adversario declarado. Hay un vínculo que sostienes aunque ya no te sostenga. Y como esta casa guarda también al abuelo paterno y a la abuela materna, puede que estés repitiendo un modo de vincularte que no inventaste tú.',
+        8: 'Lo que te ata es lo que compartes con otros: el dinero que no es solo tuyo, una herencia, una deuda, un pacto de intimidad. Son ataduras difíciles de deshacer porque deshacerlas afecta a alguien más.',
+        9: 'Lo que te ata es una creencia: una doctrina, una formación, una manera de entender el mundo que adoptaste y hoy no revisas. O el lugar del que viniste, o al que sientes que deberías ir.',
+        10: 'Lo que te ata es tu carrera y lo que la gente espera de ti. El nombre que construiste pesa, el cargo obliga, y hay un progenitor —o su idea de éxito— rondando cada decisión profesional.',
+        11: 'Lo que te ata son los amigos, el grupo, la causa a la que te sumaste. Pertenecer tiene un precio, y una parte de lo que haces la haces por no quedarte fuera.',
+        12: 'Lo que te ata no lo tienes identificado. Es un miedo antiguo, una culpa sin nombre, a veces un enemigo que no da la cara. Aquí la atadura es invisible, y por eso es la más difícil: primero hay que verla.'
+      },
+      en: {
+        1: 'What binds you is in yourself: in the way you are, in the image you project, sometimes in your own body. Something about your character or your physique feels like a sentence and organizes your decisions without your noticing. And since this house also holds the paternal grandmother and the maternal grandfather, the tie may come from further back than you think.',
+        2: 'What binds you is money and what you own. It may be the lack, it may be the fear of losing what you built, or the sense that you are worth what you have. Here material security becomes a chain the moment it turns into the measure of everything.',
+        3: 'What binds you is close by: siblings, cousins, neighbors, the same old neighborhood. Also your own way of thinking and speaking. There are conversations that have been repeating for years, and a way of seeing things you inherited without examining it.',
+        4: 'What binds you comes from the family you were born into: the parent who is its axis, the childhood home, what is expected of you for being who you are. It is the oldest tie, because it was there before you could have a say.',
+        5: 'What binds you are children, romances, or something you created that now obliges you. What began as pleasure or free expression turned into commitment, and today it weighs where it once gave joy.',
+        6: 'What binds you is routine: everyday work, schedules, the body that needs attending, the small obligations that never end. It is not a dramatic chain but a fine mesh, and that is why it is so hard to see.',
+        7: 'What binds you is the other person: your partner, your business associates, sometimes a declared adversary. There is a bond you keep up although it no longer holds you up. And since this house also holds the paternal grandfather and the maternal grandmother, you may be repeating a way of bonding you did not invent.',
+        8: 'What binds you is what you share with other people: money that is not only yours, an inheritance, a debt, a pact of intimacy. These ties are hard to undo because undoing them affects someone else.',
+        9: 'What binds you is a belief: a doctrine, a training, a way of understanding the world you took on and no longer examine. Or the place you came from, or the one you feel you ought to go to.',
+        10: 'What binds you is your career and what people expect of you. The name you built weighs, the position obliges, and there is a parent — or their idea of success — hovering over every professional decision.',
+        11: 'What binds you are your friends, the group, the cause you joined. Belonging has a price, and part of what you do you do so as not to be left out.',
+        12: 'What binds you has not been identified. It is an old fear, a nameless guilt, sometimes an enemy who never shows their face. Here the tie is invisible, and that is what makes it hardest: first you have to see it.'
+      }
+    };
+    const atadura = (ataduras[lang] && ataduras[lang][i.house]) || '';
     if (lang === 'es') {
       html += `<h3>✠ Parte del Infortunio en ${i.sign}, Casa ${i.house}</h3>`;
-      html += `<p>Calculada con la fórmula clásica ASC + Marte − Saturno, la <strong>Parte del Infortunio</strong> indica el área donde las energías de la acción (Marte) y la limitación (Saturno) se cruzan filtradas por tu identidad. En <strong>${i.sign}</strong>, Casa ${i.house} (${houseInfo(i.house).short}), señala el terreno de tus pruebas más persistentes y de los obstáculos que regresan hasta que aprendes su lección.</p>`;
-      html += `<p>El glifo de la cruz templaria que la simboliza no es casual: es la cruz de los caballeros que comprendían que las pruebas son entrenamiento. Lo que el Infortunio te pone delante no es castigo — es la dificultad concreta que, cuando la atraviesas, te entrega una autoridad ganada con esfuerzo. Donde otros tienen suerte natural (Fortuna), tú tienes esta zona donde el carácter se forja.</p>`;
+      html += `<p>Calculada con la fórmula clásica ASC + Marte − Saturno, la <strong>Parte del Infortunio</strong> señala aquello que te ata. No es una desgracia ni un castigo: es el punto donde reconoces a qué estás amarrado, qué te limita y qué te condiciona sin que lo hayas elegido. En <strong>${i.sign}</strong>, Casa ${i.house} (${houseInfo(i.house).short}), dice en qué terreno de tu vida se manifiesta.</p>`;
+      html += `<p>${atadura}</p>`;
+      html += `<p>Identificar la atadura es justamente lo que la vuelve trabajable. Mientras no tiene nombre, decide por ti; cuando la reconoces, empieza a templar el carácter en vez de limitarlo. De ahí sale la autoridad que no se hereda ni se compra: la que se forja atravesando lo propio.</p>`;
     } else {
       html += `<h3>✠ Part of Misfortune in ${i.sign}, House ${i.house}</h3>`;
-      html += `<p>Calculated with the classical formula ASC + Mars − Saturn, the <strong>Part of Misfortune</strong> indicates where the energies of action (Mars) and limitation (Saturn) cross through your identity. In <strong>${i.sign}</strong>, House ${i.house} (${houseInfo(i.house).short}), it marks the terrain of your most persistent trials and the obstacles that return until you learn their lesson.</p>`;
-      html += `<p>The Templar cross symbolizing it is not accidental: it's the cross of knights who understood that trials are training. What Misfortune puts before you is not punishment — it's the concrete difficulty that, when you cross through, hands you authority earned with effort. Where others have natural luck (Fortune), you have this zone where character is forged.</p>`;
+      html += `<p>Calculated with the classical formula ASC + Mars − Saturn, the <strong>Part of Misfortune</strong> points to what binds you. It is not misfortune or punishment: it is the point where you recognize what you are tied to, what limits you and what conditions you without your having chosen it. In <strong>${i.sign}</strong>, House ${i.house} (${houseInfo(i.house).short}), it says in which area of your life it shows.</p>`;
+      html += `<p>${atadura}</p>`;
+      html += `<p>Identifying the tie is exactly what makes it workable. While it has no name it decides for you; once you recognize it, it starts to temper your character rather than limit it. That is where an authority comes from that is neither inherited nor bought: the one forged by crossing through what is yours.</p>`;
     }
   }
 
