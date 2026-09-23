@@ -55,7 +55,7 @@ const i18n = {
     summaryTitle: "Sumario interpretativo por áreas",
     resetBtn: "← Otra carta",
     downloadPng: "Descargar imagen",
-    downloadPdf: "Imprimir / PDF",
+    downloadPdf: "Descargar PDF de tu carta",
     footerNote: "Cálculos realizados con Swiss Ephemeris · Validado contra Solar Fire v9.1.0 con precisión menor a 1 minuto de arco · Sistema Plácidus · Zodíaco tropical · Geocéntrico",
     direct: "Directo", retrograde: "Retrógrado", exact: "Exacto", active: "Activo", house: "Casa",
     statusOk: "Conectado", statusFail: "Sin conexión", statusChecking: "Verificando...",
@@ -96,7 +96,7 @@ const i18n = {
     summaryTitle: "Interpretive summary by life areas",
     resetBtn: "← New chart",
     downloadPng: "Download image",
-    downloadPdf: "Print / PDF",
+    downloadPdf: "Download your chart as PDF",
     footerNote: "Calculations powered by Swiss Ephemeris · Validated against Solar Fire v9.1.0 with sub-arcminute precision · Placidus system · Tropical zodiac · Geocentric",
     direct: "Direct", retrograde: "Retrograde", exact: "Exact", active: "Active", house: "House",
     statusOk: "Connected", statusFail: "Offline", statusChecking: "Checking...",
@@ -2516,7 +2516,12 @@ document.getElementById('reset-btn').addEventListener('click', () => {
 });
 
 document.getElementById('download-pdf-btn').addEventListener('click', () => {
+  document.body.classList.add('pdf-basico');
   window.print();
+});
+
+window.addEventListener('afterprint', () => {
+  document.body.classList.remove('pdf-basico');
 });
 
 document.getElementById('download-png-btn').addEventListener('click', async () => {
