@@ -4,6 +4,10 @@
 // Textos: Ricardo Puerta Isaza
 // ============================================================
 
+// 'gratis'   = la persona solo lee la edad que está viviendo hoy.
+// 'completo' = puede abrir las 23 edades (versión del informe pagado).
+const EDADES_MODO = 'gratis';
+
 const EDADES_ZODIACALES = [
   {
     "min": 7,
@@ -618,6 +622,7 @@ const EDADES_TEXTOS = {
     antesDe: "Todavía no llegas a la primera edad de la lista: %1$s.",
     despuesDe: "Ya pasaste la última edad de la lista: %1$s.",
     verOtras: "Las demás edades",
+    bloqueadas: "Las 23 edades completas van en el informe en PDF de tu carta natal.",
     hPasa: "Qué pasa",
     hSpoiler: "El spoiler ácido",
     hRetos: "Los retos",
@@ -634,6 +639,7 @@ const EDADES_TEXTOS = {
     antesDe: "You have not reached the first age on the list yet: %1$s.",
     despuesDe: "You are past the last age on the list: %1$s.",
     verOtras: "The other ages",
+    bloqueadas: "All 23 ages are included in the PDF report of your natal chart.",
     hPasa: "What happens",
     hSpoiler: "The blunt truth",
     hRetos: "The challenges",
@@ -666,6 +672,8 @@ const EDADES_TEXTOS = {
   .edad-pill:hover { border-color: var(--accent, #4a8fb8); }
   .edad-pill.activa { background: var(--ink, #15181d); color: #fff; border-color: var(--ink, #15181d); }
   .edad-pill.tuya { border-color: var(--gold, #c9a961); }
+  .edad-pill.bloqueada { opacity: 0.45; cursor: default; }
+  .edad-pill.bloqueada:hover { border-color: var(--line); }
   .edades-aviso { font-size: 0.78rem; color: var(--ink-faint); margin-top: 1rem; line-height: 1.55; }
   @media print { .edades-pills { display: none; } .edades-seccion { break-inside: auto; } }
   `;
@@ -741,9 +749,16 @@ function renderEdadesZodiacales(contenedorId, fechaNacimiento, lang) {
     ? `<p class="edades-intro"><strong>${t.tuEdad} ${edad} ${t.anios}.</strong> ${situacion} ${t.intro}</p>`
     : `<p class="edades-intro">${t.intro}</p>`;
 
+  const abierto = (EDADES_MODO === 'completo');
   const pills = EDADES_ZODIACALES.map((e, i) => {
     const suya = (edad !== null && edad >= e.min && edad <= e.max);
-    return `<button type="button" class="edad-pill${i === indice ? ' activa' : ''}${suya ? ' tuya' : ''}" data-edad="${i}">${edadesRango(e, lang)}</button>`;
+    const propia = (i === indice);
+    const clases = 'edad-pill'
+      + (propia ? ' activa' : '')
+      + (suya ? ' tuya' : '')
+      + ((!abierto && !propia) ? ' bloqueada' : '');
+    const attr = (abierto || propia) ? ` data-edad="${i}"` : ' disabled';
+    return `<button type="button" class="${clases}"${attr}>${edadesRango(e, lang)}</button>`;
   }).join('');
 
   cont.innerHTML = `
@@ -753,6 +768,7 @@ function renderEdadesZodiacales(contenedorId, fechaNacimiento, lang) {
       <div class="edad-card" id="edad-ficha"></div>
       <div class="section-title" style="margin-top:1.6rem">${t.verOtras}</div>
       <div class="edades-pills" id="edades-pills">${pills}</div>
+      ${abierto ? '' : `<p class="edades-aviso">${t.bloqueadas}</p>`}
       <p class="edades-aviso">${t.aviso}</p>
     </div>
   `;
@@ -762,7 +778,7 @@ function renderEdadesZodiacales(contenedorId, fechaNacimiento, lang) {
 
   cont.querySelector('#edades-pills').addEventListener('click', function (ev) {
     const b = ev.target.closest('.edad-pill');
-    if (!b) return;
+    if (!b || b.disabled || !b.dataset.edad) return;
     cont.querySelectorAll('.edad-pill').forEach(x => x.classList.remove('activa'));
     b.classList.add('activa');
     edadesPintarFicha(ficha, Number(b.dataset.edad), lang, edad);
