@@ -2060,6 +2060,10 @@ function renderChartDetail(data) {
     </div>`;
   }).join('');
   document.getElementById('natal-aspects-grid').innerHTML = naHtml || `<p style="color: var(--ink-faint);">${currentLang === 'es' ? 'Sin aspectos detectados.' : 'No aspects detected.'}</p>`;
+  // Las edades zodiacales
+  if (window.renderEdadesZodiacales) {
+    renderEdadesZodiacales('edades-wrap', data.birth_data.datetime, currentLang);
+  }
 }
 
 function renderSummary(data) {
