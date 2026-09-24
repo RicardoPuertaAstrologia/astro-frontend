@@ -2064,6 +2064,10 @@ function renderChartDetail(data) {
   if (window.renderEdadesZodiacales) {
     renderEdadesZodiacales('edades-wrap', data.birth_data.datetime, currentLang);
   }
+  // Compra del informe completo
+  if (window.renderCompra) {
+  renderCompra('compra-wrap');
+  }
 }
 
 function renderSummary(data) {
