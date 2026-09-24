@@ -42,6 +42,9 @@ const COMPRA_TEXTOS = {
     preparando: 'Preparando tu informe...',
     verDetalle: 'Leer mi carta natal detallada',
     flotante: 'Descargar tu informe completo',
+    cortinaTitulo: 'Esto hace parte de tu informe completo',
+    cortinaTexto: 'Tu carta natal escrita, los tránsitos de los planetas lentos, tu calendario de doce meses y tus áreas de vida activadas van en el informe en PDF, junto con las 23 edades zodiacales.',
+    cortinaBoton: 'Ver el informe completo',
     enviando: 'Preparando tu informe y enviándolo a tu correo…',
     enviado: 'Listo: tu informe salió hacia',
     noEnviado: 'No pudimos enviarlo al correo. Escríbeme y te lo mando yo mismo: ricardopuerta@ricardopuerta.com',
@@ -79,6 +82,9 @@ const COMPRA_TEXTOS = {
     preparando: 'Preparing your report...',
     verDetalle: 'Read my natal chart in detail',
     flotante: 'Download your full report',
+    cortinaTitulo: 'This is part of your complete report',
+    cortinaTexto: 'Your natal chart in writing, the transits of the slow planets, your twelve-month calendar and your activated life areas are in the PDF report, together with the 23 zodiacal ages.',
+    cortinaBoton: 'See the complete report',
     enviando: 'Preparing your report and sending it to your inbox…',
     enviado: 'Done: your report is on its way to',
     noEnviado: 'We could not send the email. Write to me and I will send it myself: ricardopuerta@ricardopuerta.com',
@@ -94,6 +100,11 @@ const COMPRA_TEXTOS = {
   const s = document.createElement('style');
   s.id = 'compra-estilos';
   s.textContent = `
+  .compra-cortina { text-align: center; padding: 3rem 1.5rem; }
+  .compra-cortina .candado { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.4rem;
+    line-height: 1.25; margin-bottom: .8rem; color: var(--ink, #1a1a1a); }
+  .compra-cortina p { font-size: .92rem; line-height: 1.6; color: var(--ink-soft, #55524d);
+    max-width: 36em; margin: 0 auto 1.4rem; }
   .compra-flotante { position: fixed; right: 18px; bottom: 18px; z-index: 60;
     background: #1a1a1a; color: #fff; border: none; border-radius: 999px;
     padding: .8rem 1.3rem; font-size: .85rem; font-weight: 500; cursor: pointer;
@@ -286,6 +297,89 @@ async function compraIrAPagar() {
   form.submit();
 }
 
+
+// ------------------------------------------------------------
+// EL PERMISO VIAJA CON CADA LLAMADA AL SERVIDOR
+// ------------------------------------------------------------
+// Los textos escritos por Ricardo viven en el servidor y solo salen con
+// un permiso de pago. Para no tener que tocar app.js, se envuelve el
+// fetch del navegador: si hay permiso, viaja en la cabecera.
+(function () {
+  if (window.__compraFetchEnvuelto) return;
+  window.__compraFetchEnvuelto = true;
+  const original = window.fetch;
+  window.fetch = function (recurso, opciones) {
+    try {
+      const url = (typeof recurso === 'string') ? recurso : (recurso && recurso.url) || '';
+      const permiso = compraPermiso();
+      if (permiso && url.indexOf('/cobro/') < 0 && /\/(calculate|interpret-chart)/.test(url)) {
+        opciones = Object.assign({}, opciones || {});
+        opciones.headers = Object.assign({}, opciones.headers || {}, { 'X-Permiso': permiso });
+      }
+    } catch (e) { /* si algo falla, la llamada sigue igual */ }
+    return original.call(this, recurso, opciones);
+  };
+})();
+
+
+// ------------------------------------------------------------
+// LA CORTINA DE LAS PESTAÑAS PAGADAS
+// ------------------------------------------------------------
+const COMPRA_PESTANAS_PAGADAS = ['lectura-rp', 'interpretation', 'calendar', 'summary', 'aspects'];
+
+function compraCortina() {
+  // Con permiso, o con la tienda todavía abierta, no se tapa nada.
+  if (compraTienePermiso() || !window.COMPRA_PROTEGIDO) { compraQuitarCortina(); return; }
+  const t = COMPRA_TEXTOS[compraIdioma()];
+  COMPRA_PESTANAS_PAGADAS.forEach(function (nombre) {
+    const caja = document.getElementById('tab-' + nombre);
+    if (!caja || caja.querySelector('.compra-cortina')) return;
+    const guardado = document.createElement('div');
+    guardado.className = 'compra-guardado';
+    guardado.style.display = 'none';
+    while (caja.firstChild) guardado.appendChild(caja.firstChild);
+    caja.appendChild(guardado);
+    const aviso = document.createElement('div');
+    aviso.className = 'compra-cortina';
+    aviso.innerHTML = '<div class="candado">' + t.cortinaTitulo + '</div>'
+      + '<p>' + t.cortinaTexto + '</p>'
+      + '<button type="button" class="compra-btn">' + t.cortinaBoton + '</button>';
+    aviso.querySelector('button').addEventListener('click', compraIrACompra);
+    caja.appendChild(aviso);
+  });
+}
+
+function compraQuitarCortina() {
+  document.querySelectorAll('.compra-cortina').forEach(function (c) { c.remove(); });
+  document.querySelectorAll('.compra-guardado').forEach(function (g) {
+    const caja = g.parentNode;
+    while (g.firstChild) caja.insertBefore(g.firstChild, g);
+    g.remove();
+  });
+}
+
+function compraIrACompra() {
+  const caja = document.getElementById('compra-wrap') || document.querySelector('.compra-caja');
+  if (caja) caja.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// renderResult vuelve a pintar todo; la cortina se pone después de cada pintada.
+(function () {
+  function envolver() {
+    if (typeof window.renderResult !== 'function' || window.renderResult.__conCortina) return false;
+    const original = window.renderResult;
+    const nuevo = function () {
+      const r = original.apply(this, arguments);
+      try { setTimeout(compraCortina, 60); } catch (e) {}
+      return r;
+    };
+    nuevo.__conCortina = true;
+    window.renderResult = nuevo;
+    return true;
+  }
+  if (!envolver()) window.addEventListener('DOMContentLoaded', envolver);
+})();
+
 // ------------------------------------------------------------
 // EL REGRESO DESDE WOMPI
 // ------------------------------------------------------------
@@ -350,7 +444,8 @@ async function compraDescargarCompleto(evento) {
     const archivo = await r.blob();
     const enlace = document.createElement('a');
     enlace.href = URL.createObjectURL(archivo);
-    enlace.download = ('Carta natal - ' + ((nacimiento && nacimiento.name) || 'informe')).trim() + '.pdf';
+    const base = (compraIdioma() === 'en') ? 'Natal chart - ' : 'Carta natal - ';
+    enlace.download = (base + ((nacimiento && nacimiento.name) || 'informe')).trim() + '.pdf';
     document.body.appendChild(enlace);
     enlace.click();
     document.body.removeChild(enlace);
@@ -430,10 +525,12 @@ function compraLineas(elemento) {
 function compraSecciones() {
   const secciones = [];
 
+  const en = (compraIdioma() === 'en');
+
   // Tránsitos de los planetas lentos, y calendario de 12 meses:
   // texto corrido, tal como se ve en pantalla.
-  [['interpretation', 'Tránsitos de los planetas lentos'],
-   ['calendar', 'Tu calendario · 12 meses']].forEach(function (p) {
+  [['interpretation', en ? 'Transits of the slow planets' : 'Tránsitos de los planetas lentos'],
+   ['calendar', en ? 'Your 12-month calendar' : 'Tu calendario · 12 meses']].forEach(function (p) {
     const caja = document.getElementById('tab-' + p[0]);
     if (!caja) return;
     const lineas = compraConDiseno(caja, compraLineas);
@@ -463,7 +560,8 @@ function compraSecciones() {
       return salida;
     });
     if (bloques.length) {
-      secciones.push({ titulo: 'Tus áreas de vida activadas', bloques: bloques });
+      secciones.push({ titulo: en ? 'Your activated life areas' : 'Tus áreas de vida activadas',
+                       bloques: bloques });
     }
   }
 
@@ -473,7 +571,12 @@ function compraSecciones() {
 // Arma los datos de nacimiento a partir de la carta que está en pantalla.
 function compraNacimiento() {
   if (typeof currentResult === 'undefined' || !currentResult) return null;
-  const bd = currentResult.birth_data || {};
+  return compraNacimientoDe(currentResult);
+}
+
+function compraNacimientoDe(carta) {
+  if (!carta) return null;
+  const bd = carta.birth_data || {};
   const f = String(bd.datetime || '');
   const n = {
     name: bd.name || '',
@@ -524,6 +627,22 @@ async function compraPedirInforme(id, referencia, correo, cajaAviso) {
   }
 }
 
+// Al volver de Wompi la página se carga de cero, y de cero arranca en
+// español. Si la persona estaba en inglés, se le devuelve su idioma
+// antes de pintar nada: si no, la pantalla queda mezclada y el PDF sale
+// en el idioma equivocado.
+function compraRestaurarIdioma(idioma) {
+  if (idioma !== 'es' && idioma !== 'en') return;
+  if (typeof currentLang !== 'undefined' && currentLang === idioma) return;
+  const boton = document.querySelector('.lang-btn[data-lang="' + idioma + '"]');
+  if (boton) { boton.click(); return; }
+  try {
+    currentLang = idioma;
+    if (typeof applyLang === 'function') applyLang();
+  } catch (e) { /* si la app cambia, no se rompe el regreso */ }
+}
+
+
 async function compraRevisarRegreso() {
   const params = new URLSearchParams(location.search);
   const id = params.get('id');
@@ -534,7 +653,8 @@ async function compraRevisarRegreso() {
 
   let guardado = null;
   try { guardado = JSON.parse(sessionStorage.getItem(COMPRA_GUARDADO) || 'null'); } catch (e) {}
-  const t = COMPRA_TEXTOS[(guardado && guardado.idioma === 'en') ? 'en' : compraIdioma()];
+  if (guardado && guardado.idioma) compraRestaurarIdioma(guardado.idioma);
+  const t = COMPRA_TEXTOS[compraIdioma()];
 
   let r;
   try {
@@ -562,12 +682,29 @@ async function compraRevisarRegreso() {
   } catch (e) {}
 
   // Volver a pintar la carta que la persona estaba viendo antes de pagar.
+  // Se le pide al servidor otra vez, ya con el permiso, porque la copia
+  // guardada se hizo antes de pagar y le faltan las partes del informe.
   if (guardado && guardado.carta && typeof renderResult === 'function') {
     try {
-      currentResult = guardado.carta;
+      let carta = guardado.carta;
+      const n = compraNacimientoDe(carta);
+      if (n) {
+        try {
+          const r2 = await fetch(compraServidor() + '/calculate?lang=' + compraIdioma(), {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(n)
+          });
+          if (r2.ok) {
+            const completa = await r2.json();
+            if (completa && completa.natal_chart) carta = completa;
+          }
+        } catch (e) { /* si falla, se usa la copia guardada */ }
+      }
+      currentResult = carta;
       document.getElementById('input-view').style.display = 'none';
       document.getElementById('result-view').classList.add('visible');
-      renderResult(guardado.carta);
+      renderResult(carta);
+      compraQuitarCortina();
     } catch (e) { console.warn('No se pudo rearmar la carta:', e); }
   }
 
@@ -622,4 +759,20 @@ function compraAjustarBotonPDF() {
 window.renderCompra = renderCompra;
 window.compraPermiso = compraPermiso;
 window.compraTienePermiso = compraTienePermiso;
+window.compraCortina = compraCortina;
+
+// Al abrir la página se le pregunta al servidor si los textos están
+// protegidos. Si lo están, las pestañas pagadas se tapan.
+async function compraAveriguarProteccion() {
+  try {
+    const r = await fetch(compraServidor() + '/cobro/estado');
+    if (r.ok) {
+      const e = await r.json();
+      window.COMPRA_PROTEGIDO = !!e.textos_protegidos;
+    }
+  } catch (err) { /* si no se puede preguntar, no se tapa nada */ }
+  compraCortina();
+}
+
 window.addEventListener('DOMContentLoaded', compraRevisarRegreso);
+window.addEventListener('DOMContentLoaded', compraAveriguarProteccion);
