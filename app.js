@@ -164,6 +164,13 @@ document.querySelectorAll('.lang-btn').forEach(btn => {
 // CONSTANTS
 // ============================================================
 const SIGN_GLYPHS = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
+// Un color por elemento. El orden del zodíaco los alterna siempre igual:
+// fuego, tierra, aire, agua, fuego, tierra... así que basta con i % 4.
+//   fuego  Aries · Leo · Sagitario
+//   tierra Tauro · Virgo · Capricornio
+//   aire   Géminis · Libra · Acuario
+//   agua   Cáncer · Escorpio · Piscis
+const COLOR_ELEMENTO = ['#c0503f', '#5a7d4e', '#4a8fb8', '#2f4f73'];
 const PLANET_GLYPHS = {
   sun:'☉', moon:'☽', mercury:'☿', venus:'♀', mars:'♂',
   jupiter:'♃', saturn:'♄', uranus:'♅', neptune:'♆', pluto:'♇',
@@ -954,7 +961,11 @@ function drawNatalChart(data) {
     const midAngle = lonToAngle(i * 30 + 15);
     const gx = cx + ((rZodiac + rOuter) / 2) * Math.cos(midAngle);
     const gy = cy - ((rZodiac + rOuter) / 2) * Math.sin(midAngle);
-    s += `<text x="${gx}" y="${gy}" font-size="15" text-anchor="middle" dominant-baseline="middle" fill="${inkSoftColor}" font-family="serif">${SIGN_GLYPHS[i]}</text>`;
+    // El disco del elemento, y el signo en blanco encima.
+    // El \uFE0E del final le pide al navegador que dibuje el signo como
+    // letra y no como emoji: sin eso, cada computador lo pinta a su modo.
+    s += `<circle cx="${gx}" cy="${gy}" r="11" fill="${COLOR_ELEMENTO[i % 4]}"/>`;
+    s += `<text x="${gx}" y="${gy}" font-size="14" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-family="'Segoe UI Symbol','Apple Symbols','Noto Sans Symbols 2','DejaVu Sans',serif">${SIGN_GLYPHS[i]}\uFE0E</text>`;
   }
 
   // House cusps + degrees — se detienen en la frontera, no invaden los tránsitos
