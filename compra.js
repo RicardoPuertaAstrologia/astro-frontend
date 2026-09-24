@@ -522,22 +522,95 @@ function compraLineas(elemento) {
     .filter(function (l) { return l.length > 1; });
 }
 
+// Recorre los siete planetas lentos y arma el texto de cada uno, el
+// mismo que la persona vería al hacer clic en su pastilla.
+function compraTodosLosTransitos() {
+  const bloques = [];
+  if (typeof generateInterpretation !== 'function') return bloques;
+  if (typeof currentResult === 'undefined' || !currentResult) return bloques;
+
+  const posiciones = (currentResult.transits || {}).positions || {};
+  const orden = (typeof TRANSIT_PLANETS !== 'undefined' && TRANSIT_PLANETS.length)
+    ? TRANSIT_PLANETS : Object.keys(posiciones);
+  const idioma = compraIdioma();
+  const nombre = (typeof PLANET_NAMES !== 'undefined' && PLANET_NAMES[idioma])
+    ? PLANET_NAMES[idioma] : {};
+  const quien = (currentResult.birth_data || {}).name || '';
+
+  // Un cajón fuera de la pantalla: hace falta que el texto tenga diseño
+  // para que salga con sus saltos de línea.
+  const caja = document.createElement('div');
+  caja.setAttribute('style',
+    'position:absolute;left:-10000px;top:0;width:760px;opacity:1;');
+  caja.className = 'interpretation';
+  document.body.appendChild(caja);
+  try {
+    orden.forEach(function (planeta) {
+      if (!posiciones[planeta]) return;
+      let html = '';
+      try {
+        html = generateInterpretation(currentResult, quien, planeta);
+      } catch (e) { return; }
+      if (!html) return;
+      caja.innerHTML = html;
+
+      // En pantalla cada planeta saluda, porque la persona llega a uno
+      // a la vez. En el informe ya se saludó en la portada, así que
+      // siete "Hola" seguidos sobran: se quita el saludo y la frase
+      // arranca por el planeta.
+      const entrada = caja.querySelector('p.lead') || caja.querySelector('p');
+      if (entrada && entrada.firstChild && entrada.firstChild.nodeType === 3) {
+        entrada.firstChild.textContent = entrada.firstChild.textContent
+          .replace(/^\s*(Hola|Hello)\b[^.]*\.\s*/i, '');
+      }
+
+      // Los subtítulos internos ("Lo que significa este tránsito...",
+      // "Los aspectos a tus planetas natales") se marcan para que en el
+      // PDF salgan en negrilla y no se confundan con el texto corrido.
+      caja.querySelectorAll('h3, h4').forEach(function (h) {
+        const t = (h.textContent || '').trim();
+        if (t) h.textContent = '**' + t + '**';
+      });
+      const lineas = compraLineas(caja);
+      if (lineas.length) {
+        bloques.push({ subtitulo: nombre[planeta] || planeta, parrafos: lineas });
+      }
+    });
+  } finally {
+    caja.remove();
+  }
+  return bloques;
+}
+
+
 function compraSecciones() {
   const secciones = [];
 
+  // Si la cortina está puesta, el contenido está guardado en un cajón
+  // oculto y el navegador lo entregaría sin saltos de línea. Con el pago
+  // hecho la cortina ya no tiene razón de ser, así que se quita antes de
+  // leer nada.
+  if (compraTienePermiso()) {
+    try { compraQuitarCortina(); } catch (e) {}
+  }
+
   const en = (compraIdioma() === 'en');
 
-  // Tránsitos de los planetas lentos, y calendario de 12 meses:
-  // texto corrido, tal como se ve en pantalla.
-  [['interpretation', en ? 'Transits of the slow planets' : 'Tránsitos de los planetas lentos'],
-   ['calendar', en ? 'Your 12-month calendar' : 'Tu calendario · 12 meses']].forEach(function (p) {
-    const caja = document.getElementById('tab-' + p[0]);
-    if (!caja) return;
-    const lineas = compraConDiseno(caja, compraLineas);
-    if (lineas.length) {
-      secciones.push({ titulo: p[1], bloques: [{ subtitulo: '', parrafos: lineas }] });
-    }
-  });
+  // Tránsitos de los planetas lentos: en pantalla solo se ve el planeta
+  // que la persona tenga señalado, pero en el informe van los siete.
+  // El texto de cada uno lo arma la misma función que usa la pantalla,
+  // sin volver a molestar al servidor.
+  const transitos = compraTodosLosTransitos();
+  if (transitos.length) {
+    secciones.push({
+      titulo: en ? 'Transits of the slow planets' : 'Tránsitos de los planetas lentos',
+      bloques: transitos
+    });
+  }
+
+  // El calendario de 12 meses ya no se copia de la pantalla: lo arma el
+  // servidor con los datos, para los siete planetas y en una sola línea
+  // por fecha.
 
   // Áreas de vida: cada área va como un bloque con su propio título, para
   // que en el PDF el nombre del área salga destacado en negrilla y no
