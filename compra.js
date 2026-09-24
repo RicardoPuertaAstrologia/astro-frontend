@@ -34,8 +34,15 @@ const COMPRA_TEXTOS = {
     cargando: 'Preparando el pago…',
     errorServidor: 'No se pudo preparar el pago. Intenta de nuevo en un momento.',
     verificando: 'Verificando tu pago…',
-    aprobadoTitulo: 'Pago aprobado',
-    aprobadoTexto: 'Gracias. Tu informe completo ya está abierto en esta pantalla.',
+    aprobadoTitulo: 'Tu pago ya fue aprobado',
+    aprobadoTexto: 'Tu carta natal completa quedó abierta en esta pantalla: entra a <strong>Tu carta natal detallada</strong> y a las demás pestañas para leerla toda.',
+    aprobadoCorreo: 'También te lo estamos enviando en PDF al correo que registraste',
+    descargar: 'Descarga acá tu carta natal completa',
+    botonPdfCompleto: 'Descargar tu informe completo',
+    verDetalle: 'Ver mi carta natal detallada',
+    enviando: 'Preparando tu informe y enviándolo a tu correo…',
+    enviado: 'Listo: tu informe salió hacia',
+    noEnviado: 'No pudimos enviarlo al correo. Escríbeme y te lo mando yo mismo: ricardopuerta@ricardopuerta.com',
     rechazadoTitulo: 'El pago no se completó',
     rechazadoTexto: 'No se hizo ningún cobro. Puedes intentarlo otra vez.',
     cerrar: 'Cerrar'
@@ -62,8 +69,15 @@ const COMPRA_TEXTOS = {
     cargando: 'Preparing the payment…',
     errorServidor: 'The payment could not be prepared. Please try again in a moment.',
     verificando: 'Checking your payment…',
-    aprobadoTitulo: 'Payment approved',
-    aprobadoTexto: 'Thank you. Your full report is now open on this screen.',
+    aprobadoTitulo: 'Your payment was approved',
+    aprobadoTexto: 'Your complete natal chart is now open on this screen: go to <strong>Your natal chart in detail</strong> and the other tabs to read all of it.',
+    aprobadoCorreo: 'We are also sending it to you as a PDF, to the address you registered',
+    descargar: 'Download your complete natal chart here',
+    botonPdfCompleto: 'Download your full report',
+    verDetalle: 'See my natal chart in detail',
+    enviando: 'Preparing your report and sending it to your inbox…',
+    enviado: 'Done: your report is on its way to',
+    noEnviado: 'We could not send the email. Write to me and I will send it myself: ricardopuerta@ricardopuerta.com',
     rechazadoTitulo: 'The payment was not completed',
     rechazadoTexto: 'Nothing was charged. You can try again.',
     cerrar: 'Close'
@@ -112,7 +126,12 @@ const COMPRA_TEXTOS = {
   .compra-aviso { margin: 0 0 1.4rem; padding: 1rem 1.2rem; border-radius: 10px; font-size: .92rem; line-height: 1.6; }
   .compra-aviso.bien { background: rgba(201,169,97,.12); border: 1px solid var(--gold, #c9a961); }
   .compra-aviso.mal { background: rgba(170,51,51,.08); border: 1px solid #a33; }
-  .compra-aviso strong { display: block; margin-bottom: .2rem; }
+  .compra-aviso .titulo { display: block; font-weight: 700; margin-bottom: .25rem; }
+  .compra-aviso .acciones { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1rem; }
+  .compra-aviso .acciones .compra-btn { padding: .85rem 1.5rem; font-size: .76rem; }
+  .compra-aviso .secundario { background: none; color: var(--ink, #15181d); border: 1px solid var(--ink, #15181d); }
+  .compra-aviso .secundario:hover { background: var(--ink, #15181d); color: #fff; }
+  .compra-aviso .estado { margin-top: .9rem; font-size: .88rem; color: var(--ink-faint, #5a5f67); }
   @media print { .compra-caja, .compra-velo, .compra-aviso { display: none !important; } }
   `;
   document.head.appendChild(s);
@@ -142,7 +161,7 @@ function compraCorreoValido(c) {
 async function renderCompra(contenedorId) {
   const cont = document.getElementById(contenedorId);
   if (!cont) return;
-  if (compraTienePermiso()) { cont.innerHTML = ''; return; }
+  if (compraTienePermiso()) { cont.innerHTML = ''; compraAjustarBotonPDF(); return; }
 
   const t = COMPRA_TEXTOS[compraIdioma()];
   let precio = null;
@@ -272,14 +291,125 @@ function compraPermiso() {
   } catch (e) { return ''; }
 }
 
-function compraAviso(tipo, titulo, texto) {
+function compraAviso(tipo, titulo, texto, extra) {
   const destino = document.getElementById('compra-aviso-lugar')
     || document.getElementById('result-view')
     || document.body;
+  const anterior = destino.querySelector('.compra-aviso');
+  if (anterior) anterior.remove();
   const d = document.createElement('div');
   d.className = 'compra-aviso ' + tipo;
-  d.innerHTML = `<strong>${titulo}</strong>${texto}`;
+  d.id = 'compra-aviso';
+  d.innerHTML = `<span class="titulo">${titulo}</span>${texto}${extra || ''}`;
   destino.insertBefore(d, destino.firstChild);
+  return d;
+}
+
+// Imprime TODO (la versión completa), no solo el gráfico y los datos.
+function compraDescargarCompleto() {
+  document.body.classList.remove('pdf-basico');
+  window.print();
+}
+
+function compraIrAlDetalle() {
+  const pestana = document.querySelector('.tab[data-tab="lectura-rp"]');
+  if (pestana) {
+    pestana.click();
+    pestana.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+// El gráfico de la carta, convertido en imagen para el PDF del correo.
+function compraImagenCarta() {
+  return new Promise(function (listo) {
+    try {
+      const original = document.getElementById('natal-chart');
+      if (!original) return listo(null);
+      const svg = original.cloneNode(true);
+      svg.setAttribute('viewBox', '-20 -20 520 520');
+      const texto = new XMLSerializer().serializeToString(svg);
+      const url = URL.createObjectURL(new Blob([texto], { type: 'image/svg+xml;charset=utf-8' }));
+      const img = new Image();
+      img.onload = function () {
+        const lienzo = document.createElement('canvas');
+        lienzo.width = 1400; lienzo.height = 1400;
+        const ctx = lienzo.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, lienzo.width, lienzo.height);
+        ctx.drawImage(img, 0, 0, lienzo.width, lienzo.height);
+        URL.revokeObjectURL(url);
+        try { listo(lienzo.toDataURL('image/png')); } catch (e) { listo(null); }
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); listo(null); };
+      img.src = url;
+    } catch (e) { listo(null); }
+  });
+}
+
+// Lo que ya está escrito en pantalla, para que también vaya en el PDF.
+function compraSecciones() {
+  const partes = [
+    ['interpretation', 'Tránsitos de los planetas lentos'],
+    ['calendar', 'Tu calendario · 12 meses'],
+    ['summary', 'Tus áreas de vida activadas']
+  ];
+  const secciones = [];
+  partes.forEach(function (p) {
+    const caja = document.getElementById('tab-' + p[0]);
+    if (!caja) return;
+    const texto = (caja.innerText || '').split('\n')
+      .map(function (l) { return l.trim(); })
+      .filter(function (l) { return l.length > 1; });
+    if (!texto.length) return;
+    secciones.push({ titulo: p[1], bloques: [{ subtitulo: '', parrafos: texto }] });
+  });
+  return secciones;
+}
+
+// Le pide al servidor que arme el PDF y lo mande al correo.
+async function compraPedirInforme(id, referencia, correo, cajaAviso) {
+  const t = COMPRA_TEXTOS[compraIdioma()];
+  if (!correo || typeof currentResult === 'undefined' || !currentResult) return;
+  const bd = currentResult.birth_data || {};
+  const f = String(bd.datetime || '');
+  const nacimiento = {
+    name: bd.name || '',
+    year: parseInt(f.slice(0, 4), 10),
+    month: parseInt(f.slice(5, 7), 10),
+    day: parseInt(f.slice(8, 10), 10),
+    hour: parseInt(f.slice(11, 13), 10),
+    minute: parseInt(f.slice(14, 16), 10),
+    latitude: bd.latitude,
+    longitude: bd.longitude,
+    city_name: bd.city || '',
+    use_lmt: !!bd.use_lmt
+  };
+  if (!nacimiento.year || nacimiento.latitude === undefined) return;
+
+  const estado = document.createElement('div');
+  estado.className = 'estado';
+  estado.textContent = t.enviando;
+  if (cajaAviso) cajaAviso.appendChild(estado);
+
+  let imagen = null;
+  try { imagen = await compraImagenCarta(); } catch (e) {}
+
+  try {
+    const r = await fetch(compraServidor() + '/cobro/entregar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: id, referencia: referencia, correo: correo, lang: compraIdioma(),
+        nacimiento: nacimiento, imagen: imagen, secciones: compraSecciones()
+      })
+    });
+    const datos = await r.json();
+    estado.textContent = (r.ok && datos.correo_enviado)
+      ? (t.enviado + ' ' + correo)
+      : t.noEnviado;
+  } catch (e) {
+    estado.textContent = t.noEnviado;
+  }
 }
 
 async function compraRevisarRegreso() {
@@ -329,7 +459,36 @@ async function compraRevisarRegreso() {
     } catch (e) { console.warn('No se pudo rearmar la carta:', e); }
   }
 
-  compraAviso('bien', t.aprobadoTitulo, t.aprobadoTexto);
+  const botones = `
+    <div class="acciones">
+      <button type="button" class="compra-btn" id="compra-descargar">${t.descargar}</button>
+      <button type="button" class="compra-btn secundario" id="compra-detalle">${t.verDetalle}</button>
+    </div>
+    <div class="estado">${t.aprobadoCorreo}${guardado && guardado.correo ? ': ' + guardado.correo : '.'}</div>`;
+  const caja = compraAviso('bien', t.aprobadoTitulo, t.aprobadoTexto, botones);
+
+  const bDesc = document.getElementById('compra-descargar');
+  if (bDesc) bDesc.addEventListener('click', compraDescargarCompleto);
+  const bDet = document.getElementById('compra-detalle');
+  if (bDet) bDet.addEventListener('click', compraIrAlDetalle);
+  compraAjustarBotonPDF();
+
+  compraPedirInforme(id, r.referencia || (guardado ? guardado.referencia : ''),
+                     guardado ? guardado.correo : '', caja);
+}
+
+// Con el informe comprado, el botón de siempre baja el PDF COMPLETO.
+function compraAjustarBotonPDF() {
+  if (!compraTienePermiso()) return;
+  const viejo = document.getElementById('download-pdf-btn');
+  if (!viejo || viejo.dataset.completo === 'si') return;
+  const nuevo = viejo.cloneNode(true);   // el clon no trae los oyentes anteriores
+  nuevo.dataset.completo = 'si';
+  const etiqueta = nuevo.querySelector('[data-i18n="downloadPdf"]') || nuevo;
+  etiqueta.textContent = COMPRA_TEXTOS[compraIdioma()].botonPdfCompleto;
+  etiqueta.removeAttribute('data-i18n');
+  viejo.parentNode.replaceChild(nuevo, viejo);
+  nuevo.addEventListener('click', compraDescargarCompleto);
 }
 
 window.renderCompra = renderCompra;

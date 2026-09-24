@@ -749,7 +749,10 @@ function renderEdadesZodiacales(contenedorId, fechaNacimiento, lang) {
     ? `<p class="edades-intro"><strong>${t.tuEdad} ${edad} ${t.anios}.</strong> ${situacion} ${t.intro}</p>`
     : `<p class="edades-intro">${t.intro}</p>`;
 
-  const abierto = (EDADES_MODO === 'completo');
+  // Se abren las 23 edades si el modo está en 'completo' o si la persona
+  // ya compró el informe en esta sesión.
+  const abierto = (EDADES_MODO === 'completo')
+    || (typeof window.compraTienePermiso === 'function' && window.compraTienePermiso());
   const pills = EDADES_ZODIACALES.map((e, i) => {
     const suya = (edad !== null && edad >= e.min && edad <= e.max);
     const propia = (i === indice);
