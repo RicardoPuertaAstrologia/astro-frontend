@@ -39,7 +39,9 @@ const COMPRA_TEXTOS = {
     aprobadoCorreo: 'También te lo estamos enviando en PDF al correo que registraste',
     descargar: 'Descarga acá tu carta natal completa',
     botonPdfCompleto: 'Descargar tu informe completo',
-    verDetalle: 'Ver mi carta natal detallada',
+    preparando: 'Preparando tu informe...',
+    verDetalle: 'Leer mi carta natal detallada',
+    flotante: 'Descargar tu informe completo',
     enviando: 'Preparando tu informe y enviándolo a tu correo…',
     enviado: 'Listo: tu informe salió hacia',
     noEnviado: 'No pudimos enviarlo al correo. Escríbeme y te lo mando yo mismo: ricardopuerta@ricardopuerta.com',
@@ -74,7 +76,9 @@ const COMPRA_TEXTOS = {
     aprobadoCorreo: 'We are also sending it to you as a PDF, to the address you registered',
     descargar: 'Download your complete natal chart here',
     botonPdfCompleto: 'Download your full report',
-    verDetalle: 'See my natal chart in detail',
+    preparando: 'Preparing your report...',
+    verDetalle: 'Read my natal chart in detail',
+    flotante: 'Download your full report',
     enviando: 'Preparing your report and sending it to your inbox…',
     enviado: 'Done: your report is on its way to',
     noEnviado: 'We could not send the email. Write to me and I will send it myself: ricardopuerta@ricardopuerta.com',
@@ -90,6 +94,14 @@ const COMPRA_TEXTOS = {
   const s = document.createElement('style');
   s.id = 'compra-estilos';
   s.textContent = `
+  .compra-flotante { position: fixed; right: 18px; bottom: 18px; z-index: 60;
+    background: #1a1a1a; color: #fff; border: none; border-radius: 999px;
+    padding: .8rem 1.3rem; font-size: .85rem; font-weight: 500; cursor: pointer;
+    box-shadow: 0 6px 22px rgba(0,0,0,.22); display: inline-flex; align-items: center; gap: .5rem; }
+  .compra-flotante:hover { background: #000; }
+  .compra-flotante[disabled] { opacity: .6; cursor: default; }
+  @media print { .compra-flotante { display: none !important; } }
+  @media (max-width: 520px) { .compra-flotante { right: 10px; bottom: 10px; padding: .7rem 1rem; font-size: .8rem; } }
   .compra-caja { margin-top: 2.5rem; border: 1px solid var(--gold, #c9a961); border-radius: 12px;
     padding: 1.8rem 1.6rem; background: #fff; }
   .compra-rotulo { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase;
@@ -161,7 +173,7 @@ function compraCorreoValido(c) {
 async function renderCompra(contenedorId) {
   const cont = document.getElementById(contenedorId);
   if (!cont) return;
-  if (compraTienePermiso()) { cont.innerHTML = ''; compraAjustarBotonPDF(); return; }
+  if (compraTienePermiso()) { cont.innerHTML = ''; compraAjustarBotonPDF(); compraBotonFlotante(); return; }
 
   const t = COMPRA_TEXTOS[compraIdioma()];
   let precio = null;
@@ -306,9 +318,50 @@ function compraAviso(tipo, titulo, texto, extra) {
 }
 
 // Imprime TODO (la versión completa), no solo el gráfico y los datos.
-function compraDescargarCompleto() {
-  document.body.classList.remove('pdf-basico');
-  window.print();
+async function compraDescargarCompleto(evento) {
+  const boton = evento && evento.currentTarget ? evento.currentTarget : null;
+  const etiquetaOriginal = boton ? boton.textContent : '';
+  const t = COMPRA_TEXTOS[compraIdioma()];
+
+  const nacimiento = compraNacimiento();
+
+  // Sin permiso o sin datos no hay nada que pedirle al servidor:
+  // se cae al método de siempre, imprimir desde el navegador.
+  if (!compraTienePermiso() || !nacimiento) {
+    document.body.classList.remove('pdf-basico');
+    window.print();
+    return;
+  }
+
+  if (boton) { boton.disabled = true; boton.textContent = t.preparando; }
+  try {
+    const r = await fetch(compraServidor() + '/cobro/pdf', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        permiso: compraPermiso(),
+        lang: compraIdioma(),
+        nacimiento: nacimiento,
+        imagen: await compraImagenCarta(),
+        secciones: compraSecciones()
+      })
+    });
+    if (!r.ok) throw new Error('el servidor respondió ' + r.status);
+    const archivo = await r.blob();
+    const enlace = document.createElement('a');
+    enlace.href = URL.createObjectURL(archivo);
+    enlace.download = ('Carta natal - ' + ((nacimiento && nacimiento.name) || 'informe')).trim() + '.pdf';
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+    setTimeout(function () { URL.revokeObjectURL(enlace.href); }, 4000);
+  } catch (e) {
+    console.warn('No se pudo bajar el PDF del servidor:', e);
+    document.body.classList.remove('pdf-basico');
+    window.print();
+  } finally {
+    if (boton) { boton.disabled = false; boton.textContent = etiquetaOriginal; }
+  }
 }
 
 function compraIrAlDetalle() {
@@ -347,32 +400,82 @@ function compraImagenCarta() {
 }
 
 // Lo que ya está escrito en pantalla, para que también vaya en el PDF.
+// Las pestañas que no están abiertas están ocultas, y de algo oculto el
+// navegador entrega el texto sin saltos de línea: "Tu carta" se pega con
+// el valor. Así que se le devuelve el diseño un instante, fuera de la
+// pantalla, se lee el texto bien formado y se deja todo como estaba.
+function compraConDiseno(caja, trabajo) {
+  const abierta = caja.classList.contains('active');
+  const estiloPrevio = caja.getAttribute('style');
+  if (!abierta) {
+    caja.setAttribute('style',
+      'display:block;position:absolute;left:-10000px;top:0;width:760px;opacity:1;');
+  }
+  try {
+    return trabajo(caja);
+  } finally {
+    if (!abierta) {
+      if (estiloPrevio === null) caja.removeAttribute('style');
+      else caja.setAttribute('style', estiloPrevio);
+    }
+  }
+}
+
+function compraLineas(elemento) {
+  return (elemento.innerText || elemento.textContent || '').split('\n')
+    .map(function (l) { return l.replace(/\s+/g, ' ').trim(); })
+    .filter(function (l) { return l.length > 1; });
+}
+
 function compraSecciones() {
-  const partes = [
-    ['interpretation', 'Tránsitos de los planetas lentos'],
-    ['calendar', 'Tu calendario · 12 meses'],
-    ['summary', 'Tus áreas de vida activadas']
-  ];
   const secciones = [];
-  partes.forEach(function (p) {
+
+  // Tránsitos de los planetas lentos, y calendario de 12 meses:
+  // texto corrido, tal como se ve en pantalla.
+  [['interpretation', 'Tránsitos de los planetas lentos'],
+   ['calendar', 'Tu calendario · 12 meses']].forEach(function (p) {
     const caja = document.getElementById('tab-' + p[0]);
     if (!caja) return;
-    const texto = (caja.innerText || '').split('\n')
-      .map(function (l) { return l.trim(); })
-      .filter(function (l) { return l.length > 1; });
-    if (!texto.length) return;
-    secciones.push({ titulo: p[1], bloques: [{ subtitulo: '', parrafos: texto }] });
+    const lineas = compraConDiseno(caja, compraLineas);
+    if (lineas.length) {
+      secciones.push({ titulo: p[1], bloques: [{ subtitulo: '', parrafos: lineas }] });
+    }
   });
+
+  // Áreas de vida: cada área va como un bloque con su propio título, para
+  // que en el PDF el nombre del área salga destacado en negrilla y no
+  // perdido dentro de un párrafo corrido.
+  const cajaAreas = document.getElementById('tab-summary');
+  if (cajaAreas) {
+    const bloques = compraConDiseno(cajaAreas, function (caja) {
+      const salida = [];
+      caja.querySelectorAll('.summary-card').forEach(function (tarjeta) {
+        const h = tarjeta.querySelector('h4');
+        const titulo = h ? (h.innerText || h.textContent || '').trim() : '';
+        // El cuerpo no está en un solo elemento: el navegador reacomoda
+        // los <div> que vienen dentro del <p>. Así que se lee la tarjeta
+        // entera y se descuenta el título.
+        const lineas = compraLineas(tarjeta).filter(function (l) { return l !== titulo; });
+        if (titulo || lineas.length) {
+          salida.push({ subtitulo: titulo, parrafos: lineas });
+        }
+      });
+      return salida;
+    });
+    if (bloques.length) {
+      secciones.push({ titulo: 'Tus áreas de vida activadas', bloques: bloques });
+    }
+  }
+
   return secciones;
 }
 
-// Le pide al servidor que arme el PDF y lo mande al correo.
-async function compraPedirInforme(id, referencia, correo, cajaAviso) {
-  const t = COMPRA_TEXTOS[compraIdioma()];
-  if (!correo || typeof currentResult === 'undefined' || !currentResult) return;
+// Arma los datos de nacimiento a partir de la carta que está en pantalla.
+function compraNacimiento() {
+  if (typeof currentResult === 'undefined' || !currentResult) return null;
   const bd = currentResult.birth_data || {};
   const f = String(bd.datetime || '');
-  const nacimiento = {
+  const n = {
     name: bd.name || '',
     year: parseInt(f.slice(0, 4), 10),
     month: parseInt(f.slice(5, 7), 10),
@@ -384,7 +487,16 @@ async function compraPedirInforme(id, referencia, correo, cajaAviso) {
     city_name: bd.city || '',
     use_lmt: !!bd.use_lmt
   };
-  if (!nacimiento.year || nacimiento.latitude === undefined) return;
+  if (!n.year || n.latitude === undefined) return null;
+  return n;
+}
+
+// Le pide al servidor que arme el PDF y lo mande al correo.
+async function compraPedirInforme(id, referencia, correo, cajaAviso) {
+  const t = COMPRA_TEXTOS[compraIdioma()];
+  if (!correo || typeof currentResult === 'undefined' || !currentResult) return;
+  const nacimiento = compraNacimiento();
+  if (!nacimiento) return;
 
   const estado = document.createElement('div');
   estado.className = 'estado';
@@ -472,10 +584,26 @@ async function compraRevisarRegreso() {
   const bDet = document.getElementById('compra-detalle');
   if (bDet) bDet.addEventListener('click', compraIrAlDetalle);
   compraAjustarBotonPDF();
+  compraBotonFlotante();
 
   compraPedirInforme(id, r.referencia || (guardado ? guardado.referencia : ''),
                      guardado ? guardado.correo : '', caja);
 }
+
+// Un botón que acompaña la lectura: quien ya pagó puede descargar en
+// cualquier momento, sin tener que bajar hasta el final de la página.
+function compraBotonFlotante() {
+  if (!compraTienePermiso()) return;
+  if (document.getElementById('compra-flotante')) return;
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.id = 'compra-flotante';
+  b.className = 'compra-flotante';
+  b.textContent = COMPRA_TEXTOS[compraIdioma()].flotante;
+  b.addEventListener('click', compraDescargarCompleto);
+  document.body.appendChild(b);
+}
+
 
 // Con el informe comprado, el botón de siempre baja el PDF COMPLETO.
 function compraAjustarBotonPDF() {
