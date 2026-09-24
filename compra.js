@@ -10,6 +10,7 @@
 const COMPRA_CHECKOUT = 'https://checkout.wompi.co/p/';
 const COMPRA_GUARDADO = 'rp_compra';       // lo que se guarda antes de ir a pagar
 const COMPRA_PERMISO = 'rp_permiso';       // permiso de lectura tras pagar
+const COMPRA_MARCA = '\u0001';            // marca interna: renglón que va destacado en el PDF
 
 const COMPRA_TEXTOS = {
   es: {
@@ -622,10 +623,40 @@ function compraSecciones() {
       caja.querySelectorAll('.summary-card').forEach(function (tarjeta) {
         const h = tarjeta.querySelector('h4');
         const titulo = h ? (h.innerText || h.textContent || '').trim() : '';
+
+        // El renglón que nombra el aspecto ("Urano Marte Trígono") es el
+        // que ordena la lectura: se marca para que en el PDF salga
+        // destacado y no se confunda con las palabras clave de abajo.
+        tarjeta.querySelectorAll('div').forEach(function (d) {
+          const hijos = Array.prototype.slice.call(d.children);
+          if (!hijos.length || !hijos.every(function (c) { return c.tagName === 'SPAN'; })) return;
+          if (hijos.length < 3) return;
+          let t = '';
+          if (hijos.length >= 4) {
+            // En pantalla los dos planetas van separados por el símbolo
+            // del aspecto. En el PDF los símbolos no existen, así que la
+            // línea se rearma como se dice en voz alta:
+            // "Júpiter conjunción a tu Saturno".
+            const transito = (hijos[0].textContent || '').trim();
+            const natal = (hijos[2].textContent || '').trim();
+            const aspecto = (hijos[3].textContent || '').trim().toLowerCase();
+            const unir = (compraIdioma() === 'en') ? ' to your ' : ' a tu ';
+            if (transito && natal && aspecto) t = transito + ' ' + aspecto + unir + natal;
+          }
+          if (!t) t = (d.innerText || d.textContent || '').trim();
+          if (t) d.textContent = COMPRA_MARCA + t;
+        });
+
         // El cuerpo no está en un solo elemento: el navegador reacomoda
         // los <div> que vienen dentro del <p>. Así que se lee la tarjeta
         // entera y se descuenta el título.
-        const lineas = compraLineas(tarjeta).filter(function (l) { return l !== titulo; });
+        const lineas = compraLineas(tarjeta)
+          .filter(function (l) { return l !== titulo; })
+          .map(function (l) {
+            return (l.indexOf(COMPRA_MARCA) === 0)
+              ? { t: 'aspecto', v: l.slice(COMPRA_MARCA.length).trim() }
+              : l;
+          });
         if (titulo || lineas.length) {
           salida.push({ subtitulo: titulo, parrafos: lineas });
         }
