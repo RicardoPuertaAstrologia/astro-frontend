@@ -114,6 +114,26 @@ const COMPRA_TEXTOS = {
   .compra-flotante[disabled] { opacity: .6; cursor: default; }
   @media print { .compra-flotante { display: none !important; } }
   @media (max-width: 520px) { .compra-flotante { right: 10px; bottom: 10px; padding: .7rem 1rem; font-size: .8rem; } }
+  /* Cuando la tarjeta va arriba, antes de las pestañas: de ancho completo,
+     con la oferta a la izquierda y el precio con su botón a la derecha,
+     para que no crezca a lo alto ni empuje la carta hacia abajo. */
+  .compra-arriba .compra-caja { margin-top: 0; margin-bottom: 2rem; }
+  @media (min-width: 860px) {
+    .compra-arriba .compra-caja {
+      display: grid; grid-template-columns: 1.35fr 1fr;
+      gap: 0 2.5rem; align-items: center; padding: 1.9rem 2.2rem;
+      grid-template-areas: "rotulo accion" "titulo accion" "lista accion";
+    }
+    .compra-arriba .compra-rotulo { grid-area: rotulo; margin-bottom: .45rem; }
+    .compra-arriba .compra-titulo { grid-area: titulo; margin-bottom: .9rem; }
+    .compra-arriba .compra-caja > ul { grid-area: lista; margin-bottom: 0; }
+    .compra-arriba .compra-accion {
+      grid-area: accion; border-left: 1px solid var(--line, #e2ded4);
+      padding-left: 2.5rem; align-self: center;
+    }
+    .compra-arriba .compra-precio { border-top: 0; padding-top: 0; margin-bottom: 1.2rem;
+      flex-direction: column; align-items: flex-start; gap: .3rem; }
+  }
   .compra-caja { margin-top: 2.5rem; border: 1px solid var(--gold, #c9a961); border-radius: 12px;
     padding: 1.8rem 1.6rem; background: #fff; }
   .compra-rotulo { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase;
@@ -199,11 +219,13 @@ async function renderCompra(contenedorId) {
       <div class="compra-rotulo">${t.rotulo}</div>
       <div class="compra-titulo">${t.titulo}</div>
       <ul>${t.puntos.map(p => '<li>' + p + '</li>').join('')}</ul>
-      <div class="compra-precio">
-        <span class="compra-usd">US$ ${precio ? precio.usd.toFixed(2) : '24.99'}</span>
-        ${precio ? `<span class="compra-cop">${t.hoy} ${compraPesos(precio.cop)} COP · ${t.trm}</span>` : ''}
+      <div class="compra-accion">
+        <div class="compra-precio">
+          <span class="compra-usd">US$ ${precio ? precio.usd.toFixed(2) : '24.99'}</span>
+          ${precio ? `<span class="compra-cop">${t.hoy} ${compraPesos(precio.cop)} COP · ${t.trm}</span>` : ''}
+        </div>
+        <button type="button" class="compra-btn" id="compra-abrir">${t.boton}</button>
       </div>
-      <button type="button" class="compra-btn" id="compra-abrir">${t.boton}</button>
     </div>
   `;
   const b = document.getElementById('compra-abrir');
