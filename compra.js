@@ -46,6 +46,18 @@ const COMPRA_TEXTOS = {
     cortinaTitulo: 'Esto hace parte de tu informe completo',
     cortinaTexto: 'Tu carta natal escrita, los tránsitos de los planetas lentos, tu calendario de doce meses y tus áreas de vida activadas van en el informe en PDF, junto con las 23 edades zodiacales.',
     cortinaBoton: 'Ver el informe completo',
+    tengoCodigo: '¿Tienes un código de cortesía?',
+    codigoPon: 'Escribe tu código',
+    codigoAbrir: 'Entrar',
+    codigoMal: 'Ese código no sirve. Revísalo o escríbeme.',
+    cortesiaTitulo: 'Acceso de cortesía',
+    cortesiaTexto: 'Tu informe completo quedó abierto en esta pantalla. Puedes leerlo todo y descargarlo en PDF.',
+    regalar: 'Enviar este informe a un correo',
+    regalarPon: '¿A qué correo lo mando?',
+    regalarBoton: 'Enviar el informe',
+    regalarYendo: 'Armando el informe y enviándolo...',
+    regalarListo: 'Listo: el informe salió hacia',
+    regalarMal: 'No se pudo enviar. Revisa el correo e inténtalo otra vez.',
     enviando: 'Preparando tu informe y enviándolo a tu correo…',
     enviado: 'Listo: tu informe salió hacia',
     noEnviado: 'No pudimos enviarlo al correo. Escríbeme y te lo mando yo mismo: ricardopuerta@ricardopuerta.com',
@@ -86,6 +98,18 @@ const COMPRA_TEXTOS = {
     cortinaTitulo: 'This is part of your complete report',
     cortinaTexto: 'Your natal chart in writing, the transits of the slow planets, your twelve-month calendar and your activated life areas are in the PDF report, together with the 23 zodiacal ages.',
     cortinaBoton: 'See the complete report',
+    tengoCodigo: 'Do you have a courtesy code?',
+    codigoPon: 'Type your code',
+    codigoAbrir: 'Enter',
+    codigoMal: 'That code does not work. Check it or write to me.',
+    cortesiaTitulo: 'Courtesy access',
+    cortesiaTexto: 'Your complete report is open on this screen. You can read all of it and download the PDF.',
+    regalar: 'Send this report to an email',
+    regalarPon: 'Which email should I send it to?',
+    regalarBoton: 'Send the report',
+    regalarYendo: 'Building the report and sending it...',
+    regalarListo: 'Done: the report is on its way to',
+    regalarMal: 'It could not be sent. Check the address and try again.',
     enviando: 'Preparing your report and sending it to your inbox…',
     enviado: 'Done: your report is on its way to',
     noEnviado: 'We could not send the email. Write to me and I will send it myself: ricardopuerta@ricardopuerta.com',
@@ -101,6 +125,21 @@ const COMPRA_TEXTOS = {
   const s = document.createElement('style');
   s.id = 'compra-estilos';
   s.textContent = `
+  .compra-codigo { margin-top: 1rem; font-size: .84rem; }
+  .compra-codigo a { color: var(--ink-faint, #5a5f67); text-decoration: underline;
+    text-underline-offset: 3px; cursor: pointer; }
+  .compra-codigo a:hover { color: var(--ink, #15181d); }
+  .compra-codigo .fila { display: none; gap: .5rem; margin-top: .6rem; flex-wrap: wrap; }
+  .compra-codigo.abierto .fila { display: flex; }
+  .compra-codigo.abierto > a { display: none; }
+  .compra-codigo input { flex: 1 1 190px; padding: .7rem .9rem; border-radius: 8px;
+    border: 1px solid var(--line, #e2ded4); font: inherit; font-size: .9rem; }
+  .compra-codigo button { padding: .7rem 1.3rem; font-size: .75rem; }
+  .compra-codigo .aviso { display: block; margin-top: .5rem; color: #b85c5c; font-size: .82rem; }
+  .compra-regalo { margin-top: 1rem; }
+  .compra-regalo .fila { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .6rem; }
+  .compra-regalo input { flex: 1 1 220px; padding: .7rem .9rem; border-radius: 8px;
+    border: 1px solid var(--line, #e2ded4); font: inherit; font-size: .9rem; }
   .compra-cortina { text-align: center; padding: 3rem 1.5rem; }
   .compra-cortina .candado { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.4rem;
     line-height: 1.25; margin-bottom: .8rem; color: var(--ink, #1a1a1a); }
@@ -226,8 +265,31 @@ async function renderCompra(contenedorId) {
         </div>
         <button type="button" class="compra-btn" id="compra-abrir">${t.boton}</button>
       </div>
+      <div class="compra-codigo" id="compra-codigo">
+        <a id="compra-codigo-abrir">${t.tengoCodigo}</a>
+        <div class="fila">
+          <input type="text" id="compra-codigo-txt" placeholder="${t.codigoPon}" autocomplete="off">
+          <button type="button" class="compra-btn" id="compra-codigo-ok">${t.codigoAbrir}</button>
+        </div>
+      </div>
     </div>
   `;
+  const abrirCodigo = document.getElementById('compra-codigo-abrir');
+  if (abrirCodigo) {
+    abrirCodigo.addEventListener('click', function () {
+      document.getElementById('compra-codigo').classList.add('abierto');
+      setTimeout(function () { document.getElementById('compra-codigo-txt').focus(); }, 40);
+    });
+  }
+  const okCodigo = document.getElementById('compra-codigo-ok');
+  if (okCodigo) okCodigo.addEventListener('click', compraProbarCodigo);
+  const cajaCodigo = document.getElementById('compra-codigo-txt');
+  if (cajaCodigo) {
+    cajaCodigo.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); compraProbarCodigo(); }
+    });
+  }
+
   const b = document.getElementById('compra-abrir');
   if (b) b.addEventListener('click', compraAbrirVentana);
 }
@@ -402,6 +464,147 @@ function compraIrACompra() {
   }
   if (!envolver()) window.addEventListener('DOMContentLoaded', envolver);
 })();
+
+// ------------------------------------------------------------
+// CORTESÍA: ENTRAR SIN PAGAR
+// ------------------------------------------------------------
+// Dos caminos que terminan en lo mismo: escribir el código en la
+// tarjeta, o llegar con él en la dirección (?cortesia=CODIGO), que es
+// lo cómodo para regalar por WhatsApp.
+
+function compraGuardarPermiso(datos, referencia) {
+  try {
+    sessionStorage.setItem(COMPRA_PERMISO, JSON.stringify({
+      permiso: datos.permiso,
+      referencia: referencia || 'cortesia',
+      correo: '',
+      vence: Date.now() + ((datos.horas || 6) * 3600 * 1000)
+    }));
+  } catch (e) { /* si el navegador no deja guardar, al menos vale esta pantalla */ }
+}
+
+async function compraCanjear(codigo) {
+  const r = await fetch(compraServidor() + '/cortesia', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ codigo: codigo })
+  });
+  if (!r.ok) return false;
+  const datos = await r.json();
+  if (!datos || !datos.permiso) return false;
+  compraGuardarPermiso(datos, 'cortesia');
+  return true;
+}
+
+// Al abrirse todo: quitar la cortina, ajustar los botones y dar aviso.
+function compraAbrirTodo(conAviso) {
+  const t = COMPRA_TEXTOS[compraIdioma()];
+  try { compraQuitarCortina(); } catch (e) {}
+  compraAjustarBotonPDF();
+  compraBotonFlotante();
+  const lugar = document.getElementById('compra-wrap');
+  if (lugar) lugar.innerHTML = '';
+  if (typeof renderResult === 'function' && typeof currentResult !== 'undefined' && currentResult) {
+    try { renderResult(currentResult); compraQuitarCortina(); } catch (e) {}
+  }
+  if (conAviso) {
+    const caja = compraAviso('bien', t.cortesiaTitulo, t.cortesiaTexto, '');
+    compraBotonRegalo(caja);
+  }
+}
+
+async function compraProbarCodigo() {
+  const caja = document.getElementById('compra-codigo');
+  const txt = document.getElementById('compra-codigo-txt');
+  if (!txt) return;
+  const codigo = txt.value.trim();
+  if (!codigo) return;
+  const viejo = caja.querySelector('.aviso');
+  if (viejo) viejo.remove();
+  let bien = false;
+  try { bien = await compraCanjear(codigo); } catch (e) { bien = false; }
+  if (!bien) {
+    const aviso = document.createElement('span');
+    aviso.className = 'aviso';
+    aviso.textContent = COMPRA_TEXTOS[compraIdioma()].codigoMal;
+    caja.appendChild(aviso);
+    return;
+  }
+  compraAbrirTodo(true);
+}
+
+// Llegar con el código en la dirección: carta.ricardopuerta.com/?cortesia=XXXX
+async function compraRevisarCortesia() {
+  const params = new URLSearchParams(location.search);
+  const codigo = params.get('cortesia');
+  if (!codigo) return;
+  history.replaceState({}, '', location.origin + location.pathname);
+  let bien = false;
+  try { bien = await compraCanjear(codigo.trim()); } catch (e) { bien = false; }
+  if (bien) compraAbrirTodo(false);
+}
+
+
+// ------------------------------------------------------------
+// REGALAR UNA CARTA YA HECHA
+// ------------------------------------------------------------
+// Con un permiso válido, mandar este informe al correo que se escriba.
+function compraBotonRegalo(donde) {
+  if (!compraTienePermiso()) return;
+  const t = COMPRA_TEXTOS[compraIdioma()];
+  const sitio = donde || document.querySelector('.compra-aviso');
+  if (!sitio || sitio.querySelector('.compra-regalo')) return;
+
+  const caja = document.createElement('div');
+  caja.className = 'compra-regalo';
+  caja.innerHTML = '<div class="estado">' + t.regalar + '</div>'
+    + '<div class="fila">'
+    + '<input type="email" class="correo" placeholder="' + t.regalarPon + '" autocomplete="off">'
+    + '<button type="button" class="compra-btn">' + t.regalarBoton + '</button>'
+    + '</div><div class="estado resultado"></div>';
+  sitio.appendChild(caja);
+
+  const campo = caja.querySelector('.correo');
+  const boton = caja.querySelector('button');
+  const resultado = caja.querySelector('.resultado');
+
+  async function mandar() {
+    const destino = campo.value.trim();
+    if (destino.indexOf('@') < 0) { resultado.textContent = t.regalarMal; return; }
+    const nacimiento = compraNacimiento();
+    if (!nacimiento) { resultado.textContent = t.regalarMal; return; }
+    boton.disabled = true;
+    resultado.textContent = t.regalarYendo;
+    try {
+      const r = await fetch(compraServidor() + '/cobro/enviar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          permiso: compraPermiso(),
+          correo: destino,
+          lang: compraIdioma(),
+          nacimiento: nacimiento,
+          imagen: await compraImagenCarta(),
+          secciones: compraSecciones()
+        })
+      });
+      const datos = await r.json();
+      resultado.textContent = (r.ok && datos.enviado)
+        ? (t.regalarListo + ' ' + destino)
+        : t.regalarMal;
+    } catch (e) {
+      resultado.textContent = t.regalarMal;
+    } finally {
+      boton.disabled = false;
+    }
+  }
+
+  boton.addEventListener('click', mandar);
+  campo.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); mandar(); }
+  });
+}
+
 
 // ------------------------------------------------------------
 // EL REGRESO DESDE WOMPI
@@ -848,6 +1051,7 @@ async function compraRevisarRegreso() {
   if (bDet) bDet.addEventListener('click', compraIrAlDetalle);
   compraAjustarBotonPDF();
   compraBotonFlotante();
+  compraBotonRegalo(caja);
 
   compraPedirInforme(id, r.referencia || (guardado ? guardado.referencia : ''),
                      guardado ? guardado.correo : '', caja);
@@ -902,3 +1106,4 @@ async function compraAveriguarProteccion() {
 
 window.addEventListener('DOMContentLoaded', compraRevisarRegreso);
 window.addEventListener('DOMContentLoaded', compraAveriguarProteccion);
+window.addEventListener('DOMContentLoaded', compraRevisarCortesia);
