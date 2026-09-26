@@ -53,6 +53,7 @@ const COMPRA_TEXTOS = {
     codigoMal: 'Ese código no sirve. Revísalo o escríbeme.',
     cortesiaTitulo: 'Acceso de cortesía',
     cortesiaTexto: 'Tu informe completo quedó abierto en esta pantalla. Puedes leerlo todo y descargarlo en PDF.',
+    salir: 'Salir del acceso (ver la página como un visitante)',
     regalar: 'Enviar este informe a un correo',
     regalarPon: '¿A qué correo lo mando?',
     regalarBoton: 'Enviar el informe',
@@ -68,9 +69,9 @@ const COMPRA_TEXTOS = {
   },
   en: {
     rotulo: 'The full report',
-    titulo: 'Your complete natal chart, as a PDF',
+    titulo: 'Your full natal chart, as a PDF',
     puntos: [
-      'The complete text of your natal chart',
+      'The full text of your natal chart',
       'The transits of the slow planets, one by one',
       'Your 12-month calendar and the areas of life now active',
       'The 23 zodiacal ages, with yours marked'
@@ -89,23 +90,24 @@ const COMPRA_TEXTOS = {
     errorServidor: 'The payment could not be prepared. Please try again in a moment.',
     verificando: 'Checking your payment…',
     aprobadoTitulo: 'Your payment was approved',
-    aprobadoTexto: 'Your complete natal chart is now open on this screen: go to <strong>Your natal chart in detail</strong> and the other tabs to read all of it.',
+    aprobadoTexto: 'Your full natal chart is now open on this screen: go to <strong>Your natal chart in detail</strong> and the other tabs to read all of it.',
     aprobadoCorreo: 'We are also sending it to you as a PDF, to the address you registered',
-    descargar: 'Download your complete natal chart here',
+    descargar: 'Download your full natal chart here',
     botonPdfCompleto: 'Download your full report',
     preparando: 'Preparing your report...',
     preparandoGratis: 'Preparing your chart...',
     verDetalle: 'Read my natal chart in detail',
     flotante: 'Download your full report',
-    cortinaTitulo: 'This is part of your complete report',
+    cortinaTitulo: 'This is part of your full report',
     cortinaTexto: 'Your natal chart in writing, the transits of the slow planets, your twelve-month calendar and your activated life areas are in the PDF report, together with the 23 zodiacal ages.',
-    cortinaBoton: 'See the complete report',
+    cortinaBoton: 'See the full report',
     tengoCodigo: 'Do you have a courtesy code?',
     codigoPon: 'Type your code',
     codigoAbrir: 'Enter',
     codigoMal: 'That code does not work. Check it or write to me.',
     cortesiaTitulo: 'Courtesy access',
-    cortesiaTexto: 'Your complete report is open on this screen. You can read all of it and download the PDF.',
+    cortesiaTexto: 'Your full report is open on this screen. You can read all of it and download the PDF.',
+    salir: 'Leave this access (see the page as a visitor)',
     regalar: 'Send this report to an email',
     regalarPon: 'Which email should I send it to?',
     regalarBoton: 'Send the report',
@@ -139,6 +141,10 @@ const COMPRA_TEXTOS = {
   .compra-codigo button { padding: .7rem 1.3rem; font-size: .75rem; }
   .compra-codigo .aviso { display: block; margin-top: .5rem; color: #b85c5c; font-size: .82rem; }
   .compra-regalo { margin-top: 1rem; }
+  .compra-salir { display: block; margin-top: .9rem; background: none; border: 0;
+    padding: 0; font: inherit; font-size: .82rem; color: inherit; opacity: .6;
+    text-decoration: underline; cursor: pointer; }
+  .compra-salir:hover { opacity: 1; }
   .compra-regalo .fila { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .6rem; }
   .compra-regalo input { flex: 1 1 220px; padding: .7rem .9rem; border-radius: 8px;
     border: 1px solid var(--line, #e2ded4); font: inherit; font-size: .9rem; }
@@ -457,7 +463,12 @@ function compraIrACompra() {
     const original = window.renderResult;
     const nuevo = function () {
       const r = original.apply(this, arguments);
-      try { setTimeout(compraCortina, 60); } catch (e) {}
+      try {
+        setTimeout(function () {
+          compraCortina();
+          compraRefrescarPermiso();
+        }, 60);
+      } catch (e) {}
       return r;
     };
     nuevo.__conCortina = true;
@@ -500,7 +511,6 @@ async function compraCanjear(codigo) {
 
 // Al abrirse todo: quitar la cortina, ajustar los botones y dar aviso.
 function compraAbrirTodo(conAviso) {
-  const t = COMPRA_TEXTOS[compraIdioma()];
   try { compraQuitarCortina(); } catch (e) {}
   compraAjustarBotonPDF();
   compraBotonFlotante();
@@ -509,10 +519,58 @@ function compraAbrirTodo(conAviso) {
   if (typeof renderResult === 'function' && typeof currentResult !== 'undefined' && currentResult) {
     try { renderResult(currentResult); compraQuitarCortina(); } catch (e) {}
   }
-  if (conAviso) {
-    const caja = compraAviso('bien', t.cortesiaTitulo, t.cortesiaTexto, '');
-    compraBotonRegalo(caja);
+  if (conAviso) compraRefrescarPermiso(true);
+}
+
+// Lo que hay que rehacer CADA VEZ que la pantalla se vuelve a pintar o
+// que se cambia de idioma. Sin esto pasaban dos cosas:
+//   · con el enlace de cortesía, el aviso y la casilla de regalo
+//     desaparecían en cuanto se calculaba la carta;
+//   · al pasar a inglés, los botones se quedaban rotulados en español.
+function compraGuardado() {
+  try { return JSON.parse(sessionStorage.getItem(COMPRA_PERMISO) || 'null'); }
+  catch (e) { return null; }
+}
+
+function compraRefrescarPermiso(forzar) {
+  if (!compraTienePermiso()) return;
+  const idioma = compraIdioma();
+  const t = COMPRA_TEXTOS[idioma];
+  try { compraQuitarCortina(); } catch (e) {}
+  compraAjustarBotonPDF();
+  compraBotonFlotante();
+
+  const resultado = document.getElementById('result-view');
+  const hayCarta = resultado && resultado.classList.contains('visible');
+  const lugar = hayCarta ? document.getElementById('compra-wrap')
+                         : document.getElementById('input-view');
+  if (!lugar) return;
+  const puesto = lugar.querySelector('.compra-aviso');
+  if (puesto && !forzar && puesto.dataset.idioma === idioma) return;
+
+  if (hayCarta) {
+    lugar.innerHTML = '';
+    // el aviso que se puso sobre el formulario al llegar ya no hace falta,
+    // y si se queda hay dos avisos y dos enlaces de salida en la página
+    const entrada = document.getElementById('input-view');
+    if (entrada) entrada.querySelectorAll('.compra-aviso').forEach(function (v) { v.remove(); });
+  } else {
+    const v = lugar.querySelector('.compra-aviso');
+    if (v) v.remove();
   }
+  const g = compraGuardado();
+  const ref = String((g && g.referencia) || 'cortesia');
+  const esCortesia = ref.indexOf('cortesia') === 0;
+  const caja = compraAviso('bien',
+    esCortesia ? t.cortesiaTitulo : t.aprobadoTitulo,
+    esCortesia ? t.cortesiaTexto : t.aprobadoTexto, '');
+  caja.dataset.idioma = idioma;
+  // La casilla de regalo solo tiene sentido con una carta ya calculada:
+  // es esa carta la que se manda.
+  if (hayCarta) compraBotonRegalo(caja);
+  // El enlace de salida es solo para las cortesías: a quien pagó no se le
+  // ofrece salirse de lo que compró.
+  if (esCortesia) compraBotonSalir(caja.querySelector('.compra-regalo') || caja);
 }
 
 async function compraProbarCodigo() {
@@ -543,7 +601,7 @@ async function compraRevisarCortesia() {
   history.replaceState({}, '', location.origin + location.pathname);
   let bien = false;
   try { bien = await compraCanjear(codigo.trim()); } catch (e) { bien = false; }
-  if (bien) compraAbrirTodo(false);
+  if (bien) compraAbrirTodo(true);   // con aviso: que se vea que el código sirvió
 }
 
 
@@ -607,6 +665,23 @@ function compraBotonRegalo(donde) {
   });
 }
 
+// Salir del acceso. Sirve para una cosa muy concreta: comprobar qué ve
+// alguien que llega de la calle, sin tener que cerrar el navegador
+// entero. El permiso vive seis horas y se queda pegado a la pestaña.
+function compraBotonSalir(donde) {
+  if (!donde || donde.querySelector('.compra-salir')) return;
+  const t = COMPRA_TEXTOS[compraIdioma()];
+  const a = document.createElement('button');
+  a.type = 'button';
+  a.className = 'compra-salir';
+  a.textContent = t.salir;
+  a.addEventListener('click', function () {
+    try { sessionStorage.removeItem(COMPRA_PERMISO); } catch (e) {}
+    location.reload();
+  });
+  donde.appendChild(a);
+}
+
 
 // ------------------------------------------------------------
 // EL REGRESO DESDE WOMPI
@@ -626,8 +701,17 @@ function compraPermiso() {
 }
 
 function compraAviso(tipo, titulo, texto, extra) {
-  const destino = document.getElementById('compra-aviso-lugar')
-    || document.getElementById('result-view')
+  // Con la carta ya en pantalla va dentro de compra-wrap: es el único sitio
+  // que sobrevive a que la app vuelva a pintar. Puesto en result-view, el
+  // aviso de cortesía desaparecía en cuanto se calculaba la carta.
+  // Antes de calcular nada, va arriba del formulario, que es lo que la
+  // persona está viendo cuando llega por el enlace de cortesía.
+  const resultado = document.getElementById('result-view');
+  const hayCarta = resultado && resultado.classList.contains('visible');
+  const destino = (hayCarta && document.getElementById('compra-wrap'))
+    || (!hayCarta && document.getElementById('input-view'))
+    || document.getElementById('compra-aviso-lugar')
+    || resultado
     || document.body;
   const anterior = destino.querySelector('.compra-aviso');
   if (anterior) anterior.remove();
@@ -1148,7 +1232,11 @@ async function compraRevisarRegreso() {
 // cualquier momento, sin tener que bajar hasta el final de la página.
 function compraBotonFlotante() {
   if (!compraTienePermiso()) return;
-  if (document.getElementById('compra-flotante')) return;
+  const ya = document.getElementById('compra-flotante');
+  if (ya) {   // existe: solo hay que asegurarse de que esté en el idioma de ahora
+    ya.textContent = COMPRA_TEXTOS[compraIdioma()].flotante;
+    return;
+  }
   const b = document.createElement('button');
   b.type = 'button';
   b.id = 'compra-flotante';
@@ -1219,11 +1307,25 @@ function compraAjustarBotonGratis() {
 function compraAjustarBotonPDF() {
   if (!compraTienePermiso()) return;
   const viejo = document.getElementById('download-pdf-btn');
-  if (!viejo || viejo.dataset.completo === 'si') return;
+  if (!viejo) return;
+  const idioma = compraIdioma();
+
+  // Si ya está cambiado Y en el idioma correcto, no hay nada que hacer.
+  // Si el idioma cambió, hay que volver a rotularlo: antes se quedaba en
+  // español para siempre porque solo se miraba si ya estaba cambiado.
+  if (viejo.dataset.completo === 'si') {
+    if (viejo.dataset.idioma === idioma) return;
+    const et = viejo.querySelector('[data-i18n="downloadPdf"]') || viejo;
+    et.textContent = COMPRA_TEXTOS[idioma].botonPdfCompleto;
+    viejo.dataset.idioma = idioma;
+    return;
+  }
+
   const nuevo = viejo.cloneNode(true);   // el clon no trae los oyentes anteriores
   nuevo.dataset.completo = 'si';
+  nuevo.dataset.idioma = idioma;
   const etiqueta = nuevo.querySelector('[data-i18n="downloadPdf"]') || nuevo;
-  etiqueta.textContent = COMPRA_TEXTOS[compraIdioma()].botonPdfCompleto;
+  etiqueta.textContent = COMPRA_TEXTOS[idioma].botonPdfCompleto;
   etiqueta.removeAttribute('data-i18n');
   viejo.parentNode.replaceChild(nuevo, viejo);
   nuevo.addEventListener('click', compraDescargarCompleto);
@@ -1247,7 +1349,23 @@ async function compraAveriguarProteccion() {
   compraCortina();
 }
 
+// Al cambiar de idioma hay que volver a rotular todo lo nuestro: los dos
+// botones de descarga, el aviso y la tarjeta. La app repinta lo suyo,
+// pero no sabe nada de estos trozos.
+function compraVigilarIdioma() {
+  document.querySelectorAll('.lang-btn[data-lang]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      setTimeout(function () {
+        compraRefrescarPermiso();
+        compraAjustarBotonGratis();
+        compraCortina();
+      }, 120);
+    });
+  });
+}
+
 window.addEventListener('DOMContentLoaded', compraRevisarRegreso);
 window.addEventListener('DOMContentLoaded', compraAveriguarProteccion);
 window.addEventListener('DOMContentLoaded', compraRevisarCortesia);
 window.addEventListener('DOMContentLoaded', compraAjustarBotonGratis);
+window.addEventListener('DOMContentLoaded', compraVigilarIdioma);
