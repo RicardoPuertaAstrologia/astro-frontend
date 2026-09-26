@@ -88,7 +88,8 @@
   .brand-logo { width: 290px; height: auto; color: var(--ink); display: block; flex-shrink: 0; }
   .top-actions { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
   .lang-switch { display: inline-flex; align-items: center; border: 1px solid var(--line-strong); border-radius: 999px; padding: 2px; background: var(--surface); }
-  .lang-btn { appearance: none; border: none; background: none; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; color: var(--ink-faint); padding: 0.4rem 0.85rem; border-radius: 999px; transition: color 0.2s, background 0.2s; }
+  .lang-btn { appearance: none; border: none; background: none; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; color: var(--ink-faint); padding: 0.4rem 0.85rem; border-radius: 999px; transition: color 0.2s, background 0.2s; display: inline-flex; align-items: center; gap: 0.42em; }
+  .lang-btn .bandera { width: 1.25em; height: auto; flex: none; border-radius: 1.5px; box-shadow: 0 0 0 .5px rgba(0,0,0,.28); }
   .lang-btn:hover { color: var(--ink-soft); }
   .lang-btn.active { background: var(--ink); color: var(--bg); }
   @media (max-width: 780px) { .top-bar { padding: 1rem 1.25rem; } .brand-logo { width: 220px; } }
@@ -543,8 +544,8 @@
   </svg>
   <div class="top-actions">
     <div class="lang-switch">
-      <button class="lang-btn active" data-lang="es">ES</button>
-      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn active" data-lang="es"><svg class="bandera" viewBox="0 0 60 40" aria-hidden="true"><rect width="60" height="40" fill="#AA151B"/><rect y="10" width="60" height="20" fill="#F1BF00"/></svg>ES</button>
+      <button class="lang-btn" data-lang="en"><svg class="bandera" viewBox="0 0 60 40" aria-hidden="true"><rect width="60" height="40" fill="#ffffff"/><g fill="#B22234"><rect width="60" height="3.08"/><rect y="6.15" width="60" height="3.08"/><rect y="12.31" width="60" height="3.08"/><rect y="18.46" width="60" height="3.08"/><rect y="24.62" width="60" height="3.08"/><rect y="30.77" width="60" height="3.08"/><rect y="36.92" width="60" height="3.08"/></g><rect width="25" height="21.54" fill="#3C3B6E"/><g fill="#ffffff"><circle cx="5" cy="4.6" r="1.5"/><circle cx="12.5" cy="4.6" r="1.5"/><circle cx="20" cy="4.6" r="1.5"/><circle cx="8.75" cy="10.8" r="1.5"/><circle cx="16.25" cy="10.8" r="1.5"/><circle cx="5" cy="17" r="1.5"/><circle cx="12.5" cy="17" r="1.5"/><circle cx="20" cy="17" r="1.5"/></g></svg>EN</button>
     </div>
   </div>
 </header>
