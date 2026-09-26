@@ -53,6 +53,9 @@ const COMPRA_TEXTOS = {
     codigoMal: 'Ese código no sirve. Revísalo o escríbeme.',
     cortesiaTitulo: 'Acceso de cortesía',
     cortesiaTexto: 'Tu informe completo quedó abierto en esta pantalla. Puedes leerlo todo y descargarlo en PDF.',
+    confirmandoTitulo: 'Confirmando tu pago',
+    confirmandoTexto: 'Un momento: estamos confirmando el pago con Wompi y abriendo tu informe. No cierres esta página.',
+    abriendoTexto: 'Pago confirmado. Armando tu carta completa…',
     salir: 'Salir del acceso (ver la página como un visitante)',
     regalar: 'Enviar este informe a un correo',
     regalarPon: '¿A qué correo lo mando?',
@@ -107,6 +110,9 @@ const COMPRA_TEXTOS = {
     codigoMal: 'That code does not work. Check it or write to me.',
     cortesiaTitulo: 'Courtesy access',
     cortesiaTexto: 'Your full report is open on this screen. You can read all of it and download the PDF.',
+    confirmandoTitulo: 'Confirming your payment',
+    confirmandoTexto: 'One moment: we are confirming the payment with Wompi and opening your report. Please do not close this page.',
+    abriendoTexto: 'Payment confirmed. Building your full chart…',
     salir: 'Leave this access (see the page as a visitor)',
     regalar: 'Send this report to an email',
     regalarPon: 'Which email should I send it to?',
@@ -1156,6 +1162,12 @@ async function compraRevisarRegreso() {
   if (guardado && guardado.idioma) compraRestaurarIdioma(guardado.idioma);
   const t = COMPRA_TEXTOS[compraIdioma()];
 
+  // Lo PRIMERO, antes de pedirle nada al servidor: decirle a la persona
+  // que está pasando algo. Confirmar el pago y rearmar la carta toma unos
+  // segundos, y antes esos segundos transcurrían con la pantalla vacía,
+  // como si la página no hubiera cargado.
+  compraAviso('bien', t.confirmandoTitulo, t.confirmandoTexto);
+
   let r;
   try {
     const url = compraServidor() + '/cobro/verificar?id=' + encodeURIComponent(id)
@@ -1180,6 +1192,8 @@ async function compraRevisarRegreso() {
       vence: Date.now() + (r.horas || 6) * 3600 * 1000
     }));
   } catch (e) {}
+
+  compraAviso('bien', t.confirmandoTitulo, t.abriendoTexto);
 
   // Volver a pintar la carta que la persona estaba viendo antes de pagar.
   // Se le pide al servidor otra vez, ya con el permiso, porque la copia
@@ -1215,6 +1229,10 @@ async function compraRevisarRegreso() {
     </div>
     <div class="estado">${t.aprobadoCorreo}${guardado && guardado.correo ? ': ' + guardado.correo : '.'}</div>`;
   const caja = compraAviso('bien', t.aprobadoTitulo, t.aprobadoTexto, botones);
+  // Se marca con el idioma para que compraRefrescarPermiso lo respete: sin
+  // esto, el refresco que corre 60 ms después de repintar la pantalla lo
+  // reemplazaba por el aviso corriente y se perdían estos dos botones.
+  caja.dataset.idioma = compraIdioma();
 
   const bDesc = document.getElementById('compra-descargar');
   if (bDesc) bDesc.addEventListener('click', compraDescargarCompleto);

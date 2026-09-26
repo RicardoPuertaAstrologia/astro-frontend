@@ -1902,8 +1902,14 @@ function renderCalendar(data) {
   const focusName = PLANET_NAMES[currentLang][focusPlanet];
 
   if (events.length === 0) {
+    // Si el servidor manda una nota (por ejemplo, que Lilith no lleva
+    // calendario), se muestra esa y no el "sin aspectos", que sería falso.
+    const nota = data.calendar_12mo.nota;
+    const texto = nota || (currentLang === 'es'
+      ? 'Sin aspectos exactos en los próximos 12 meses.'
+      : 'No exact aspects in the next 12 months.');
     document.getElementById('calendar-list').innerHTML =
-      `<div style="padding:2rem; text-align:center; color: var(--ink-faint);">${currentLang === 'es' ? 'Sin aspectos exactos en los próximos 12 meses.' : 'No exact aspects in the next 12 months.'}</div>`;
+      `<div style="padding:2rem; text-align:center; color: var(--ink-faint); max-width:46ch; margin:0 auto; line-height:1.6;">${texto}</div>`;
     return;
   }
 
