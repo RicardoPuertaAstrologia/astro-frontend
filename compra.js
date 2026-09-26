@@ -41,6 +41,7 @@ const COMPRA_TEXTOS = {
     descargar: 'Descarga acá tu carta natal completa',
     botonPdfCompleto: 'Descargar tu informe completo',
     preparando: 'Preparando tu informe...',
+    preparandoGratis: 'Preparando tu carta...',
     verDetalle: 'Leer mi carta natal detallada',
     flotante: 'Descargar tu informe completo',
     cortinaTitulo: 'Esto hace parte de tu informe completo',
@@ -93,6 +94,7 @@ const COMPRA_TEXTOS = {
     descargar: 'Download your complete natal chart here',
     botonPdfCompleto: 'Download your full report',
     preparando: 'Preparing your report...',
+    preparandoGratis: 'Preparing your chart...',
     verDetalle: 'Read my natal chart in detail',
     flotante: 'Download your full report',
     cortinaTitulo: 'This is part of your complete report',
@@ -725,6 +727,26 @@ function compraImagenCarta() {
 // navegador entrega el texto sin saltos de línea: "Tu carta" se pega con
 // el valor. Así que se le devuelve el diseño un instante, fuera de la
 // pantalla, se lee el texto bien formado y se deja todo como estaba.
+// Para leer una pestaña hay que darle diseño, y además hay que marcar y
+// quitar cosas. Eso se hace sobre una COPIA fuera de la pantalla: si se
+// hiciera sobre la página viva, se le arrancarían pedazos a lo que la
+// persona está viendo, y el segundo informe saldría distinto al primero.
+function compraSobreUnaCopia(elemento, trabajo) {
+  const caja = document.createElement('div');
+  caja.setAttribute('style',
+    'position:absolute;left:-10000px;top:0;width:760px;opacity:1;');
+  const copia = elemento.cloneNode(true);
+  copia.removeAttribute('style');
+  copia.classList.add('active');
+  caja.appendChild(copia);
+  document.body.appendChild(caja);
+  try {
+    return trabajo(copia);
+  } finally {
+    caja.remove();
+  }
+}
+
 function compraConDiseno(caja, trabajo) {
   const abierta = caja.classList.contains('active');
   const estiloPrevio = caja.getAttribute('style');
@@ -740,6 +762,17 @@ function compraConDiseno(caja, trabajo) {
       else caja.setAttribute('style', estiloPrevio);
     }
   }
+}
+
+// Traduce una línea marcada al bloque que le toca en el PDF.
+const COMPRA_TIPOS = { A: 'aspecto', F: 'facilita', D: 'dificulta', H: 'rotulo' };
+
+function compraDesmarcar(linea) {
+  if (linea.indexOf(COMPRA_MARCA) !== 0) return linea;
+  const tipo = COMPRA_TIPOS[linea.charAt(COMPRA_MARCA.length)];
+  const texto = linea.slice(COMPRA_MARCA.length + 1).trim();
+  if (!tipo || !texto) return texto || linea;
+  return { t: tipo, v: texto };
 }
 
 function compraLineas(elemento) {
@@ -795,9 +828,9 @@ function compraTodosLosTransitos() {
       // PDF salgan en negrilla y no se confundan con el texto corrido.
       caja.querySelectorAll('h3, h4').forEach(function (h) {
         const t = (h.textContent || '').trim();
-        if (t) h.textContent = '**' + t + '**';
+        if (t) h.textContent = COMPRA_MARCA + 'H' + t;
       });
-      const lineas = compraLineas(caja);
+      const lineas = compraLineas(caja).map(compraDesmarcar);
       if (lineas.length) {
         bloques.push({ subtitulo: nombre[planeta] || planeta, parrafos: lineas });
       }
@@ -834,6 +867,62 @@ function compraSecciones() {
     });
   }
 
+  // Los aspectos de los tránsitos, uno por uno, con sus dos recuadros:
+  // lo que se facilita y lo que se dificulta.
+  const cajaAspectos = document.getElementById('tab-aspects');
+  if (cajaAspectos) {
+    const bloques = compraSobreUnaCopia(cajaAspectos, function (caja) {
+      const salida = [];
+      caja.querySelectorAll('.aspect-card').forEach(function (tarjeta) {
+        // El título se arma con los dos planetas, el aspecto y el orbe.
+        // En pantalla eso va repartido en varios trozos; en el papel
+        // tiene que leerse de corrido y una sola vez.
+        const estado = tarjeta.querySelector('.aspect-status');
+        if (estado) estado.remove();
+        const cab = tarjeta.querySelector('.aspect-planets');
+        let planetas = cab ? (cab.innerText || cab.textContent || '').replace(/\s+/g, ' ').trim() : '';
+        // "AC Ascendente" y "MC Medio Cielo" traen el símbolo escrito al lado.
+        planetas = planetas.replace(/\b(AC|MC|DC|IC)\s+(?=[A-ZÁÉÍÓÚ])/g, '');
+        const tipo = tarjeta.querySelector('.aspect-type');
+        const orbe = tarjeta.querySelector('.aspect-orb');
+        const aspecto = tipo ? (tipo.innerText || tipo.textContent || '').trim() : '';
+        const cuantoOrbe = orbe ? (orbe.innerText || orbe.textContent || '').trim() : '';
+        const titulo = [planetas, aspecto, cuantoOrbe].filter(Boolean).join(' · ');
+
+        // Fuera lo que es de la pantalla y no del papel.
+        const cabecera = tarjeta.querySelector('.aspect-header');
+        if (cabecera) cabecera.remove();
+        if (cab) cab.remove();
+        tarjeta.querySelectorAll('.read-more-toggle, button').forEach(function (x) { x.remove(); });
+
+        // Los dos recuadros se reconocen por la flecha de su rótulo.
+        tarjeta.querySelectorAll('div').forEach(function (d) {
+          const rotulo = d.querySelector(':scope > span');
+          if (!rotulo) return;
+          const r = (rotulo.textContent || '').trim();
+          const marca = (r.indexOf('↗') === 0) ? 'F' : ((r.indexOf('↘') === 0) ? 'D' : '');
+          if (!marca) return;
+          const cuerpo = Array.prototype.slice.call(d.querySelectorAll('p'))
+            .map(function (p) { return (p.innerText || p.textContent || '').trim(); })
+            .filter(Boolean).join(' ');
+          if (cuerpo) d.textContent = COMPRA_MARCA + marca + cuerpo;
+        });
+
+        const lineas = compraLineas(tarjeta)
+          .filter(function (l) { return l !== titulo; })
+          .map(compraDesmarcar);
+        if (titulo || lineas.length) salida.push({ subtitulo: titulo, parrafos: lineas });
+      });
+      return salida;
+    });
+    if (bloques.length) {
+      secciones.push({
+        titulo: en ? 'Exact aspects by transit' : 'Aspectos exactos por tránsito',
+        bloques: bloques
+      });
+    }
+  }
+
   // El calendario de 12 meses ya no se copia de la pantalla: lo arma el
   // servidor con los datos, para los siete planetas y en una sola línea
   // por fecha.
@@ -843,7 +932,7 @@ function compraSecciones() {
   // perdido dentro de un párrafo corrido.
   const cajaAreas = document.getElementById('tab-summary');
   if (cajaAreas) {
-    const bloques = compraConDiseno(cajaAreas, function (caja) {
+    const bloques = compraSobreUnaCopia(cajaAreas, function (caja) {
       const salida = [];
       caja.querySelectorAll('.summary-card').forEach(function (tarjeta) {
         const h = tarjeta.querySelector('h4');
@@ -869,7 +958,7 @@ function compraSecciones() {
             if (transito && natal && aspecto) t = transito + ' ' + aspecto + unir + natal;
           }
           if (!t) t = (d.innerText || d.textContent || '').trim();
-          if (t) d.textContent = COMPRA_MARCA + t;
+          if (t) d.textContent = COMPRA_MARCA + 'A' + t;
         });
 
         // El cuerpo no está en un solo elemento: el navegador reacomoda
@@ -878,9 +967,7 @@ function compraSecciones() {
         const lineas = compraLineas(tarjeta)
           .filter(function (l) { return l !== titulo; })
           .map(function (l) {
-            return (l.indexOf(COMPRA_MARCA) === 0)
-              ? { t: 'aspecto', v: l.slice(COMPRA_MARCA.length).trim() }
-              : l;
+            return compraDesmarcar(l);
           });
         if (titulo || lineas.length) {
           salida.push({ subtitulo: titulo, parrafos: lineas });
@@ -1072,6 +1159,62 @@ function compraBotonFlotante() {
 }
 
 
+// El PDF gratis también lo arma el servidor. Antes lo imprimía el
+// navegador escondiendo con CSS las pestañas pagadas, y en el celular
+// esa forma falla: el aviso de "terminé de imprimir" llega antes de
+// tiempo, se quita el escondite y sale todo. Lo que el servidor no
+// pone en ese PDF, sencillamente no está.
+async function compraBajarGratis(evento) {
+  const boton = evento && evento.currentTarget ? evento.currentTarget : null;
+  const t = COMPRA_TEXTOS[compraIdioma()];
+  const etiquetaOriginal = boton ? boton.innerHTML : '';
+  const nacimiento = compraNacimiento();
+  if (!nacimiento) { window.print(); return; }
+
+  if (boton) { boton.disabled = true; boton.textContent = t.preparandoGratis; }
+  try {
+    const r = await fetch(compraServidor() + '/informe/gratis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        lang: compraIdioma(),
+        nacimiento: nacimiento,
+        imagen: await compraImagenCarta()
+      })
+    });
+    if (!r.ok) throw new Error('el servidor respondió ' + r.status);
+    const archivo = await r.blob();
+    const enlace = document.createElement('a');
+    enlace.href = URL.createObjectURL(archivo);
+    const base = (compraIdioma() === 'en') ? 'Natal chart - ' : 'Carta natal - ';
+    enlace.download = (base + (nacimiento.name || 'carta')).trim() + '.pdf';
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+    setTimeout(function () { URL.revokeObjectURL(enlace.href); }, 4000);
+  } catch (e) {
+    console.warn('No se pudo bajar la carta del servidor:', e);
+    // Si el servidor no responde, se imprime como antes, pero escondiendo
+    // lo pagado y sin confiar en el aviso de fin de impresión.
+    document.body.classList.add('pdf-basico');
+    window.print();
+    setTimeout(function () { document.body.classList.remove('pdf-basico'); }, 8000);
+  } finally {
+    if (boton) { boton.disabled = false; boton.innerHTML = etiquetaOriginal; }
+  }
+}
+
+function compraAjustarBotonGratis() {
+  if (compraTienePermiso()) return;          // con permiso manda el otro ajuste
+  const viejo = document.getElementById('download-pdf-btn');
+  if (!viejo || viejo.dataset.gratis === 'si') return;
+  const nuevo = viejo.cloneNode(true);       // el clon no trae los oyentes de antes
+  nuevo.dataset.gratis = 'si';
+  viejo.parentNode.replaceChild(nuevo, viejo);
+  nuevo.addEventListener('click', compraBajarGratis);
+}
+
+
 // Con el informe comprado, el botón de siempre baja el PDF COMPLETO.
 function compraAjustarBotonPDF() {
   if (!compraTienePermiso()) return;
@@ -1107,3 +1250,4 @@ async function compraAveriguarProteccion() {
 window.addEventListener('DOMContentLoaded', compraRevisarRegreso);
 window.addEventListener('DOMContentLoaded', compraAveriguarProteccion);
 window.addEventListener('DOMContentLoaded', compraRevisarCortesia);
+window.addEventListener('DOMContentLoaded', compraAjustarBotonGratis);
