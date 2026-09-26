@@ -51,6 +51,9 @@ const COMPRA_TEXTOS = {
     codigoPon: 'Escribe tu código',
     codigoAbrir: 'Entrar',
     codigoMal: 'Ese código no sirve. Revísalo o escríbeme.',
+    codigoProbando: 'Comprobando…',
+    codigoDormido: 'El servidor estaba dormido y está despertando. Espera unos segundos y vuelve a darle a Entrar.',
+    codigoFalla: 'No pudimos conectar con el servidor. Inténtalo otra vez en un momento.',
     cortesiaTitulo: 'Acceso de cortesía',
     cortesiaTexto: 'Tu informe completo quedó abierto en esta pantalla. Puedes leerlo todo y descargarlo en PDF.',
     confirmandoTitulo: 'Confirmando tu pago',
@@ -108,6 +111,9 @@ const COMPRA_TEXTOS = {
     codigoPon: 'Type your code',
     codigoAbrir: 'Enter',
     codigoMal: 'That code does not work. Check it or write to me.',
+    codigoProbando: 'Checking…',
+    codigoDormido: 'The server was asleep and is waking up. Wait a few seconds and press Enter again.',
+    codigoFalla: 'We could not reach the server. Please try again in a moment.',
     cortesiaTitulo: 'Courtesy access',
     cortesiaTexto: 'Your full report is open on this screen. You can read all of it and download the PDF.',
     confirmandoTitulo: 'Confirming your payment',
@@ -502,17 +508,35 @@ function compraGuardarPermiso(datos, referencia) {
   } catch (e) { /* si el navegador no deja guardar, al menos vale esta pantalla */ }
 }
 
-async function compraCanjear(codigo) {
-  const r = await fetch(compraServidor() + '/cortesia', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ codigo: codigo })
-  });
-  if (!r.ok) return false;
-  const datos = await r.json();
-  if (!datos || !datos.permiso) return false;
+// Devuelve 'bien', 'malo' (el servidor dijo que ese código no existe) o
+// 'sinservidor' (no se pudo llegar a preguntarle).
+//
+// Esta diferencia importa: en el plan gratuito de Render el servidor se
+// duerme a los 15 minutos, y el primer intento después de eso puede no
+// llegar. Antes, ese caso mostraba "Ese código no sirve", que es falso y
+// hace perder la tarde buscando un problema que no existe.
+async function compraCanjearDetalle(codigo) {
+  let r;
+  try {
+    r = await fetch(compraServidor() + '/cortesia', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ codigo: codigo })
+    });
+  } catch (e) {
+    return 'sinservidor';
+  }
+  if (r.status === 404) return 'malo';        // el servidor lo evaluó y no está
+  if (!r.ok) return 'sinservidor';            // 502, 503, 504: servidor caído o despertando
+  let datos = null;
+  try { datos = await r.json(); } catch (e) { return 'sinservidor'; }
+  if (!datos || !datos.permiso) return 'malo';
   compraGuardarPermiso(datos, 'cortesia');
-  return true;
+  return 'bien';
+}
+
+async function compraCanjear(codigo) {
+  return (await compraCanjearDetalle(codigo)) === 'bien';
 }
 
 // Al abrirse todo: quitar la cortina, ajustar los botones y dar aviso.
@@ -585,14 +609,32 @@ async function compraProbarCodigo() {
   if (!txt) return;
   const codigo = txt.value.trim();
   if (!codigo) return;
+  const t = COMPRA_TEXTOS[compraIdioma()];
   const viejo = caja.querySelector('.aviso');
   if (viejo) viejo.remove();
-  let bien = false;
-  try { bien = await compraCanjear(codigo); } catch (e) { bien = false; }
-  if (!bien) {
+
+  const boton = document.getElementById('compra-codigo-ok');
+  const etiqueta = boton ? boton.textContent : '';
+  if (boton) { boton.disabled = true; boton.textContent = t.codigoProbando; }
+
+  let resultado;
+  try { resultado = await compraCanjearDetalle(codigo); }
+  catch (e) { resultado = 'sinservidor'; }
+
+  // Si no se llegó al servidor, casi siempre es que estaba dormido y el
+  // intento lo despertó. Se reintenta solo una vez, pasados unos segundos.
+  if (resultado === 'sinservidor') {
+    await new Promise(function (listo) { setTimeout(listo, 6000); });
+    try { resultado = await compraCanjearDetalle(codigo); }
+    catch (e) { resultado = 'sinservidor'; }
+  }
+
+  if (boton) { boton.disabled = false; boton.textContent = etiqueta; }
+
+  if (resultado !== 'bien') {
     const aviso = document.createElement('span');
     aviso.className = 'aviso';
-    aviso.textContent = COMPRA_TEXTOS[compraIdioma()].codigoMal;
+    aviso.textContent = (resultado === 'malo') ? t.codigoMal : t.codigoDormido;
     caja.appendChild(aviso);
     return;
   }
