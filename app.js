@@ -39,20 +39,20 @@ const i18n = {
     loadingText: "Calculando con Swiss Ephemeris",
     resultTitle: "El mapa de tu vida", resultTitle2: "Tu carta natal completa, tus tránsitos actuales y la lectura profunda de tu cielo",
     planetNow: "Planeta en este momento",
-    labelPlanet: "Planeta", 
+    labelPlanet: "Tránsito",
     planetHouse: "Casa natal que está transitando",
-    aspectCount: "Aspectos exactos a tus planetas natales",
+    aspectCount: "Aspectos exactos a los puntos de tu carta natal",
     tabInterpret: "Tránsitos de los planetas lentos", tabLecturaRP: "Tu carta natal detallada", tabAspects: "Aspectos de los tránsitos", tabCalendar: "Tu calendario · 12 meses",
     tabChart: "Los datos de tu carta", tabSummary: "Tus áreas de vida activadas",
     aspectsTitle: "Aspectos exactos por tránsito",
     chartTitle: "Tu carta natal completa",
     chartWheelNatal: "Carta natal",
     chartWheelTransits: "tránsitos actuales",
-    legendNatal: "Planetas natales",
+    legendNatal: "Tu carta natal",
     legendTransit: "Tránsitos de hoy",
-    planetsTitle: "Planetas natales",
+    planetsTitle: "Los puntos de tu carta",
     housesTitle: "Casas y regentes",
-    natalAspectsTitle: "Aspectos entre tus planetas natales",
+    natalAspectsTitle: "Aspectos entre los puntos de tu carta natal",
     summaryTitle: "Sumario interpretativo por áreas",
     resetBtn: "← Otra carta",
     downloadPng: "Descargar imagen",
@@ -60,7 +60,7 @@ const i18n = {
     footerNote: "Cálculos realizados con Swiss Ephemeris · Validado contra Solar Fire v9.1.0 con precisión menor a 1 minuto de arco · Sistema Plácidus · Zodíaco tropical · Geocéntrico",
     direct: "Directo", retrograde: "Retrógrado", exact: "Exacto", active: "Activo", house: "Casa",
     statusOk: "Conectado", statusFail: "Sin conexión", statusChecking: "Verificando...",
-    th_planet: "Planeta", th_position: "Posición", th_house: "Casa", th_motion: "Estado", th_dignity: "Dignidad",
+    th_planet: "Punto", th_position: "Posición", th_house: "Casa", th_motion: "Estado", th_dignity: "Dignidad",
     th_house_n: "Casa", th_cusp: "Cúspide", th_ruler: "Regente", th_ruler_loc: "Regente está en",
     today: "hoy", tomorrow: "mañana", yesterday: "ayer", days_ago: "hace {n} días", in_days: "en {n} días",
     in_months: "en {n} meses", months_ago: "hace {n} meses",
@@ -81,20 +81,20 @@ const i18n = {
     loadingText: "Calculating with Swiss Ephemeris",
     resultTitle: "The map of your life", resultTitle2: "Your complete natal chart, your current transits, and the deep reading of your sky",
     planetNow: "Planet right now",
-    labelPlanet: "Planet", 
+    labelPlanet: "Transit",
     planetHouse: "Natal house being transited",
-    aspectCount: "Exact aspects to your natal planets",
+    aspectCount: "Exact aspects to the points of your natal chart",
     tabInterpret: "Transits of the slow planets", tabLecturaRP: "Your detailed natal chart", tabAspects: "Transit aspects", tabCalendar: "Your calendar · 12 months",
     tabChart: "Your chart data", tabSummary: "Your activated life areas",
     aspectsTitle: "Exact aspects by transit",
     chartTitle: "Your full natal chart",
     chartWheelNatal: "Natal chart",
     chartWheelTransits: "current transits",
-    legendNatal: "Natal planets",
+    legendNatal: "Your natal chart",
     legendTransit: "Today's transits",
-    planetsTitle: "Natal planets",
+    planetsTitle: "The points of your chart",
     housesTitle: "Houses and rulers",
-    natalAspectsTitle: "Aspects between your natal planets",
+    natalAspectsTitle: "Aspects between the points of your natal chart",
     summaryTitle: "Interpretive summary by life areas",
     resetBtn: "← New chart",
     downloadPng: "Download image",
@@ -102,7 +102,7 @@ const i18n = {
     footerNote: "Calculations powered by Swiss Ephemeris · Validated against Solar Fire v9.1.0 with sub-arcminute precision · Placidus system · Tropical zodiac · Geocentric",
     direct: "Direct", retrograde: "Retrograde", exact: "Exact", active: "Active", house: "House",
     statusOk: "Connected", statusFail: "Offline", statusChecking: "Checking...",
-    th_planet: "Planet", th_position: "Position", th_house: "House", th_motion: "Motion", th_dignity: "Dignity",
+    th_planet: "Point", th_position: "Position", th_house: "House", th_motion: "Motion", th_dignity: "Dignity",
     th_house_n: "House", th_cusp: "Cusp", th_ruler: "Ruler", th_ruler_loc: "Ruler is in",
     today: "today", tomorrow: "tomorrow", yesterday: "yesterday", days_ago: "{n} days ago", in_days: "in {n} days",
     in_months: "in {n} months", months_ago: "{n} months ago",
@@ -369,7 +369,7 @@ const transitArchetypes = {
     neptune: { word: "disolución",    phrase: "Neptuno disuelve, espiritualiza, conecta con lo sutil y lo invisible.", verb: "disolver" },
     pluto:   { word: "transformación", phrase: "Plutón transforma desde la raíz, pone en crisis y regenera con poder.", verb: "transformar" },
     chiron:  { word: "sanación",      phrase: "Quirón toca donde duele, y al tocarlo abre la puerta de lo que todavía puede curarse.", verb: "sanar" },
-    lilith:  { word: "revelación",    phrase: "Lilith revela la insatisfacción: indica el origen de lo que no te deja en paz, y saca a la luz lo que te apasiona y mantienes oculto.", verb: "identificar" }   
+    lilith:  { word: "insatisfacción", phrase: "Lilith señala insatisfacciones, dificultades y tristezas, pero también sirve para identificar aquello que te apasiona y aquello que te somete.", verb: "identificar" }   
   },
   en: {
     jupiter: { word: "expansion",     phrase: "Jupiter opens doors, magnifies what it touches, fills with faith and opportunity.", verb: "expanding" },
@@ -378,7 +378,7 @@ const transitArchetypes = {
     neptune: { word: "dissolution",   phrase: "Neptune dissolves, spiritualizes, connects with the subtle and invisible.", verb: "dissolving" },
     pluto:   { word: "transformation", phrase: "Pluto transforms from the root, throws into crisis and regenerates with power.", verb: "transforming" },
     chiron:  { word: "healing",       phrase: "Chiron touches where it hurts, and in touching it opens the door to what can still be healed.", verb: "healing" },
-    lilith:  { word: "revelation",    phrase: "Lilith reveals dissatisfaction: it points to the source of what won't leave you in peace, and brings to light what you're passionate about and keep hidden.", verb: "identifying" }
+    lilith:  { word: "dissatisfaction", phrase: "Lilith points to dissatisfactions, difficulties and sorrows, but it also serves to identify what you are passionate about and what keeps you subjugated.", verb: "identifying" }
   }
 };
 
@@ -1304,13 +1304,43 @@ function generateInterpretation(data, name, focusPlanet) {
   const planetName = PLANET_NAMES[lang][focusPlanet];
   const archetype = transitArchetypes[lang][focusPlanet];
 
+  // Ni Quirón ni Lilith son planetas. Quirón es un asteroide y Lilith es
+  // un punto calculado: el apogeo de la órbita de la Luna. Llamarlos
+  // «el planeta de…» era un error de fondo, no de estilo.
+  const CUERPO_DE = {
+    es: { chiron: 'el asteroide de la', lilith: 'el punto de la' },
+    en: { chiron: 'the asteroid of',    lilith: 'the point of' }
+  };
+  const tipoCuerpo = (CUERPO_DE[lang] || {})[focusPlanet]
+    || (lang === 'es' ? 'el planeta de la' : 'the planet of');
+
+  // Lilith no cabe en una sola palabra abstracta: no es «revelación»,
+  // que suena a revelar y no a rebeldía. Es el punto de las
+  // insatisfacciones, de las dificultades y las tristezas, y también de
+  // lo que nos apasiona y de lo que nos somete. Por eso lleva su propia
+  // frase en vez de la plantilla que sirve para los planetas.
+  const APOSICION = {
+    es: { lilith: 'el punto de las insatisfacciones y de lo que nos somete' },
+    en: { lilith: 'the point of dissatisfaction and of what keeps us subjugated' }
+  };
+  const CIERRE = {
+    es: { lilith: 'está quedando bajo la mirada de Lilith, que saca a la luz lo que llevabas tragando' },
+    en: { lilith: 'is coming under the gaze of Lilith, which brings to light what you had been swallowing' }
+  };
+  const aposicion = (APOSICION[lang] || {})[focusPlanet]
+    || `${tipoCuerpo} <em>${archetype.word}</em>`;
+  const cierre = (CIERRE[lang] || {})[focusPlanet]
+    || (lang === 'es'
+        ? `está recibiendo la ${archetype.word} de ${planetName} desde dentro`
+        : `is receiving ${planetName}'s ${archetype.word} from within`);
+
   let html = '';
 
   // LEAD
   if (lang === 'es') {
-    html += `<p class="lead">Hola${name ? ' ' + formatName(name) : ''}. <strong>${planetName}</strong>, el planeta de la <em>${archetype.word}</em>, está atravesando hoy <strong>${planetData.formatted}</strong>${planetData.retrograde ? ' (retrógrado)' : ''}, y sobre tu carta natal está activando tu <strong>Casa ${houseNum}&nbsp;— ${houseInfo.short}</strong>. Eso significa que durante este período, todo lo relacionado con ${houseInfo.full} está recibiendo la ${archetype.word} de ${planetName} desde dentro.</p>`;
+    html += `<p class="lead">Hola${name ? ' ' + formatName(name) : ''}. <strong>${planetName}</strong>, ${aposicion}, está atravesando hoy <strong>${planetData.formatted}</strong>${planetData.retrograde ? ' (retrógrado)' : ''}, y sobre tu carta natal está activando tu <strong>Casa ${houseNum}&nbsp;— ${houseInfo.short}</strong>. Eso significa que durante este período, todo lo relacionado con ${houseInfo.full} ${cierre}.</p>`;
   } else {
-    html += `<p class="lead">Hello${name ? ' ' + formatName(name) : ''}. <strong>${planetName}</strong>, the planet of <em>${archetype.word}</em>, is currently crossing <strong>${planetData.formatted}</strong>${planetData.retrograde ? ' (retrograde)' : ''}, and on your natal chart is activating your <strong>House ${houseNum}&nbsp;— ${houseInfo.short}</strong>. This means that during this period, everything related to ${houseInfo.full} is receiving ${planetName}'s ${archetype.word} from within.</p>`;
+    html += `<p class="lead">Hello${name ? ' ' + formatName(name) : ''}. <strong>${planetName}</strong>, ${aposicion}, is currently crossing <strong>${planetData.formatted}</strong>${planetData.retrograde ? ' (retrograde)' : ''}, and on your natal chart is activating your <strong>House ${houseNum}&nbsp;— ${houseInfo.short}</strong>. This means that during this period, everything related to ${houseInfo.full} ${cierre}.</p>`;
   }
 
   // ARCHETYPE
@@ -1339,16 +1369,16 @@ function generateInterpretation(data, name, focusPlanet) {
   // HOUSE
   html += `<h3>${lang === 'es' ? `En tu Casa ${houseNum} — ${houseInfo.short}` : `In your House ${houseNum} — ${houseInfo.short}`}</h3>`;
   if (lang === 'es') {
-    html += `<p>El área de ${houseInfo.full} es donde más se siente el trabajo de ${planetName} en este momento. Aquí es donde puedes notar los cambios más evidentes: experiencias nuevas, decisiones que se imponen, sensaciones que aparecen sin que las busques.</p>`;
+    html += `<p>El área de ${houseInfo.full} es donde más se siente la influencia de ${planetName} en este momento. Aquí es donde puedes notar los cambios más evidentes: experiencias nuevas, decisiones que se imponen, sensaciones que aparecen sin que las busques.</p>`;
   } else {
-    html += `<p>The area of ${houseInfo.full} is where ${planetName}'s work is most felt right now. Here you may notice the most evident changes: new experiences, decisions that impose themselves, feelings that arise unbidden.</p>`;
+    html += `<p>The area of ${houseInfo.full} is where ${planetName}'s influence is most felt right now. Here you may notice the most evident changes: new experiences, decisions that impose themselves, feelings that arise unbidden.</p>`;
   }
 
   // ASPECTS
   if (aspects.length > 0) {
     html += `<h3>${lang === 'es' ? 'Los aspectos a tus planetas natales' : 'Aspects to your natal planets'}</h3>`;
-    if (lang === 'es') html += `<p>${planetName} está formando aspectos exactos con ${aspects.length} planeta${aspects.length > 1 ? 's' : ''} de tu carta natal:</p>`;
-    else html += `<p>${planetName} is forming exact aspects with ${aspects.length} planet${aspects.length > 1 ? 's' : ''} of your natal chart:</p>`;
+    if (lang === 'es') html += `<p>${planetName} está formando aspectos exactos con ${aspects.length} punto${aspects.length > 1 ? 's' : ''} de tu carta natal:</p>`;
+    else html += `<p>${planetName} is forming exact aspects with ${aspects.length} point${aspects.length > 1 ? 's' : ''} of your natal chart:</p>`;
 
     aspects.forEach(asp => {
       const np = PLANET_NAMES[lang][asp.natal_planet];
@@ -1618,7 +1648,7 @@ function renderAspectsByTransit(data) {
     // === ASPECTOS A PLANETAS NATALES ===
     if (aspects.length > 0) {
       html += `<div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line);">
-        <div class="info-label" style="margin-bottom: 1rem;">${lang === 'es' ? `Aspectos exactos a tus planetas natales (${aspects.length})` : `Exact aspects to your natal planets (${aspects.length})`}</div>`;
+        <div class="info-label" style="margin-bottom: 1rem;">${lang === 'es' ? `Aspectos exactos a los puntos de tu carta natal (${aspects.length})` : `Exact aspects to the points of your natal chart (${aspects.length})`}</div>`;
 
       aspects.forEach((asp, idx) => {
         html += renderAspectCard(tp, asp, idx, lang);
@@ -1747,8 +1777,8 @@ function renderAspectCard(transitPlanet, asp, idx, lang) {
 
     // === Sección 2: Quiénes son los dos planetas (arquetipo + regencias) ===
     if (tProfile && nProfile) {
-      const labelTransit = lang === 'es' ? 'El planeta que transita' : 'The transiting planet';
-      const labelNatal = lang === 'es' ? 'El planeta natal afectado' : 'The natal planet affected';
+      const labelTransit = lang === 'es' ? 'El punto que transita' : 'The transiting point';
+      const labelNatal = lang === 'es' ? 'El punto natal afectado' : 'The natal point affected';
 
       html += `<div style="background: var(--surface-2); padding: 1rem 1.15rem; border-radius: 4px; margin-bottom: 1rem; font-size: 0.92rem; line-height: 1.6;">
         <p style="margin-bottom: 0.7rem;">
