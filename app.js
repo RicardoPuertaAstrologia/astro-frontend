@@ -1553,8 +1553,15 @@ function renderResult(data) {
   // Header
   document.getElementById('result-name-display').textContent =
     data.birth_data.name || (currentLang === 'es' ? 'Tu carta natal' : 'Your natal chart');
+  const _gm = (v, pos, neg, anchoGrados) => {
+    const a = Math.abs(v);
+    let g = Math.floor(a), m = Math.round((a - g) * 60);
+    if (m === 60) { m = 0; g += 1; }
+    return String(g).padStart(anchoGrados, '0') + '°' + (v >= 0 ? pos : neg) + String(m).padStart(2, '0') + "'";
+  };
   document.getElementById('result-meta').textContent =
-    `${data.birth_data.datetime} · ${data.birth_data.city.split(',')[0]} · ${data.birth_data.timezone}`;
+    `${data.birth_data.datetime} · ${data.birth_data.city.split(',')[0]} · ${data.birth_data.timezone} · ${_gm(data.birth_data.latitude, 'N', 'S', 2)} ${_gm(data.birth_data.longitude, 'E', currentLang === 'es' ? 'O' : 'W', 3)}`;
+
 
   // Transit selector pills
   const selector = document.getElementById('transit-selector');
