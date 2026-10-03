@@ -1196,6 +1196,9 @@ async function compraRevisarRegreso() {
   const id = params.get('id');
   if (!id) return;
 
+  // Si lo que se compró fue el astromapa, de esto se encarga compra-mapa.js.
+  if (window.mapaEsCompraDelMapa && window.mapaEsCompraDelMapa()) return;
+
   // Se limpia la dirección para que al recargar no se repita la verificación.
   history.replaceState({}, '', location.origin + location.pathname);
 
