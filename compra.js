@@ -284,15 +284,14 @@ async function renderCompra(contenedorId) {
           ${precio ? `<span class="compra-cop">${t.hoy} ${compraPesos(precio.cop)} COP · ${t.trm}</span>` : ''}
         </div>
         <button type="button" class="compra-btn" id="compra-abrir">${t.boton}</button>
-      </div>
-      <div class="compra-codigo" id="compra-codigo">
-        <a id="compra-codigo-abrir">${t.tengoCodigo}</a>
-        <div class="fila">
-          <input type="text" id="compra-codigo-txt" placeholder="${t.codigoPon}" autocomplete="off">
-          <button type="button" class="compra-btn" id="compra-codigo-ok">${t.codigoAbrir}</button>
+        <div class="compra-codigo" id="compra-codigo">
+          <a id="compra-codigo-abrir">${t.tengoCodigo}</a>
+          <div class="fila">
+            <input type="text" id="compra-codigo-txt" placeholder="${t.codigoPon}" autocomplete="off">
+            <button type="button" class="compra-btn" id="compra-codigo-ok">${t.codigoAbrir}</button>
+          </div>
         </div>
       </div>
-    </div>
   `;
   const abrirCodigo = document.getElementById('compra-codigo-abrir');
   if (abrirCodigo) {
