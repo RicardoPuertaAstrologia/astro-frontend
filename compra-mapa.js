@@ -77,7 +77,7 @@ const MAPA_TEXTOS = {
     noEnviado: 'No pude enviarte el correo, pero puedes descargarlo acá mismo. Si lo quieres por correo, escríbeme.',
     tengoCodigo: '¿Tienes un código de cortesía?',
     codigoPon: 'Escribe tu código',
-    codigoAbrir: 'Abrir',
+    codigoAbrir: 'Entrar',
     codigoProbando: 'Comprobando…',
     codigoMal: 'Ese código no sirve.',
     codigoDormido: 'No pude preguntarle al servidor. Puede que estuviera dormido: intenta otra vez.',
@@ -133,8 +133,8 @@ const MAPA_TEXTOS = {
     enviado: 'Done, I sent it to',
     noEnviado: 'I could not send the email, but you can download it right here. If you want it by email, write to me.',
     tengoCodigo: 'Do you have a courtesy code?',
-    codigoPon: 'Enter your code',
-    codigoAbrir: 'Open',
+    codigoPon: 'Type your code',
+    codigoAbrir: 'Enter',
     codigoProbando: 'Checking…',
     codigoMal: 'That code does not work.',
     codigoDormido: 'I could not reach the server. It may have been asleep: please try again.',
@@ -262,6 +262,16 @@ let MAPA_CORTESIA = '';          // qué abrió el último código canjeado
 
 
 /* ══════════════════════════════════════════════ LA TARJETA ══ */
+/* La tarjeta de compra es una REJILLA de dos columnas con áreas con
+   nombre: «rotulo», «titulo» y «lista» a la izquierda, «accion» —el
+   precio y el botón— a la derecha. Cualquier hijo que no tenga área se
+   coloca solo, en la siguiente fila que la rejilla invente.
+   Por eso todo lo que añadimos lleva ANCHO, que lo pone a ocupar la
+   fila entera. Sin esto, dos añadidos seguidos se repartían la fila
+   —uno a la izquierda, otro a la derecha— y la casilla del código
+   quedaba a la derecha, en vez de abajo a la izquierda como en la
+   tarjeta del informe. */
+const MAPA_ANCHO = ' style="grid-column:1 / -1"';
 /* Lo que haya pasado con la compra, para que la tarjeta lo sepa aunque la
    pantalla se repinte diez veces. */
 let MAPA_RECIEN = null;     // {correo, estado} justo después de pagar
@@ -308,9 +318,11 @@ function mapaPintarTarjeta(contenedorId) {
       '<div class="compra-caja">' +
         '<div class="compra-rotulo">' + t.rotulo + '</div>' +
         '<div class="compra-titulo">' + t.aprobadoTitulo + '</div>' +
-        '<p style="margin:.4rem 0 1rem">' + t.aprobadoTexto + '</p>' +
-        '<button type="button" class="compra-btn" id="mapa-bajar">' + t.descargar + '</button>' +
-        '<div class="estado" id="mapa-estado-correo" style="margin-top:.9rem;font-size:.88rem">' +
+        '<p style="grid-column:1 / -1;margin:.4rem 0 1rem">' + t.aprobadoTexto + '</p>' +
+        '<button type="button" class="compra-btn" id="mapa-bajar"' + MAPA_ANCHO + '>' +
+          t.descargar + '</button>' +
+        '<div class="estado" id="mapa-estado-correo" ' +
+          'style="grid-column:1 / -1;margin-top:.9rem;font-size:.88rem">' +
           mapaTextoDelCorreo() + '</div>' +
         mapaCajaRegalo() +
       '</div>';
@@ -326,9 +338,10 @@ function mapaPintarTarjeta(contenedorId) {
       '<div class="compra-caja">' +
         '<div class="compra-rotulo">' + t.rotulo + '</div>' +
         '<div class="compra-titulo">' + t.yaTienes + '</div>' +
-        '<p style="margin:.4rem 0 1rem">' +
+        '<p style="grid-column:1 / -1;margin:.4rem 0 1rem">' +
           (MAPA_CORTESIA === 'mapa' ? t.cortesiaMapa : t.yaTienesTexto) + '</p>' +
-        '<button type="button" class="compra-btn" id="mapa-bajar">' + t.descargar + '</button>' +
+        '<button type="button" class="compra-btn" id="mapa-bajar"' + MAPA_ANCHO + '>' +
+          t.descargar + '</button>' +
         mapaCajaRegalo() +
       '</div>';
     cont.appendChild(caja);
@@ -349,17 +362,11 @@ function mapaPintarTarjeta(contenedorId) {
         '</div>' +
         '<button type="button" class="compra-btn" id="mapa-comprar">' + t.boton + '</button>' +
       '</div>' +
-      // El enlace va discreto, como el de «¿Tienes un código de cortesía?»
-      // de la tarjeta del informe: no compite con el botón de comprar.
-      '<p style="margin:.9rem 0 0;font-size:.85rem">' +
-        '<a href="' + t.masInfoUrl + '" target="_blank" rel="noopener" ' +
-        'style="color:#5a5f67;text-decoration:underline;text-underline-offset:3px">' +
-        t.masInfo + '</a>' +
-      '</p>' +
       // Si acaba de canjear un código que resultó ser del informe, se le
       // dice acá mismo, para que no se quede pensando que no pasó nada.
       (MAPA_CORTESIA === 'informe'
-        ? '<p class="estado" style="margin:.7rem 0 0">' + t.cortesiaInforme + '</p>' : '') +
+        ? '<p class="estado" style="grid-column:1 / -1;margin:.7rem 0 0">' +
+            t.cortesiaInforme + '</p>' : '') +
       mapaCajaCodigo() +
     '</div>';
   cont.appendChild(caja);
@@ -387,6 +394,13 @@ function mapaCajaCodigo() {
   const t = mapaTextos();
   return '<div class="compra-codigo" id="mapa-codigo">' +
       '<a id="mapa-codigo-abrir">' + t.tengoCodigo + '</a>' +
+      // «¿Qué trae el astromapa?» va en el MISMO renglón, detrás del enlace
+      // de la cortesía. Así la frase de la cortesía queda en el mismo sitio
+      // exacto que en la tarjeta del informe, y las dos tarjetas miden igual.
+      // Va dentro de un <span> a propósito: la hoja de estilos esconde los
+      // <a> que cuelgan directamente de .compra-codigo cuando se abre.
+      '<span id="mapa-masinfo"> · <a href="' + t.masInfoUrl + '" ' +
+        'target="_blank" rel="noopener">' + t.masInfo + '</a></span>' +
       '<div class="fila">' +
         '<input type="text" id="mapa-codigo-txt" placeholder="' + t.codigoPon + '" autocomplete="off">' +
         '<button type="button" class="compra-btn" id="mapa-codigo-ok">' + t.codigoAbrir + '</button>' +
@@ -398,6 +412,8 @@ function mapaEngancharCodigo() {
   const abrir = document.getElementById('mapa-codigo-abrir');
   if (abrir) abrir.addEventListener('click', function () {
     document.getElementById('mapa-codigo').classList.add('abierto');
+    const otro = document.getElementById('mapa-masinfo');
+    if (otro) otro.style.display = 'none';
     setTimeout(function () {
       const c = document.getElementById('mapa-codigo-txt');
       if (c) c.focus();
@@ -456,7 +472,7 @@ async function mapaProbarCodigo() {
    que ya tiene el informe. */
 function mapaCajaRegalo() {
   const t = mapaTextos();
-  return '<div class="compra-regalo" id="mapa-regalo">' +
+  return '<div class="compra-regalo" id="mapa-regalo"' + MAPA_ANCHO + '>' +
       '<div class="estado">' + t.regalar + '</div>' +
       '<div class="fila">' +
         '<input type="email" class="correo" id="mapa-regalo-txt" placeholder="' +
