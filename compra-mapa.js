@@ -75,6 +75,20 @@ const MAPA_TEXTOS = {
     enviando: 'Enviándote el astromapa al correo…',
     enviado: 'Listo, te lo envié a',
     noEnviado: 'No pude enviarte el correo, pero puedes descargarlo acá mismo. Si lo quieres por correo, escríbeme.',
+    tengoCodigo: '¿Tienes un código de cortesía?',
+    codigoPon: 'Escribe tu código',
+    codigoAbrir: 'Abrir',
+    codigoProbando: 'Comprobando…',
+    codigoMal: 'Ese código no sirve.',
+    codigoDormido: 'No pude preguntarle al servidor. Puede que estuviera dormido: intenta otra vez.',
+    cortesiaMapa: 'Tu astromapa quedó abierto. Puedes descargarlo acá.',
+    cortesiaInforme: 'Ese código es del informe de la carta natal, no del astromapa. Te lo abrí arriba.',
+    regalar: 'Enviar este astromapa a un correo',
+    regalarPon: 'correo de la persona',
+    regalarBoton: 'Enviar el astromapa',
+    regalarYendo: 'Enviando…',
+    regalarListo: 'Enviado a',
+    regalarMal: 'No se pudo enviar. Revisa el correo e intenta otra vez.',
     yaTienes: 'Tu astromapa',
     yaTienesTexto: 'Ya está pago. Puedes descargarlo cuantas veces quieras durante las próximas horas.',
     sinServidor: 'No se pudo armar el astromapa. Vuelve a intentarlo en un momento.'
@@ -118,6 +132,20 @@ const MAPA_TEXTOS = {
     enviando: 'Sending your astromap by email…',
     enviado: 'Done, I sent it to',
     noEnviado: 'I could not send the email, but you can download it right here. If you want it by email, write to me.',
+    tengoCodigo: 'Do you have a courtesy code?',
+    codigoPon: 'Enter your code',
+    codigoAbrir: 'Open',
+    codigoProbando: 'Checking…',
+    codigoMal: 'That code does not work.',
+    codigoDormido: 'I could not reach the server. It may have been asleep: please try again.',
+    cortesiaMapa: 'Your astromap is open. You can download it here.',
+    cortesiaInforme: 'That code is for the birth chart report, not the astromap. I opened it for you above.',
+    regalar: 'Send this astromap to an email',
+    regalarPon: "the person's email",
+    regalarBoton: 'Send the astromap',
+    regalarYendo: 'Sending…',
+    regalarListo: 'Sent to',
+    regalarMal: 'It could not be sent. Check the address and try again.',
     yaTienes: 'Your astromap',
     yaTienesTexto: 'It is paid for. You can download it as many times as you like over the next few hours.',
     sinServidor: 'The astromap could not be built. Please try again in a moment.'
@@ -159,15 +187,78 @@ window.mapaEsCompraDelMapa = mapaEsCompraDelMapa;
 function mapaPermiso() {
   const m = mapaLeer(MAPA_PERMISO);
   if (m && m.permiso && m.vence > Date.now()) return m.permiso;
+  // Y si no, el de una cortesía ANTIGUA, de las que abrían todo. Se
+  // compara exacto, no por el principio: 'cortesia-informe' es de un
+  // código que abre sólo el informe y no debe valer para el mapa.
   const g = mapaLeer('rp_permiso');
   if (g && g.permiso && g.vence > Date.now() &&
-      String(g.referencia || '').toLowerCase().indexOf('cortesia') === 0) {
+      String(g.referencia || '').toLowerCase() === 'cortesia') {
     return g.permiso;
   }
   return '';
 }
 
 function mapaTienePermiso() { return !!mapaPermiso(); }
+
+
+/* ══════════════════════════════════ CÓDIGOS DE CORTESÍA ══ */
+/* Se reemplaza compraCanjearDetalle por una versión que mira QUÉ abre el
+   código. El servidor lo dice en la respuesta: 'todo', 'mapa' o
+   'informe'. Según eso se guarda el permiso en un sitio, en el otro, o
+   en los dos. compra.js sigue llamando a esta función igual que antes.  */
+let MAPA_CORTESIA = '';          // qué abrió el último código canjeado
+
+(function () {
+  function reemplazar() {
+    if (typeof window.compraCanjearDetalle !== 'function') return false;
+    if (window.compraCanjearDetalle.__conMapa) return true;
+
+    const nuevo = async function (codigo) {
+      let r;
+      try {
+        r = await fetch(compraServidor() + '/cortesia', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ codigo: codigo })
+        });
+      } catch (e) { return 'sinservidor'; }
+      if (r.status === 404) return 'malo';
+      if (!r.ok) return 'sinservidor';
+      let d = null;
+      try { d = await r.json(); } catch (e) { return 'sinservidor'; }
+      if (!d || !d.permiso) return 'malo';
+
+      // Si el servidor es viejo y no manda "producto", se entiende que
+      // el código abre todo, que es como funcionaba antes.
+      const producto = d.producto || 'todo';
+      MAPA_CORTESIA = producto;
+      const vence = Date.now() + ((d.horas || 6) * 3600 * 1000);
+      const guardar = function (clave, referencia) {
+        try {
+          sessionStorage.setItem(clave, JSON.stringify({
+            permiso: d.permiso, referencia: referencia, correo: '', vence: vence
+          }));
+        } catch (e) {}
+      };
+      // OJO: si el código es sólo del mapa NO se guarda el permiso del
+      // informe. Si se guardara, compra.js creería que el informe está
+      // abierto, quitaría la cortina de sus pestañas y la persona vería
+      // cuatro pestañas vacías: los textos los entrega el servidor, y el
+      // servidor no se los va a dar.
+      // La referencia distingue qué clase de cortesía es. Importa: un
+      // código SÓLO del informe no puede quedar marcado igual que uno
+      // que abre todo, o el mapa se creería abierto sin estarlo.
+      if (producto === 'todo') guardar('rp_permiso', 'cortesia');
+      if (producto === 'informe') guardar('rp_permiso', 'cortesia-informe');
+      if (producto === 'todo' || producto === 'mapa') guardar(MAPA_PERMISO, 'cortesia-mapa');
+      mapaAsegurarTarjeta();
+      return 'bien';
+    };
+    nuevo.__conMapa = true;
+    window.compraCanjearDetalle = nuevo;
+    return true;
+  }
+  if (!reemplazar()) window.addEventListener('DOMContentLoaded', reemplazar);
+})();
 
 
 /* ══════════════════════════════════════════════ LA TARJETA ══ */
@@ -189,7 +280,7 @@ function mapaAsegurarTarjeta() {
 
 function mapaEstadoAhora() {
   if (MAPA_RECIEN) return 'recien:' + (MAPA_RECIEN.estado || '');
-  return mapaTienePermiso() ? 'pago' : 'vender';
+  return (mapaTienePermiso() ? 'pago' : 'vender') + ':' + MAPA_CORTESIA;
 }
 
 function mapaPintarTarjeta(contenedorId) {
@@ -221,23 +312,28 @@ function mapaPintarTarjeta(contenedorId) {
         '<button type="button" class="compra-btn" id="mapa-bajar">' + t.descargar + '</button>' +
         '<div class="estado" id="mapa-estado-correo" style="margin-top:.9rem;font-size:.88rem">' +
           mapaTextoDelCorreo() + '</div>' +
+        mapaCajaRegalo() +
       '</div>';
     cont.appendChild(caja);
     document.getElementById('mapa-bajar').addEventListener('click', mapaDescargar);
+    mapaEngancharRegalo();
     return;
   }
 
-  // ── ya lo tiene de antes: sólo la descarga ──
+  // ── ya lo tiene de antes: la descarga y la casilla de regalo ──
   if (mapaTienePermiso()) {
     caja.innerHTML =
       '<div class="compra-caja">' +
         '<div class="compra-rotulo">' + t.rotulo + '</div>' +
         '<div class="compra-titulo">' + t.yaTienes + '</div>' +
-        '<p style="margin:.4rem 0 1rem">' + t.yaTienesTexto + '</p>' +
+        '<p style="margin:.4rem 0 1rem">' +
+          (MAPA_CORTESIA === 'mapa' ? t.cortesiaMapa : t.yaTienesTexto) + '</p>' +
         '<button type="button" class="compra-btn" id="mapa-bajar">' + t.descargar + '</button>' +
+        mapaCajaRegalo() +
       '</div>';
     cont.appendChild(caja);
     document.getElementById('mapa-bajar').addEventListener('click', mapaDescargar);
+    mapaEngancharRegalo();
     return;
   }
 
@@ -260,9 +356,15 @@ function mapaPintarTarjeta(contenedorId) {
         'style="color:#5a5f67;text-decoration:underline;text-underline-offset:3px">' +
         t.masInfo + '</a>' +
       '</p>' +
+      // Si acaba de canjear un código que resultó ser del informe, se le
+      // dice acá mismo, para que no se quede pensando que no pasó nada.
+      (MAPA_CORTESIA === 'informe'
+        ? '<p class="estado" style="margin:.7rem 0 0">' + t.cortesiaInforme + '</p>' : '') +
+      mapaCajaCodigo() +
     '</div>';
   cont.appendChild(caja);
   document.getElementById('mapa-comprar').addEventListener('click', mapaAbrirVentana);
+  mapaEngancharCodigo();
 
   // El precio en pesos se pide aparte: si el servidor no contesta, la
   // tarjeta ya está pintada y sólo se queda sin esa línea.
@@ -276,6 +378,133 @@ function mapaPintarTarjeta(contenedorId) {
       if (linea) linea.textContent = t.hoy + ' ' + compraPesos(p.cop) + ' COP · ' + t.trm;
     })
     .catch(function () {});
+}
+
+/* La casilla de «¿Tienes un código de cortesía?», igual que la de la
+   tarjeta del informe. Antes sólo estaba allá, y desde acá no había
+   manera de canjear un código del astromapa. */
+function mapaCajaCodigo() {
+  const t = mapaTextos();
+  return '<div class="compra-codigo" id="mapa-codigo">' +
+      '<a id="mapa-codigo-abrir">' + t.tengoCodigo + '</a>' +
+      '<div class="fila">' +
+        '<input type="text" id="mapa-codigo-txt" placeholder="' + t.codigoPon + '" autocomplete="off">' +
+        '<button type="button" class="compra-btn" id="mapa-codigo-ok">' + t.codigoAbrir + '</button>' +
+      '</div>' +
+    '</div>';
+}
+
+function mapaEngancharCodigo() {
+  const abrir = document.getElementById('mapa-codigo-abrir');
+  if (abrir) abrir.addEventListener('click', function () {
+    document.getElementById('mapa-codigo').classList.add('abierto');
+    setTimeout(function () {
+      const c = document.getElementById('mapa-codigo-txt');
+      if (c) c.focus();
+    }, 40);
+  });
+  const ok = document.getElementById('mapa-codigo-ok');
+  if (ok) ok.addEventListener('click', mapaProbarCodigo);
+  const txt = document.getElementById('mapa-codigo-txt');
+  if (txt) txt.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); mapaProbarCodigo(); }
+  });
+}
+
+async function mapaProbarCodigo() {
+  const caja = document.getElementById('mapa-codigo');
+  const txt = document.getElementById('mapa-codigo-txt');
+  if (!txt) return;
+  const codigo = txt.value.trim();
+  if (!codigo) return;
+  const t = mapaTextos();
+  const viejo = caja.querySelector('.aviso');
+  if (viejo) viejo.remove();
+
+  const boton = document.getElementById('mapa-codigo-ok');
+  const etiqueta = boton ? boton.textContent : '';
+  if (boton) { boton.disabled = true; boton.textContent = t.codigoProbando; }
+
+  let resultado;
+  try { resultado = await compraCanjearDetalle(codigo); }
+  catch (e) { resultado = 'sinservidor'; }
+  // El servidor de Render se duerme a los quince minutos y el primer
+  // intento después de eso puede no llegar. Se reintenta una vez.
+  if (resultado === 'sinservidor') {
+    await new Promise(function (listo) { setTimeout(listo, 6000); });
+    try { resultado = await compraCanjearDetalle(codigo); }
+    catch (e) { resultado = 'sinservidor'; }
+  }
+  if (boton) { boton.disabled = false; boton.textContent = etiqueta; }
+
+  if (resultado !== 'bien') {
+    const aviso = document.createElement('span');
+    aviso.className = 'aviso';
+    aviso.textContent = (resultado === 'malo') ? t.codigoMal : t.codigoDormido;
+    caja.appendChild(aviso);
+    return;
+  }
+  // Si el código resultó ser del informe, se le abre el informe y se le
+  // dice: no se le deja con la sensación de que no pasó nada.
+  if (MAPA_CORTESIA !== 'mapa' && typeof compraAbrirTodo === 'function') {
+    compraAbrirTodo(true);
+  }
+  mapaAsegurarTarjeta();
+}
+
+/* «Enviar este astromapa a un correo», la gemela de la casilla de regalo
+   que ya tiene el informe. */
+function mapaCajaRegalo() {
+  const t = mapaTextos();
+  return '<div class="compra-regalo" id="mapa-regalo">' +
+      '<div class="estado">' + t.regalar + '</div>' +
+      '<div class="fila">' +
+        '<input type="email" class="correo" id="mapa-regalo-txt" placeholder="' +
+          t.regalarPon + '" autocomplete="off">' +
+        '<button type="button" class="compra-btn" id="mapa-regalo-ok">' +
+          t.regalarBoton + '</button>' +
+      '</div><div class="estado resultado" id="mapa-regalo-res"></div>' +
+    '</div>';
+}
+
+function mapaEngancharRegalo() {
+  const boton = document.getElementById('mapa-regalo-ok');
+  const campo = document.getElementById('mapa-regalo-txt');
+  if (!boton || !campo) return;
+  const res = document.getElementById('mapa-regalo-res');
+  const t = mapaTextos();
+
+  async function mandar() {
+    const destino = campo.value.trim();
+    let nacimiento = compraNacimiento();
+    if (!nacimiento) {
+      const g = mapaLeer('rp_compra');
+      if (g && g.nacimiento) nacimiento = g.nacimiento;
+    }
+    if (destino.indexOf('@') < 0 || !nacimiento) { res.textContent = t.regalarMal; return; }
+    boton.disabled = true;
+    res.textContent = t.regalarYendo;
+    try {
+      const r = await fetch(compraServidor() + '/mapa/enviar', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          permiso: mapaPermiso(), correo: destino,
+          lang: compraIdioma(), nacimiento: nacimiento
+        })
+      });
+      const datos = await r.json();
+      res.textContent = (r.ok && datos.enviado)
+        ? (t.regalarListo + ' ' + destino) : t.regalarMal;
+    } catch (e) {
+      res.textContent = t.regalarMal;
+    } finally {
+      boton.disabled = false;
+    }
+  }
+  boton.addEventListener('click', mandar);
+  campo.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); mandar(); }
+  });
 }
 
 function mapaTextoDelCorreo() {
