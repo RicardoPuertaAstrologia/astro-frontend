@@ -292,6 +292,7 @@ async function renderCompra(contenedorId) {
           </div>
         </div>
       </div>
+    </div>
   `;
   const abrirCodigo = document.getElementById('compra-codigo-abrir');
   if (abrirCodigo) {
