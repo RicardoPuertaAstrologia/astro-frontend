@@ -361,13 +361,19 @@ function mapaPintarTarjeta(contenedorId) {
           '<span class="compra-cop" id="mapa-cop"></span>' +
         '</div>' +
         '<button type="button" class="compra-btn" id="mapa-comprar">' + t.boton + '</button>' +
+        // La casilla de la cortesía va DENTRO de la columna del precio, justo
+        // debajo del botón de comprar, igual que en la tarjeta del informe.
+        mapaCajaCodigo() +
       '</div>' +
       // Si acaba de canjear un código que resultó ser del informe, se le
       // dice acá mismo, para que no se quede pensando que no pasó nada.
       (MAPA_CORTESIA === 'informe'
         ? '<p class="estado" style="grid-column:1 / -1;margin:.7rem 0 0">' +
             t.cortesiaInforme + '</p>' : '') +
-      mapaCajaCodigo() +
+      '<p style="grid-column:1 / -1;margin:1rem 0 0;font-size:.84rem">' +
+        '<a href="' + t.masInfoUrl + '" target="_blank" rel="noopener" ' +
+        'style="color:#5a5f67;text-decoration:underline;text-underline-offset:3px">' +
+        t.masInfo + '</a></p>' +
     '</div>';
   cont.appendChild(caja);
   document.getElementById('mapa-comprar').addEventListener('click', mapaAbrirVentana);
@@ -394,13 +400,6 @@ function mapaCajaCodigo() {
   const t = mapaTextos();
   return '<div class="compra-codigo" id="mapa-codigo">' +
       '<a id="mapa-codigo-abrir">' + t.tengoCodigo + '</a>' +
-      // «¿Qué trae el astromapa?» va en el MISMO renglón, detrás del enlace
-      // de la cortesía. Así la frase de la cortesía queda en el mismo sitio
-      // exacto que en la tarjeta del informe, y las dos tarjetas miden igual.
-      // Va dentro de un <span> a propósito: la hoja de estilos esconde los
-      // <a> que cuelgan directamente de .compra-codigo cuando se abre.
-      '<span id="mapa-masinfo"> · <a href="' + t.masInfoUrl + '" ' +
-        'target="_blank" rel="noopener">' + t.masInfo + '</a></span>' +
       '<div class="fila">' +
         '<input type="text" id="mapa-codigo-txt" placeholder="' + t.codigoPon + '" autocomplete="off">' +
         '<button type="button" class="compra-btn" id="mapa-codigo-ok">' + t.codigoAbrir + '</button>' +
@@ -412,8 +411,6 @@ function mapaEngancharCodigo() {
   const abrir = document.getElementById('mapa-codigo-abrir');
   if (abrir) abrir.addEventListener('click', function () {
     document.getElementById('mapa-codigo').classList.add('abierto');
-    const otro = document.getElementById('mapa-masinfo');
-    if (otro) otro.style.display = 'none';
     setTimeout(function () {
       const c = document.getElementById('mapa-codigo-txt');
       if (c) c.focus();
