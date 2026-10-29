@@ -1,0 +1,63 @@
+name: Verificar sintaxis de JavaScript
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Verificar sintaxis de archivos JavaScript
+        run: |
+          echo "Revisando sintaxis de archivos JavaScript..."
+          error=0
+          for archivo in $(find . -name "*.js" -not -path "./node_modules/*" -not -path "./.vercel/*"); do
+            if ! node --check "$archivo" 2>&1; then
+              echo "ERROR de sintaxis en: $archivo"
+              error=1
+            fi
+          done
+          if [ $error -eq 1 ]; then
+            echo "La verificacion encontro errores. El despliegue NO deberia continuar."
+            exit 1
+          fi
+          echo "Todos los archivos JavaScript tienen sintaxis valida."
+
+      - name: Verificar sintaxis de archivos HTML
+        run: |
+          echo "Revisando que los archivos HTML existan y sean legibles..."
+          for archivo in $(find . -name "*.html" -not -path "./node_modules/*" -not -path "./.vercel/*"); do
+            if [ ! -r "$archivo" ]; then
+              echo "ERROR: no se puede leer el archivo $archivo"
+              exit 1
+            fi
+            echo "OK: $archivo"
+          done
+          echo "Todos los archivos HTML son accesibles."
+
+      - name: Verificar sintaxis de archivos JSON
+        run: |
+          echo "Revisando sintaxis de archivos JSON..."
+          error=0
+          for archivo in $(find . -name "*.json" -not -path "./node_modules/*" -not -path "./.vercel/*"); do
+            if ! node -e "JSON.parse(require('fs').readFileSync('$archivo', 'utf8'))" 2>&1; then
+              echo "ERROR de sintaxis en: $archivo"
+              error=1
+            fi
+          done
+          if [ $error -eq 1 ]; then
+            echo "La verificacion encontro errores. El despliegue NO deberia continuar."
+            exit 1
+          fi
+          echo "Todos los archivos JSON tienen sintaxis valida."
