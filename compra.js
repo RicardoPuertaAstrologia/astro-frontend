@@ -66,6 +66,8 @@ const COMPRA_TEXTOS = {
     regalarYendo: 'Armando el informe y enviándolo...',
     regalarListo: 'Listo: el informe salió hacia',
     regalarMal: 'No se pudo enviar. Revisa el correo e inténtalo otra vez.',
+    errorCartaCambiadaTitulo: 'Carta distinta a la de tu acceso',
+    errorCartaCambiada: 'Este acceso corresponde a otra carta natal: ya se usó para la primera que generaste. Para generar o descargar una carta distinta necesitas un nuevo pago o un código de cortesía distinto.',
     enviando: 'Preparando tu informe y enviándolo a tu correo…',
     enviado: 'Listo: tu informe salió hacia',
     noEnviado: 'No pudimos enviarlo al correo. Escríbeme y te lo mando yo mismo: ricardopuerta@ricardopuerta.com',
@@ -126,6 +128,8 @@ const COMPRA_TEXTOS = {
     regalarYendo: 'Building the report and sending it...',
     regalarListo: 'Done: the report is on its way to',
     regalarMal: 'It could not be sent. Check the address and try again.',
+    errorCartaCambiadaTitulo: 'Different chart from the one in your access',
+    errorCartaCambiada: 'This access corresponds to a different birth chart: it was used for the first one you generated. To generate or download another chart you need a new payment or a different courtesy code.',
     enviando: 'Preparing your report and sending it to your inbox…',
     enviado: 'Done: your report is on its way to',
     noEnviado: 'We could not send the email. Write to me and I will send it myself: ricardopuerta@ricardopuerta.com',
@@ -696,10 +700,15 @@ function compraBotonRegalo(donde) {
           secciones: compraSecciones()
         })
       });
-      const datos = await r.json();
-      resultado.textContent = (r.ok && datos.enviado)
-        ? (t.regalarListo + ' ' + destino)
-        : t.regalarMal;
+      const datos = await r.json().catch(function () { return {}; });
+      if (r.ok && datos.enviado) {
+        resultado.textContent = t.regalarListo + ' ' + destino;
+      } else if (compraEsErrorDeCartaCambiada(r.status, datos)) {
+        // El servidor rechazó porque el permiso es de otra carta.
+        resultado.textContent = t.errorCartaCambiada;
+      } else {
+        resultado.textContent = t.regalarMal;
+      }
     } catch (e) {
       resultado.textContent = t.regalarMal;
     } finally {
@@ -771,6 +780,22 @@ function compraAviso(tipo, titulo, texto, extra) {
   return d;
 }
 
+// Detecta el caso específico de «este permiso corresponde a otra carta»,
+// que el backend devuelve con status 400 y un detalle que menciona
+// explícitamente otra carta, otra persona u otro astromapa. Sirve para
+// mostrarle a la persona un mensaje claro en vez del genérico «no se
+// pudo enviar».
+function compraEsErrorDeCartaCambiada(status, datos) {
+  if (status !== 400 || !datos || !datos.detail) return false;
+  const d = String(datos.detail).toLowerCase();
+  return d.indexOf('otra carta') >= 0
+      || d.indexOf('otra persona') >= 0
+      || d.indexOf('otro astromapa') >= 0
+      || d.indexOf('otro informe') >= 0;
+}
+window.compraEsErrorDeCartaCambiada = compraEsErrorDeCartaCambiada;
+
+
 // Imprime TODO (la versión completa), no solo el gráfico y los datos.
 async function compraDescargarCompleto(evento) {
   const boton = evento && evento.currentTarget ? evento.currentTarget : null;
@@ -800,7 +825,18 @@ async function compraDescargarCompleto(evento) {
         secciones: compraSecciones()
       })
     });
-    if (!r.ok) throw new Error('el servidor respondió ' + r.status);
+    if (!r.ok) {
+      // Si el backend rechaza porque el permiso es de otra carta, no se
+      // cae al window.print() silencioso: se muestra un aviso claro.
+      let datosErr = null;
+      try { datosErr = await r.clone().json(); } catch (eJson) {}
+      if (compraEsErrorDeCartaCambiada(r.status, datosErr)) {
+        if (boton) { boton.disabled = false; boton.textContent = etiquetaOriginal; }
+        compraAviso('mal', t.errorCartaCambiadaTitulo, t.errorCartaCambiada);
+        return;
+      }
+      throw new Error('el servidor respondió ' + r.status);
+    }
     const archivo = await r.blob();
     const enlace = document.createElement('a');
     enlace.href = URL.createObjectURL(archivo);
