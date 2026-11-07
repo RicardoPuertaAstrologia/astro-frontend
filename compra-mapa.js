@@ -89,6 +89,8 @@ const MAPA_TEXTOS = {
     regalarYendo: 'Enviando…',
     regalarListo: 'Enviado a',
     regalarMal: 'No se pudo enviar. Revisa el correo e intenta otra vez.',
+    errorCartaCambiadaTitulo: 'Astromapa distinto al de tu acceso',
+    errorCartaCambiada: 'Este acceso corresponde a otro astromapa: ya se usó para el primero que generaste. Para generar o descargar uno distinto necesitas un nuevo pago o un código de cortesía distinto.',
     yaTienes: 'Tu astromapa',
     yaTienesTexto: 'Ya está pago. Puedes descargarlo cuantas veces quieras durante las próximas horas.',
     sinServidor: 'No se pudo armar el astromapa. Vuelve a intentarlo en un momento.'
@@ -146,6 +148,8 @@ const MAPA_TEXTOS = {
     regalarYendo: 'Sending…',
     regalarListo: 'Sent to',
     regalarMal: 'It could not be sent. Check the address and try again.',
+    errorCartaCambiadaTitulo: 'Different astromap from the one in your access',
+    errorCartaCambiada: 'This access corresponds to a different astromap: it was used for the first one you generated. To generate or download a different one you need a new payment or a different courtesy code.',
     yaTienes: 'Your astromap',
     yaTienesTexto: 'It is paid for. You can download it as many times as you like over the next few hours.',
     sinServidor: 'The astromap could not be built. Please try again in a moment.'
@@ -505,9 +509,15 @@ function mapaEngancharRegalo() {
           lang: compraIdioma(), nacimiento: nacimiento
         })
       });
-      const datos = await r.json();
-      res.textContent = (r.ok && datos.enviado)
-        ? (t.regalarListo + ' ' + destino) : t.regalarMal;
+      const datos = await r.json().catch(function () { return {}; });
+      if (r.ok && datos.enviado) {
+        res.textContent = t.regalarListo + ' ' + destino;
+      } else if (typeof window.compraEsErrorDeCartaCambiada === 'function' &&
+                 window.compraEsErrorDeCartaCambiada(r.status, datos)) {
+        res.textContent = t.errorCartaCambiada;
+      } else {
+        res.textContent = t.regalarMal;
+      }
     } catch (e) {
       res.textContent = t.regalarMal;
     } finally {
@@ -769,7 +779,23 @@ async function mapaDescargar(evento) {
         permiso: permiso, lang: compraIdioma(), nacimiento: nacimiento
       })
     });
-    if (!r.ok) throw new Error('el servidor respondió ' + r.status);
+    if (!r.ok) {
+      // Si el backend rechaza por amarre a otro astromapa, no se cae al
+      // fallback silencioso: se le dice a la persona.
+      let datosErr = null;
+      try { datosErr = await r.clone().json(); } catch (eJson) {}
+      if (typeof window.compraEsErrorDeCartaCambiada === 'function' &&
+          window.compraEsErrorDeCartaCambiada(r.status, datosErr)) {
+        if (boton) { boton.disabled = false; boton.textContent = etiqueta; }
+        if (typeof compraAviso === 'function') {
+          compraAviso('mal', t.errorCartaCambiadaTitulo, t.errorCartaCambiada);
+        } else {
+          alert(t.errorCartaCambiada);
+        }
+        return;
+      }
+      throw new Error('el servidor respondió ' + r.status);
+    }
     const archivo = await r.blob();
     const enlace = document.createElement('a');
     enlace.href = URL.createObjectURL(archivo);
