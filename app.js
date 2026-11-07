@@ -2367,6 +2367,37 @@ async function cargarLecturaRP() {
     });
 
     if (!res.ok) {
+      // Caso especial: el backend rechaza porque el permiso corresponde a
+      // otra carta (brecha del amarre cerrada en pagos.py). En lugar del
+      // "HTTP 400" técnico, se muestra un mensaje claro al usuario.
+      let detalleErr = null;
+      try {
+        const errData = await res.clone().json();
+        detalleErr = errData && errData.detail;
+      } catch (eJson) {}
+
+      const d = String(detalleErr || '').toLowerCase();
+      const esCartaCambiada = res.status === 400 && (
+        d.indexOf('otra carta') >= 0 ||
+        d.indexOf('otra persona') >= 0 ||
+        d.indexOf('otro astromapa') >= 0 ||
+        d.indexOf('otro informe') >= 0
+      );
+
+      if (esCartaCambiada) {
+        const titulo = lang === 'es'
+          ? 'Carta distinta a la de tu acceso'
+          : 'Different chart from the one in your access';
+        const texto = lang === 'es'
+          ? 'Este acceso corresponde a otra carta natal: ya se usó para la primera que generaste. Para leer la lectura detallada de una carta distinta necesitas un nuevo pago o un código de cortesía distinto.'
+          : 'This access corresponds to a different birth chart: it was used for the first one you generated. To read the detailed reading of another chart you need a new payment or a different courtesy code.';
+        container.innerHTML = `
+          <div style="text-align:center; padding: 3rem 2rem; max-width: 42rem; margin: 0 auto;">
+            <h3 style="color: var(--error); font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; margin-bottom: 1rem;">${titulo}</h3>
+            <p style="color: var(--ink); line-height: 1.7;">${texto}</p>
+          </div>`;
+        return;
+      }
       throw new Error(`HTTP ${res.status}`);
     }
 
